@@ -1,0 +1,119 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>20_parser_thresholds_and_reprocessing_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-parser-confidence-thresholds-and-reprocessing-policy-mvp">Jobarium Parser Confidence Thresholds and Reprocessing Policy (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define:
+1. confidence thresholds and user-confirmation rules (item 20),
+2. parser reprocessing policy when parser version changes (item 21).</p>
+<h2 id="confidence-thresholds-mvp-defaults">Confidence Thresholds (MVP Defaults)</h2>
+<h3 id="threshold-bands">Threshold Bands</h3>
+<ul>
+<li><code>high</code> &gt;= 0.85</li>
+<li><code>medium</code> 0.60-0.84</li>
+<li><code>low</code> &lt; 0.60</li>
+</ul>
+<h2 id="field-handling-rules">Field Handling Rules</h2>
+<h3 id="required-matchability-fields">Required Matchability Fields</h3>
+<ul>
+<li>Fields:<ul>
+<li>primary role/title</li>
+<li>work authorization</li>
+<li>location/radius or remote preference</li>
+<li>pay expectation</li>
+<li>start availability</li>
+</ul>
+</li>
+<li>Rule:<ul>
+<li>never auto-finalize from parser alone.</li>
+<li>must be user-confirmed at least once.</li>
+</ul>
+</li>
+</ul>
+<h3 id="non-required-enrichment-fields">Non-Required Enrichment Fields</h3>
+<ul>
+<li>Fields:<ul>
+<li>additional skills</li>
+<li>certifications</li>
+<li>portfolio links</li>
+<li>work history bullets</li>
+</ul>
+</li>
+<li>Rule:<ul>
+<li><code>high</code>: auto-apply allowed if field not user-locked.</li>
+<li><code>medium</code>: apply as suggestion; user confirmation recommended.</li>
+<li><code>low</code>: do not auto-apply; explicit user review required.</li>
+</ul>
+</li>
+</ul>
+<h3 id="locked-field-rule">Locked Field Rule</h3>
+<ul>
+<li>If <code>locked_by_user=true</code>, parser cannot overwrite regardless of confidence.</li>
+</ul>
+<h2 id="ux-confirmation-requirements">UX Confirmation Requirements</h2>
+<ul>
+<li>Show confidence tag per parsed field (<code>high|medium|low</code>).</li>
+<li>Highlight low-confidence fields in "Needs review."</li>
+<li>Provide one-click accept/edit for medium/low suggested values.</li>
+</ul>
+<h2 id="parser-versioning">Parser Versioning</h2>
+<ul>
+<li>Parser version format: <code>parser_v{major}.{minor}.{patch}</code>.</li>
+<li>Store <code>parser_version</code> on:<ul>
+<li>parse job</li>
+<li>parse result</li>
+<li>candidate field provenance records</li>
+</ul>
+</li>
+</ul>
+<h2 id="reprocessing-policy">Reprocessing Policy</h2>
+<h3 id="reprocess-triggers">Reprocess Triggers</h3>
+<ol>
+<li>major parser version upgrade,</li>
+<li>extraction bug fix for critical fields,</li>
+<li>taxonomy normalization changes impacting matching quality.</li>
+</ol>
+<h3 id="reprocess-scope">Reprocess Scope</h3>
+<ul>
+<li>Priority 1:<ul>
+<li>active candidates updated in last 90 days.</li>
+</ul>
+</li>
+<li>Priority 2:<ul>
+<li>candidates with open invites/active jobs.</li>
+</ul>
+</li>
+<li>Priority 3:<ul>
+<li>remaining backlog in batches.</li>
+</ul>
+</li>
+</ul>
+<h3 id="reprocess-safety-rules">Reprocess Safety Rules</h3>
+<ul>
+<li>Never overwrite user-locked fields.</li>
+<li>Preserve prior parse results for audit and diff.</li>
+<li>Emit reprocess event with old/new parser version metadata.</li>
+</ul>
+<h2 id="operational-limits">Operational Limits</h2>
+<ul>
+<li>Batch size: tune to keep pipeline under target latency.</li>
+<li>Concurrency caps by tenant to avoid noisy-neighbor impact.</li>
+<li>Pause/retry controls if parse failure rate spikes.</li>
+</ul>
+<h2 id="acceptance-criteria">Acceptance Criteria</h2>
+<ul>
+<li>Threshold behavior is deterministic and testable.</li>
+<li>Required fields always require user confirmation.</li>
+<li>Reprocessing runs without corrupting user-confirmed data.</li>
+<li>Audit trail captures parser version transitions and field changes.</li>
+</ul></div></div></body></html>

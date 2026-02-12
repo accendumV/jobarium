@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>05_end_to_end_golden_flow.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-end-to-end-golden-flow-mvp">Jobarium End-to-End Golden Flow (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define the canonical system flow connecting candidate actions, employer actions, and platform automation.</p>
+<h2 id="golden-flow-sequence">Golden Flow Sequence</h2>
+<ol>
+<li>Candidate signs up and uploads CV.</li>
+<li>CV parser extracts profile data; candidate confirms critical fields.</li>
+<li>Employer creates job, requirements, and question kit; enables automation.</li>
+<li>Matching pipeline evaluates candidate-job fit.</li>
+<li>Candidate enters shortlist; platform creates and sends invite.</li>
+<li>Candidate accepts invite and submits asynchronous Q&amp;A.</li>
+<li>Packet builder generates summary + transcript packet.</li>
+<li>Employer reviews packet and takes action.</li>
+<li>Outcome signals feed ranking improvements and analytics.</li>
+</ol>
+<h2 id="event-aligned-flow">Event-Aligned Flow</h2>
+<ol>
+<li><code>candidate.document.uploaded</code></li>
+<li><code>candidate.document.parsed</code></li>
+<li><code>profile.updated</code></li>
+<li><code>job.updated</code></li>
+<li><code>matching.shortlist.changed</code></li>
+<li><code>invite.created</code></li>
+<li><code>qa.submitted</code></li>
+<li><code>packet.ready</code></li>
+<li><code>packet.action.recorded</code> (recommended new event)</li>
+</ol>
+<h2 id="data-hand-offs-by-stage">Data Hand-offs by Stage</h2>
+<h3 id="candidate-onboarding-profile">Candidate Onboarding -&gt; Profile</h3>
+<ul>
+<li>input: resume file, core preferences</li>
+<li>output: normalized candidate profile + embeddings</li>
+</ul>
+<h3 id="employer-setup-matchable-job">Employer Setup -&gt; Matchable Job</h3>
+<ul>
+<li>input: structured requirements + question kit</li>
+<li>output: normalized job profile + embeddings</li>
+</ul>
+<h3 id="match-and-invite-candidate-engagement">Match and Invite -&gt; Candidate Engagement</h3>
+<ul>
+<li>input: shortlist diffs + invite policy</li>
+<li>output: active invite state + delivery status</li>
+</ul>
+<h3 id="qa-packet">Q&amp;A -&gt; Packet</h3>
+<ul>
+<li>input: candidate answers + role context</li>
+<li>output: packet summary, evidence snippets, transcript</li>
+</ul>
+<h3 id="employer-decision-learning-loop">Employer Decision -&gt; Learning Loop</h3>
+<ul>
+<li>input: interview/clarify/reject action</li>
+<li>output: analytics counters + ranking feedback features</li>
+</ul>
+<h2 id="ux-guardrails-across-the-flow">UX Guardrails Across the Flow</h2>
+<ul>
+<li>Always show users why they are seeing this step.</li>
+<li>Keep each step short and reversible where possible.</li>
+<li>Never block core flow on non-critical enrichments.</li>
+<li>Preserve trust with explicit consent and clear automation rules.</li>
+</ul>
+<h2 id="operational-slo-targets-initial">Operational SLO Targets (Initial)</h2>
+<ul>
+<li>CV parse p95 &lt; 3 minutes</li>
+<li>Match refresh after major profile/job update p95 &lt; 10 minutes</li>
+<li>Invite dispatch p95 &lt; 2 minutes after shortlist entry</li>
+<li>Packet generation p95 &lt; 90 seconds after Q&amp;A submit</li>
+</ul>
+<h2 id="mvp-risks-in-this-flow">MVP Risks in This Flow</h2>
+<ul>
+<li>Parser quality variance can reduce first impression.</li>
+<li>Overly strict employer filters can produce low packet volume.</li>
+<li>Overly loose filters can produce low-quality packets.</li>
+</ul>
+<h2 id="mitigations">Mitigations</h2>
+<ul>
+<li>Confidence-based field confirmation in onboarding.</li>
+<li>Requirement quality checks in job setup wizard.</li>
+<li>Alerting on jobs with zero packet output after defined window.</li>
+</ul>
+<h2 id="definition-of-flow-is-working">Definition of "Flow Is Working"</h2>
+<ul>
+<li>Candidate receives relevant invite without manual applying.</li>
+<li>Employer receives completed packet without sourcing manually.</li>
+<li>Employer can make a decision in one review pass.</li>
+</ul></div></div></body></html>

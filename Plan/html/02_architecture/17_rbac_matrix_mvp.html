@@ -1,0 +1,411 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>17_rbac_matrix_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-rbac-matrix-mvp">Jobarium RBAC Matrix (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define role-based access control at endpoint/action level for MVP services.</p>
+<p>This is the authoritative policy for:
+- who can read/write which resources,
+- cross-tenant isolation,
+- admin-only operations,
+- support-safe access patterns.</p>
+<h2 id="roles">Roles</h2>
+<ul>
+<li><code>candidate</code></li>
+<li><code>employer_admin</code></li>
+<li><code>hiring_manager</code></li>
+<li><code>platform_admin</code></li>
+</ul>
+<h2 id="global-rbac-rules">Global RBAC Rules</h2>
+<ol>
+<li>Deny-by-default for all endpoints/actions.</li>
+<li>Tenant isolation is mandatory:
+   - employer users can access only their organization records.
+   - candidates can access only their own records.</li>
+<li><code>platform_admin</code> can access cross-tenant operational data but must be audit-logged.</li>
+<li>Sensitive actions require explicit scope check + audit event.</li>
+</ol>
+<h2 id="resource-access-matrix">Resource Access Matrix</h2>
+<h3 id="identity-and-profile">Identity and Profile</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View own user profile</td>
+<td>Allow (self)</td>
+<td>Allow (self)</td>
+<td>Allow (self)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Update own user profile</td>
+<td>Allow (self)</td>
+<td>Allow (self)</td>
+<td>Allow (self)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View candidate profile</td>
+<td>Allow (self)</td>
+<td>Allow (org scoped via packet)</td>
+<td>Allow (org scoped via packet)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Update candidate profile</td>
+<td>Allow (self)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow (support-only)</td>
+</tr>
+<tr>
+<td>Upload candidate document</td>
+<td>Allow (self)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow (support-only)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="organization-and-team">Organization and Team</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create organization</td>
+<td>Deny</td>
+<td>Allow</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View organization settings</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org, read-only)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Update organization settings</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Manage org members</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="jobs-and-templates">Jobs and Templates</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Create/edit job</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org, if granted)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Activate/pause/close job</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org, if granted)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View job in employer portal</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View job as candidate (public/invited)</td>
+<td>Allow (eligible scope)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Manage role templates (org templates)</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org, if granted)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Manage platform default templates</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="matching-and-invitations">Matching and Invitations</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View shortlist candidates</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Allow (own org jobs)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Trigger manual invite</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Allow (own org jobs, if granted)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Configure invite policy</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Deny (unless explicit permission)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View invite status (candidate)</td>
+<td>Allow (self)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View invite status (employer)</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Allow (own org jobs)</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="qa-and-packet-workflow">Q&amp;A and Packet Workflow</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start/submit Q&amp;A session</td>
+<td>Allow (self invite only)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow (support replay only)</td>
+</tr>
+<tr>
+<td>View own Q&amp;A answers</td>
+<td>Allow (self)</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View packet summary/transcript</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Allow (own org jobs)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Take packet action (interview/clarify/reject)</td>
+<td>Deny</td>
+<td>Allow (own org jobs)</td>
+<td>Allow (own org jobs)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View authenticity reason codes</td>
+<td>Deny</td>
+<td>Allow (own org packets)</td>
+<td>Allow (own org packets)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Override authenticity label</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow (with audit reason required)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="billing-and-analytics">Billing and Analytics</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View org billing status</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org, read-only)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Manage subscription/payment config</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View employer analytics dashboard</td>
+<td>Deny</td>
+<td>Allow (own org)</td>
+<td>Allow (own org)</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>View platform-wide analytics</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="adminops-functions">Admin/Ops Functions</h3>
+<table>
+<thead>
+<tr>
+<th>Resource / Action</th>
+<th>candidate</th>
+<th>employer_admin</th>
+<th>hiring_manager</th>
+<th>platform_admin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>View failed jobs/DLQ</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Replay failed event/job</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Process GDPR request</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+<tr>
+<td>Access audit logs</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Deny</td>
+<td>Allow</td>
+</tr>
+</tbody>
+</table>
+<h2 id="api-authorization-requirements">API Authorization Requirements</h2>
+<ul>
+<li>Every API route must declare:<ul>
+<li>required role(s),</li>
+<li>tenant scoping rule,</li>
+<li>sensitive action audit requirement.</li>
+</ul>
+</li>
+<li>Service-to-service operations must use workload identity and scoped service accounts.</li>
+</ul>
+<h2 id="sensitive-operations-requiring-explicit-audit-reason">Sensitive Operations Requiring Explicit Audit Reason</h2>
+<ul>
+<li>authenticity override</li>
+<li>manual packet state correction</li>
+<li>GDPR delete execution</li>
+<li>cross-tenant read by <code>platform_admin</code></li>
+<li>billing plan manual adjustments</li>
+</ul>
+<h2 id="mvp-implementation-notes">MVP Implementation Notes</h2>
+<ul>
+<li>Keep permissions model simple:<ul>
+<li>role + organization scope + resource ownership check.</li>
+</ul>
+</li>
+<li>Optional phase 1.5:<ul>
+<li>granular permission flags for <code>hiring_manager</code> actions.</li>
+</ul>
+</li>
+</ul>
+<h2 id="test-checklist">Test Checklist</h2>
+<ol>
+<li>Unauthorized role receives <code>403</code> for protected endpoints.</li>
+<li>Cross-tenant access attempts are blocked.</li>
+<li>Support/admin actions generate audit entries.</li>
+<li>Candidate cannot access other candidates' data.</li>
+<li>Hiring manager limitations enforced as configured.</li>
+</ol></div></div></body></html>

@@ -1,0 +1,160 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>19_audit_logging_and_retention_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-audit-logging-and-retention-policy-mvp">Jobarium Audit Logging and Retention Policy (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define what must be audit-logged, who can access logs, and how long logs are retained.</p>
+<p>This policy supports:
+- security accountability,
+- GDPR obligations,
+- incident investigation,
+- dispute handling (including authenticity disputes).</p>
+<h2 id="scope">Scope</h2>
+<ul>
+<li>User actions (candidate/employer/admin)</li>
+<li>System actions affecting workflow state</li>
+<li>Security-relevant events</li>
+<li>GDPR request processing lifecycle</li>
+</ul>
+<h2 id="audit-log-event-schema-minimum">Audit Log Event Schema (Minimum)</h2>
+<ul>
+<li><code>audit_id</code> (uuid)</li>
+<li><code>timestamp</code> (ISO-8601 UTC)</li>
+<li><code>actor_type</code> (<code>user|service</code>)</li>
+<li><code>actor_id</code> (user id or service account id)</li>
+<li><code>actor_role</code> (if user)</li>
+<li><code>tenant_id</code> (nullable for platform-wide ops)</li>
+<li><code>action</code> (verb)</li>
+<li><code>object_type</code></li>
+<li><code>object_id</code></li>
+<li><code>result</code> (<code>success|failure</code>)</li>
+<li><code>reason</code> (required for sensitive overrides/manual admin actions)</li>
+<li><code>source_ip</code> (if user-triggered)</li>
+<li><code>metadata_json</code> (non-PII by default)</li>
+</ul>
+<h2 id="what-must-be-logged-p0">What Must Be Logged (P0)</h2>
+<h3 id="authentication-and-access">Authentication and Access</h3>
+<ul>
+<li>login success/failure</li>
+<li>session revoke/expire</li>
+<li>password reset and auth method changes</li>
+<li>authorization denials for protected endpoints</li>
+</ul>
+<h3 id="candidateemployer-critical-actions">Candidate/Employer Critical Actions</h3>
+<ul>
+<li>job activate/pause/close</li>
+<li>invite policy changes</li>
+<li>manual invite actions</li>
+<li>packet action decisions (interview/clarify/reject)</li>
+<li>Q&amp;A submission event linkage</li>
+</ul>
+<h3 id="adminops-actions">Admin/Ops Actions</h3>
+<ul>
+<li>DLQ replay execution</li>
+<li>manual state override actions</li>
+<li>authenticity label override/review decision</li>
+<li>cross-tenant data access by <code>platform_admin</code></li>
+<li>billing manual adjustments</li>
+</ul>
+<h3 id="privacycompliance">Privacy/Compliance</h3>
+<ul>
+<li>consent accepted/revoked</li>
+<li>GDPR export request received/completed</li>
+<li>GDPR delete/anonymize request received/completed</li>
+<li>retention job execution outcomes</li>
+</ul>
+<h2 id="access-control-for-audit-logs">Access Control for Audit Logs</h2>
+<ul>
+<li>Read access:<ul>
+<li><code>platform_admin</code> only (default).</li>
+</ul>
+</li>
+<li>Write access:<ul>
+<li>application services through centralized logging pipeline only.</li>
+</ul>
+</li>
+<li>No direct mutation/deletion of historical audit records by application roles.</li>
+</ul>
+<h2 id="retention-policy-mvp-defaults">Retention Policy (MVP Defaults)</h2>
+<h3 id="retention-by-category">Retention by Category</h3>
+<ul>
+<li>Security/auth events: 365 days</li>
+<li>Core workflow actions (job/invite/packet decisions): 365 days</li>
+<li>Admin override actions: 730 days</li>
+<li>GDPR processing records: 730 days</li>
+<li>Telemetry-derived authenticity raw aggregates: 90 days</li>
+<li>Final authenticity assessment records: 365 days</li>
+</ul>
+<h3 id="deletionarchive-rules">Deletion/Archive Rules</h3>
+<ul>
+<li>On retention expiry:<ul>
+<li>move to archive tier if needed for legal hold,</li>
+<li>otherwise delete permanently.</li>
+</ul>
+</li>
+<li>Legal hold flag prevents deletion while active.</li>
+</ul>
+<h2 id="data-minimization-rules">Data Minimization Rules</h2>
+<ul>
+<li>Do not store raw secrets/tokens in audit metadata.</li>
+<li>Avoid full answer text in audit logs; store references/IDs.</li>
+<li>Mask contact data in logs where feasible.</li>
+</ul>
+<h2 id="integrity-and-tamper-resistance">Integrity and Tamper Resistance</h2>
+<ul>
+<li>Audit stream should be append-only.</li>
+<li>Enable immutable retention control where supported.</li>
+<li>Log pipeline failures must raise alerts.</li>
+</ul>
+<h2 id="operational-monitoring">Operational Monitoring</h2>
+<ul>
+<li>Alert on:<ul>
+<li>missing audit events for critical actions,</li>
+<li>audit pipeline ingestion failures,</li>
+<li>unusual spikes in <code>platform_admin</code> cross-tenant reads.</li>
+</ul>
+</li>
+<li>Weekly review:<ul>
+<li>sensitive admin action report,</li>
+<li>failed authorization trends.</li>
+</ul>
+</li>
+</ul>
+<h2 id="gdpr-interaction-rules">GDPR Interaction Rules</h2>
+<ul>
+<li>Audit entries about GDPR actions are retained as compliance evidence.</li>
+<li>For data deletion requests:<ul>
+<li>user content is deleted/anonymized per policy,</li>
+<li>audit records keep minimal, lawful evidence fields.</li>
+</ul>
+</li>
+</ul>
+<h2 id="implementation-responsibilities">Implementation Responsibilities</h2>
+<ul>
+<li>CTO:<ul>
+<li>enforce technical controls and retention jobs.</li>
+</ul>
+</li>
+<li>CEO:<ul>
+<li>approve policy exceptions and legal-hold decisions.</li>
+</ul>
+</li>
+</ul>
+<h2 id="validation-checklist">Validation Checklist</h2>
+<ul>
+<li>[ ] All P0 actions mapped to audit events.</li>
+<li>[ ] RBAC enforced for audit log access.</li>
+<li>[ ] Retention jobs tested in staging.</li>
+<li>[ ] GDPR workflow and audit linkage verified.</li>
+<li>[ ] Alerting on audit pipeline failure configured.</li>
+</ul></div></div></body></html>

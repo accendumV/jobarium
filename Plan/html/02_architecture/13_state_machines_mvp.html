@@ -1,0 +1,416 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>13_state_machines_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-lifecycle-state-machines-mvp">Jobarium Lifecycle State Machines (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define explicit lifecycle state machines for core workflow entities:
+- <code>job_posting</code>
+- <code>invite</code>
+- <code>qa_session</code>
+- <code>candidate_packet</code></p>
+<p>This document is implementation-facing and intended to remove ambiguity in backend and UI behavior.</p>
+<h2 id="global-rules">Global Rules</h2>
+<ul>
+<li>State transitions are append-only in audit history.</li>
+<li>Invalid transitions must be rejected and logged.</li>
+<li>Every successful transition updates <code>updated_at</code>.</li>
+<li>Transition side effects must be idempotent.</li>
+<li>Async handlers must use idempotency keys.</li>
+</ul>
+<h2 id="1-job-posting-state-machine">1) Job Posting State Machine</h2>
+<h3 id="states">States</h3>
+<ul>
+<li><code>draft</code></li>
+<li><code>active</code></li>
+<li><code>paused</code></li>
+<li><code>closed</code></li>
+<li><code>archived</code></li>
+</ul>
+<h3 id="transition-table">Transition Table</h3>
+<table>
+<thead>
+<tr>
+<th>Current State</th>
+<th>Event</th>
+<th>Guard Conditions</th>
+<th>Next State</th>
+<th>Side Effects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>draft</code></td>
+<td><code>job.activate</code></td>
+<td>required fields + question kit valid</td>
+<td><code>active</code></td>
+<td>emit <code>job.updated</code>; schedule matching refresh</td>
+</tr>
+<tr>
+<td><code>draft</code></td>
+<td><code>job.archive</code></td>
+<td>none</td>
+<td><code>archived</code></td>
+<td>emit <code>job.updated</code></td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td><code>job.pause</code></td>
+<td>none</td>
+<td><code>paused</code></td>
+<td>emit <code>job.updated</code>; stop new invites</td>
+</tr>
+<tr>
+<td><code>active</code></td>
+<td><code>job.close</code></td>
+<td>none</td>
+<td><code>closed</code></td>
+<td>emit <code>job.updated</code>; expire open invites</td>
+</tr>
+<tr>
+<td><code>paused</code></td>
+<td><code>job.resume</code></td>
+<td>role still valid</td>
+<td><code>active</code></td>
+<td>emit <code>job.updated</code>; matching refresh</td>
+</tr>
+<tr>
+<td><code>paused</code></td>
+<td><code>job.close</code></td>
+<td>none</td>
+<td><code>closed</code></td>
+<td>emit <code>job.updated</code></td>
+</tr>
+<tr>
+<td><code>closed</code></td>
+<td><code>job.reopen</code></td>
+<td>role still valid</td>
+<td><code>active</code></td>
+<td>emit <code>job.updated</code>; matching refresh</td>
+</tr>
+<tr>
+<td><code>closed</code></td>
+<td><code>job.archive</code></td>
+<td>none</td>
+<td><code>archived</code></td>
+<td>emit <code>job.updated</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="invalid-transition-examples">Invalid Transition Examples</h3>
+<ul>
+<li><code>archived -&gt; active</code></li>
+<li><code>draft -&gt; closed</code> (use <code>active</code> then <code>closed</code> for traceable lifecycle)</li>
+</ul>
+<h2 id="2-invite-state-machine">2) Invite State Machine</h2>
+<h3 id="states_1">States</h3>
+<ul>
+<li><code>queued</code></li>
+<li><code>sent</code></li>
+<li><code>opened</code></li>
+<li><code>started</code></li>
+<li><code>submitted</code></li>
+<li><code>expired</code></li>
+<li><code>cancelled</code></li>
+<li><code>failed</code></li>
+</ul>
+<h3 id="transition-table_1">Transition Table</h3>
+<table>
+<thead>
+<tr>
+<th>Current State</th>
+<th>Event</th>
+<th>Guard Conditions</th>
+<th>Next State</th>
+<th>Side Effects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>queued</code></td>
+<td><code>invite.dispatch_success</code></td>
+<td>provider ack received</td>
+<td><code>sent</code></td>
+<td>emit <code>invite.created</code>; persist provider metadata</td>
+</tr>
+<tr>
+<td><code>queued</code></td>
+<td><code>invite.dispatch_failed</code></td>
+<td>retries remaining</td>
+<td><code>queued</code></td>
+<td>retry with backoff</td>
+</tr>
+<tr>
+<td><code>queued</code></td>
+<td><code>invite.dispatch_failed_final</code></td>
+<td>retries exhausted</td>
+<td><code>failed</code></td>
+<td>emit <code>invite.failed</code>; alert ops if threshold reached</td>
+</tr>
+<tr>
+<td><code>sent</code></td>
+<td><code>invite.opened</code></td>
+<td>tracking event received</td>
+<td><code>opened</code></td>
+<td>analytics increment</td>
+</tr>
+<tr>
+<td><code>sent</code></td>
+<td><code>invite.start</code></td>
+<td>candidate opts in</td>
+<td><code>started</code></td>
+<td>create <code>qa_session</code></td>
+</tr>
+<tr>
+<td><code>opened</code></td>
+<td><code>invite.start</code></td>
+<td>candidate opts in</td>
+<td><code>started</code></td>
+<td>create <code>qa_session</code></td>
+</tr>
+<tr>
+<td><code>sent</code></td>
+<td><code>invite.expire</code></td>
+<td>now &gt; <code>expires_at</code></td>
+<td><code>expired</code></td>
+<td>emit <code>invite.expired</code></td>
+</tr>
+<tr>
+<td><code>opened</code></td>
+<td><code>invite.expire</code></td>
+<td>now &gt; <code>expires_at</code> and not started</td>
+<td><code>expired</code></td>
+<td>emit <code>invite.expired</code></td>
+</tr>
+<tr>
+<td><code>started</code></td>
+<td><code>qa.submitted</code></td>
+<td>linked session submitted</td>
+<td><code>submitted</code></td>
+<td>emit <code>invite.completed</code></td>
+</tr>
+<tr>
+<td><code>queued</code>/<code>sent</code>/<code>opened</code></td>
+<td><code>invite.cancel</code></td>
+<td>job closed/cancelled/admin action</td>
+<td><code>cancelled</code></td>
+<td>emit <code>invite.cancelled</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="notes">Notes</h3>
+<ul>
+<li><code>started</code> invite cannot transition to <code>expired</code>; once session started, expiry is governed by <code>qa_session</code>.</li>
+<li>Cooldown logic is external to state machine and enforced before creating <code>queued</code>.</li>
+</ul>
+<h2 id="3-qa-session-state-machine">3) QA Session State Machine</h2>
+<h3 id="states_2">States</h3>
+<ul>
+<li><code>created</code></li>
+<li><code>in_progress</code></li>
+<li><code>submitted</code></li>
+<li><code>expired</code></li>
+<li><code>abandoned</code></li>
+</ul>
+<h3 id="transition-table_2">Transition Table</h3>
+<table>
+<thead>
+<tr>
+<th>Current State</th>
+<th>Event</th>
+<th>Guard Conditions</th>
+<th>Next State</th>
+<th>Side Effects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>created</code></td>
+<td><code>qa.start</code></td>
+<td>invite valid</td>
+<td><code>in_progress</code></td>
+<td>record <code>started_at</code>; emit <code>qa.started</code></td>
+</tr>
+<tr>
+<td><code>in_progress</code></td>
+<td><code>qa.autosave</code></td>
+<td>payload valid</td>
+<td><code>in_progress</code></td>
+<td>persist delta; update heartbeat</td>
+</tr>
+<tr>
+<td><code>in_progress</code></td>
+<td><code>qa.submit</code></td>
+<td>all required answers valid</td>
+<td><code>submitted</code></td>
+<td>emit <code>qa.submitted</code>; trigger authenticity assessment + packet build</td>
+</tr>
+<tr>
+<td><code>created</code></td>
+<td><code>qa.expire</code></td>
+<td>invite/session ttl exceeded</td>
+<td><code>expired</code></td>
+<td>emit <code>qa.expired</code></td>
+</tr>
+<tr>
+<td><code>in_progress</code></td>
+<td><code>qa.expire</code></td>
+<td>ttl exceeded and not submitted</td>
+<td><code>expired</code></td>
+<td>emit <code>qa.expired</code></td>
+</tr>
+<tr>
+<td><code>in_progress</code></td>
+<td><code>qa.abandon</code></td>
+<td>inactivity threshold exceeded</td>
+<td><code>abandoned</code></td>
+<td>emit <code>qa.abandoned</code>; optional reminder</td>
+</tr>
+<tr>
+<td><code>abandoned</code></td>
+<td><code>qa.resume</code></td>
+<td>still before ttl</td>
+<td><code>in_progress</code></td>
+<td>emit <code>qa.resumed</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="validation-rules">Validation Rules</h3>
+<ul>
+<li><code>submitted</code> is terminal.</li>
+<li>Submission after <code>expired</code> is rejected.</li>
+<li>Required answers must pass type validation.</li>
+</ul>
+<h2 id="4-candidate-packet-state-machine">4) Candidate Packet State Machine</h2>
+<h3 id="states_3">States</h3>
+<ul>
+<li><code>building</code></li>
+<li><code>ready</code></li>
+<li><code>reviewed</code></li>
+<li><code>actioned</code></li>
+<li><code>superseded</code></li>
+<li><code>failed</code></li>
+</ul>
+<h3 id="transition-table_3">Transition Table</h3>
+<table>
+<thead>
+<tr>
+<th>Current State</th>
+<th>Event</th>
+<th>Guard Conditions</th>
+<th>Next State</th>
+<th>Side Effects</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>building</code></td>
+<td><code>packet.build_success</code></td>
+<td>summary + transcript available</td>
+<td><code>ready</code></td>
+<td>emit <code>packet.ready</code>; notify employer</td>
+</tr>
+<tr>
+<td><code>building</code></td>
+<td><code>packet.build_failed</code></td>
+<td>retries remaining</td>
+<td><code>building</code></td>
+<td>retry build job</td>
+</tr>
+<tr>
+<td><code>building</code></td>
+<td><code>packet.build_failed_final</code></td>
+<td>retries exhausted</td>
+<td><code>failed</code></td>
+<td>emit <code>packet.failed</code>; alert ops</td>
+</tr>
+<tr>
+<td><code>ready</code></td>
+<td><code>packet.viewed</code></td>
+<td>employer authorized</td>
+<td><code>reviewed</code></td>
+<td>analytics increment</td>
+</tr>
+<tr>
+<td><code>reviewed</code></td>
+<td><code>packet.action.interview</code></td>
+<td>action valid</td>
+<td><code>actioned</code></td>
+<td>persist <code>packet_action</code>; notify candidate</td>
+</tr>
+<tr>
+<td><code>reviewed</code></td>
+<td><code>packet.action.clarify</code></td>
+<td>action valid</td>
+<td><code>actioned</code></td>
+<td>persist <code>packet_action</code>; notify candidate</td>
+</tr>
+<tr>
+<td><code>reviewed</code></td>
+<td><code>packet.action.reject</code></td>
+<td>action valid</td>
+<td><code>actioned</code></td>
+<td>persist <code>packet_action</code>; notify candidate</td>
+</tr>
+<tr>
+<td><code>ready</code></td>
+<td><code>packet.supersede</code></td>
+<td>newer valid packet exists</td>
+<td><code>superseded</code></td>
+<td>link <code>superseded_by_packet_id</code></td>
+</tr>
+<tr>
+<td><code>reviewed</code></td>
+<td><code>packet.supersede</code></td>
+<td>newer valid packet exists</td>
+<td><code>superseded</code></td>
+<td>link relationship</td>
+</tr>
+</tbody>
+</table>
+<h3 id="notes_1">Notes</h3>
+<ul>
+<li><code>actioned</code> is terminal for MVP.</li>
+<li>Superseding is for re-screen scenarios where policy allows a fresh Q&amp;A.</li>
+</ul>
+<h2 id="cross-entity-invariants">Cross-Entity Invariants</h2>
+<ol>
+<li>A <code>qa_session</code> cannot exist without an <code>invite</code>.</li>
+<li>A <code>candidate_packet</code> cannot become <code>ready</code> unless linked <code>qa_session</code> is <code>submitted</code>.</li>
+<li>Closing a job must cancel or expire all non-terminal invites.</li>
+<li>Only one active <code>ready/reviewed/actioned</code> packet per candidate-job pair unless explicitly superseded policy is enabled.</li>
+</ol>
+<h2 id="api-and-ui-implementation-requirements">API and UI Implementation Requirements</h2>
+<ul>
+<li>Backend must expose transition errors using stable codes:<ul>
+<li><code>INVALID_STATE_TRANSITION</code></li>
+<li><code>GUARD_CONDITION_FAILED</code></li>
+<li><code>ENTITY_TERMINAL_STATE</code></li>
+</ul>
+</li>
+<li>UI must map each terminal state to explicit user-facing messages.</li>
+<li>Admin tools must allow replay only for failed async operations, not manual forced transitions bypassing guards.</li>
+</ul>
+<h2 id="telemetry-requirements">Telemetry Requirements</h2>
+<ul>
+<li>Emit transition metric: <code>state_transition_total{entity,from,to,event}</code>.</li>
+<li>Emit invalid transition metric: <code>state_transition_invalid_total{entity,event}</code>.</li>
+<li>Track transition latency for async paths (invite dispatch, packet build).</li>
+</ul>
+<h2 id="versioning">Versioning</h2>
+<ul>
+<li>State machine version: <code>v1</code>.</li>
+<li>Any breaking transition change requires:
+  1. decision log entry,
+  2. migration note,
+  3. backward compatibility plan for in-flight entities.</li>
+</ul></div></div></body></html>

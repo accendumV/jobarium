@@ -1,0 +1,387 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>14_event_contracts_registry.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-event-contracts-registry-mvp-v1">Jobarium Event Contracts Registry (MVP, v1)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define versioned event contracts for all asynchronous workflows so producers and consumers can evolve safely.</p>
+<p>This registry is the source of truth for:
+- payload schemas,
+- producer/consumer ownership,
+- idempotency and ordering assumptions,
+- compatibility and versioning policy.</p>
+<h2 id="global-envelope-applies-to-all-events">Global Envelope (applies to all events)</h2>
+<h3 id="required-envelope-fields">Required Envelope Fields</h3>
+<ul>
+<li><code>event_id</code> (string, UUID)</li>
+<li><code>event_name</code> (string)</li>
+<li><code>event_version</code> (string, e.g. <code>v1</code>)</li>
+<li><code>occurred_at</code> (string, ISO-8601 UTC)</li>
+<li><code>producer</code> (string, service name)</li>
+<li><code>trace_id</code> (string)</li>
+<li><code>idempotency_key</code> (string)</li>
+</ul>
+<h3 id="optional-envelope-fields">Optional Envelope Fields</h3>
+<ul>
+<li><code>tenant_id</code> (string)</li>
+<li><code>correlation_id</code> (string)</li>
+<li><code>schema_ref</code> (string)</li>
+</ul>
+<h3 id="delivery-model">Delivery Model</h3>
+<ul>
+<li>Pub/Sub at-least-once delivery.</li>
+<li>Consumers must be idempotent.</li>
+<li>Out-of-order delivery is possible; consumers must validate entity timestamps/state.</li>
+</ul>
+<h2 id="versioning-policy">Versioning Policy</h2>
+<ul>
+<li>Additive non-breaking change (new optional field): remain on same version.</li>
+<li>Breaking change (required field change/removal/type change): create new version.</li>
+<li>Each new major version requires:
+  1. decision log entry,
+  2. migration plan,
+  3. deprecation timeline for old version.</li>
+</ul>
+<h2 id="contract-template">Contract Template</h2>
+<p>For each event:
+- Name + version
+- Producer
+- Consumers
+- Trigger
+- Required payload fields
+- Optional payload fields
+- Idempotency key rule
+- Ordering assumptions
+- Retry/DLQ notes</p>
+<hr />
+<h2 id="e-01-profileupdated-v1">E-01 <code>profile.updated</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>candidate-profile-service</code></li>
+<li>Consumers: <code>matching-service</code>, <code>enrichment-service</code>, <code>analytics-service</code></li>
+<li>Trigger: candidate profile create/update confirmed</li>
+<li>Required payload:<ul>
+<li><code>candidate_id</code> (string)</li>
+<li><code>profile_version</code> (integer)</li>
+<li><code>changed_fields</code> (array[string])</li>
+<li><code>updated_at</code> (ISO string)</li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>source</code> (<code>manual</code> | <code>import</code> | <code>parser</code>)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>profile.updated:{candidate_id}:{profile_version}</code></li>
+</ul>
+</li>
+<li>Ordering:<ul>
+<li>process latest <code>profile_version</code>; ignore stale</li>
+</ul>
+</li>
+</ul>
+<h2 id="e-02-jobupdated-v1">E-02 <code>job.updated</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>job-service</code></li>
+<li>Consumers: <code>matching-service</code>, <code>analytics-service</code></li>
+<li>Trigger: job create/update/activation/pause/close</li>
+<li>Required payload:<ul>
+<li><code>job_id</code></li>
+<li><code>job_version</code> (integer)</li>
+<li><code>status</code> (<code>draft|active|paused|closed|archived</code>)</li>
+<li><code>updated_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>changed_fields</code> (array[string])</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>job.updated:{job_id}:{job_version}</code></li>
+</ul>
+</li>
+<li>Ordering:<ul>
+<li>apply only if <code>job_version</code> is newer</li>
+</ul>
+</li>
+</ul>
+<h2 id="e-03-candidatedocumentuploaded-v1">E-03 <code>candidate.document.uploaded</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>candidate-document-service</code></li>
+<li>Consumers: <code>parser-service</code>, <code>security-scan-service</code></li>
+<li>Trigger: resume upload finalized</li>
+<li>Required payload:<ul>
+<li><code>candidate_id</code></li>
+<li><code>document_id</code></li>
+<li><code>storage_uri</code></li>
+<li><code>mime_type</code></li>
+<li><code>uploaded_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>source</code> (<code>web</code> | <code>mobile</code>)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>candidate.document.uploaded:{document_id}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-04-candidatedocumentparsed-v1">E-04 <code>candidate.document.parsed</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>parser-service</code></li>
+<li>Consumers: <code>enrichment-service</code>, <code>candidate-profile-service</code>, <code>analytics-service</code></li>
+<li>Trigger: parse completed (success path)</li>
+<li>Required payload:<ul>
+<li><code>candidate_id</code></li>
+<li><code>document_id</code></li>
+<li><code>parse_job_id</code></li>
+<li><code>parser_version</code></li>
+<li><code>quality_score</code> (number 0-1)</li>
+<li><code>completed_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>confidence_summary</code> (object)</li>
+<li><code>low_confidence_fields</code> (array[string])</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>candidate.document.parsed:{parse_job_id}:{parser_version}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-05-candidateenrichmentrequested-v1">E-05 <code>candidate.enrichment.requested</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>enrichment-orchestrator</code></li>
+<li>Consumers: <code>enrichment-worker</code></li>
+<li>Trigger: profile/job/parser update requiring enrichment</li>
+<li>Required payload:<ul>
+<li><code>candidate_id</code></li>
+<li><code>enrichment_version</code></li>
+<li><code>reason</code> (<code>profile_updated|document_parsed|scheduled|model_bump</code>)</li>
+<li><code>requested_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>priority</code> (<code>high|normal|low</code>)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>candidate.enrichment.requested:{candidate_id}:{enrichment_version}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-06-candidateenrichmentcompleted-v1">E-06 <code>candidate.enrichment.completed</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>enrichment-worker</code></li>
+<li>Consumers: <code>matching-service</code>, <code>analytics-service</code></li>
+<li>Trigger: enrichment finishes</li>
+<li>Required payload:<ul>
+<li><code>candidate_id</code></li>
+<li><code>enrichment_version</code></li>
+<li><code>signals_updated</code> (array[string])</li>
+<li><code>completed_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>warnings</code> (array[string])</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>candidate.enrichment.completed:{candidate_id}:{enrichment_version}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-07-matchingshortlistchanged-v1">E-07 <code>matching.shortlist.changed</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>matching-service</code></li>
+<li>Consumers: <code>automation-service</code>, <code>analytics-service</code></li>
+<li>Trigger: shortlist diff computed for a job</li>
+<li>Required payload:<ul>
+<li><code>job_id</code></li>
+<li><code>shortlist_version</code> (integer)</li>
+<li><code>entered_candidates</code> (array[string])</li>
+<li><code>exited_candidates</code> (array[string])</li>
+<li><code>computed_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>reason</code> (<code>event_triggered|hourly_refresh</code>)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>matching.shortlist.changed:{job_id}:{shortlist_version}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-08-invitecreated-v1">E-08 <code>invite.created</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>automation-service</code></li>
+<li>Consumers: <code>notification-service</code>, <code>analytics-service</code></li>
+<li>Trigger: invite record created and queued</li>
+<li>Required payload:<ul>
+<li><code>invite_id</code></li>
+<li><code>job_id</code></li>
+<li><code>candidate_id</code></li>
+<li><code>expires_at</code></li>
+<li><code>created_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>channel_preferences</code> (array[<code>email</code>,<code>sms</code>])</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>invite.created:{invite_id}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-09-inviteexpired-v1">E-09 <code>invite.expired</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>automation-service</code></li>
+<li>Consumers: <code>analytics-service</code>, <code>candidate-experience-service</code></li>
+<li>Trigger: invite reached expiry and not started</li>
+<li>Required payload:<ul>
+<li><code>invite_id</code></li>
+<li><code>job_id</code></li>
+<li><code>candidate_id</code></li>
+<li><code>expired_at</code></li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>invite.expired:{invite_id}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-10-qasubmitted-v1">E-10 <code>qa.submitted</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>qa-service</code></li>
+<li>Consumers: <code>authenticity-service</code>, <code>packet-builder-service</code>, <code>analytics-service</code></li>
+<li>Trigger: candidate submits all required answers</li>
+<li>Required payload:<ul>
+<li><code>session_id</code></li>
+<li><code>invite_id</code></li>
+<li><code>job_id</code></li>
+<li><code>candidate_id</code></li>
+<li><code>submitted_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>answer_count</code> (integer)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>qa.submitted:{session_id}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-11-qaauthenticityassessed-v1">E-11 <code>qa.authenticity.assessed</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>authenticity-service</code></li>
+<li>Consumers: <code>packet-builder-service</code>, <code>analytics-service</code>, <code>admin-ops-service</code></li>
+<li>Trigger: authenticity scoring complete</li>
+<li>Required payload:<ul>
+<li><code>session_id</code></li>
+<li><code>candidate_id</code></li>
+<li><code>job_id</code></li>
+<li><code>policy_result</code> (<code>likely_self_authored|mixed_assistance|heavy_assistance_suspected</code>)</li>
+<li><code>authenticity_score</code> (0-100)</li>
+<li><code>confidence</code> (0-1)</li>
+<li><code>model_version</code></li>
+<li><code>assessed_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>reason_codes</code> (array[string], max 3 for downstream UI)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>qa.authenticity.assessed:{session_id}:{model_version}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-12-packetready-v1">E-12 <code>packet.ready</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>packet-builder-service</code></li>
+<li>Consumers: <code>employer-inbox-service</code>, <code>notification-service</code>, <code>analytics-service</code></li>
+<li>Trigger: packet build success</li>
+<li>Required payload:<ul>
+<li><code>packet_id</code></li>
+<li><code>job_id</code></li>
+<li><code>candidate_id</code></li>
+<li><code>session_id</code></li>
+<li><code>ready_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>summary_version</code> (string)</li>
+<li><code>trust_label</code> (string)</li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>packet.ready:{packet_id}</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="e-13-billingusageupdated-v1">E-13 <code>billing.usage.updated</code> (<code>v1</code>)</h2>
+<ul>
+<li>Producer: <code>billing-service</code></li>
+<li>Consumers: <code>billing-service</code> (aggregator), <code>analytics-service</code></li>
+<li>Trigger: metered usage increments</li>
+<li>Required payload:<ul>
+<li><code>organization_id</code></li>
+<li><code>billing_month</code> (YYYY-MM)</li>
+<li><code>metric_name</code> (<code>packets_generated|invites_sent|active_jobs</code>)</li>
+<li><code>delta</code> (number)</li>
+<li><code>updated_at</code></li>
+</ul>
+</li>
+<li>Optional payload:<ul>
+<li><code>source_event_id</code></li>
+</ul>
+</li>
+<li>Idempotency key:<ul>
+<li><code>billing.usage.updated:{organization_id}:{billing_month}:{metric_name}:{source_event_id}</code></li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="consumer-validation-rules">Consumer Validation Rules</h2>
+<ol>
+<li>Reject events with unknown <code>event_version</code> for strict consumers.</li>
+<li>Validate required fields before processing.</li>
+<li>If validation fails, route to DLQ with error reason.</li>
+<li>Do not partial-process invalid events.</li>
+</ol>
+<h2 id="replay-rules">Replay Rules</h2>
+<ul>
+<li>Replay must preserve original <code>event_id</code> and <code>occurred_at</code>.</li>
+<li>Replayed message must include <code>replay=true</code> flag in message attributes.</li>
+<li>Consumers should remain idempotent and avoid duplicate side effects.</li>
+</ul>
+<h2 id="ownership-and-change-control">Ownership and Change Control</h2>
+<ul>
+<li>Contract owner:<ul>
+<li>CEO/CTO until dedicated platform owner exists.</li>
+</ul>
+</li>
+<li>Any schema change requires:
+  1. PR updating this registry,
+  2. affected consumer compatibility notes,
+  3. decision log entry for breaking changes.</li>
+</ul>
+<h2 id="open-items-follow-up">Open Items (Follow-up)</h2>
+<ol>
+<li>Add JSON Schema snippets per event in a machine-readable appendix.</li>
+<li>Add message attribute conventions for routing/priority.</li>
+<li>Define SLA per event type (publish-to-consume latency targets).</li>
+</ol></div></div></body></html>

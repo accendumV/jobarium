@@ -1,0 +1,210 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>23_entity_ownership_and_precedence_matrix_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-entity-ownership-and-precedence-matrix-mvp">Jobarium Entity Ownership and Precedence Matrix (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define source-of-truth ownership and conflict resolution precedence for core entities and derived signals.</p>
+<p>This document closes ambiguity for:
+- item 5 in system completeness gate,
+- concurrent updates from user/manual/parser/enrichment pipelines.</p>
+<h2 id="precedence-model">Precedence Model</h2>
+<h3 id="source-priority-default">Source Priority (default)</h3>
+<ol>
+<li><strong>User-confirmed manual input</strong> (highest)</li>
+<li><strong>Employer-configured explicit settings</strong> (for employer-owned entities)</li>
+<li><strong>System deterministic derivation</strong> (rules-based)</li>
+<li><strong>Parser/AI extracted suggestion</strong> (lowest, unless user confirms)</li>
+</ol>
+<h3 id="timestamp-rule">Timestamp Rule</h3>
+<ul>
+<li>For same-priority sources, latest <code>updated_at</code> wins.</li>
+<li>Stale updates (older version/timestamp) are ignored.</li>
+</ul>
+<h3 id="locking-rule">Locking Rule</h3>
+<ul>
+<li>User-confirmed fields become <code>locked_by_user=true</code>.</li>
+<li>Parser/enrichment cannot overwrite locked fields.</li>
+</ul>
+<h2 id="ownership-matrix">Ownership Matrix</h2>
+<table>
+<thead>
+<tr>
+<th>Entity/Field Group</th>
+<th>Canonical Owner</th>
+<th>Allowed Writers</th>
+<th>Precedence Rule</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>candidate_profile</code> core required fields</td>
+<td>candidate user</td>
+<td>candidate, platform_admin (support)</td>
+<td>user/manual &gt; parser</td>
+<td>parser can suggest only</td>
+</tr>
+<tr>
+<td><code>candidate_skill</code></td>
+<td>candidate + enrichment</td>
+<td>candidate, enrichment worker</td>
+<td>user/manual &gt; enrichment &gt; parser</td>
+<td>maintain provenance per skill</td>
+</tr>
+<tr>
+<td><code>candidate_certification</code></td>
+<td>candidate</td>
+<td>candidate, parser, platform_admin</td>
+<td>user/manual &gt; parser</td>
+<td>parser suggestions require confirmation when low confidence</td>
+</tr>
+<tr>
+<td><code>candidate_preference</code> (pay/start/remote)</td>
+<td>candidate</td>
+<td>candidate</td>
+<td>candidate only</td>
+<td>parser cannot set directly</td>
+</tr>
+<tr>
+<td><code>candidate_document</code> metadata</td>
+<td>system</td>
+<td>upload service, parser service</td>
+<td>system deterministic</td>
+<td>immutable raw reference</td>
+</tr>
+<tr>
+<td><code>job_posting</code> fields</td>
+<td>employer organization</td>
+<td>employer_admin/hiring_manager</td>
+<td>employer explicit only</td>
+<td>no auto-overwrite</td>
+</tr>
+<tr>
+<td><code>job_requirement</code></td>
+<td>employer organization</td>
+<td>employer_admin/hiring_manager</td>
+<td>employer explicit only</td>
+<td>templates initialize only</td>
+</tr>
+<tr>
+<td><code>job_question_kit</code></td>
+<td>employer organization</td>
+<td>employer_admin/hiring_manager</td>
+<td>employer explicit only</td>
+<td>template values editable</td>
+</tr>
+<tr>
+<td><code>match_score</code> and sub-scores</td>
+<td>matching service</td>
+<td>matching service</td>
+<td>latest model/ranking version</td>
+<td>recompute replaces prior snapshot</td>
+</tr>
+<tr>
+<td><code>job_shortlist</code></td>
+<td>matching service</td>
+<td>matching service</td>
+<td>latest shortlist version</td>
+<td>delta events emitted</td>
+</tr>
+<tr>
+<td><code>invite</code></td>
+<td>automation service</td>
+<td>automation service, platform_admin (cancel only)</td>
+<td>state machine guards</td>
+<td>no direct writes by employer UI</td>
+</tr>
+<tr>
+<td><code>qa_answer</code></td>
+<td>candidate</td>
+<td>candidate (session owner)</td>
+<td>session/state guard</td>
+<td>immutable after submit</td>
+</tr>
+<tr>
+<td><code>qa_authenticity_assessment</code></td>
+<td>authenticity service</td>
+<td>authenticity service, platform_admin (override with reason)</td>
+<td>latest assessment version</td>
+<td>override always audited</td>
+</tr>
+<tr>
+<td><code>candidate_packet</code></td>
+<td>packet builder service</td>
+<td>packet builder, platform_admin (support correction)</td>
+<td>latest valid packet; supersede by policy</td>
+<td>decisions append to <code>packet_action</code></td>
+</tr>
+<tr>
+<td><code>subscription</code></td>
+<td>billing service</td>
+<td>billing service, platform_admin</td>
+<td>billing service canonical</td>
+<td>manual adjustments audited</td>
+</tr>
+</tbody>
+</table>
+<h2 id="field-level-conflict-resolution-rules">Field-Level Conflict Resolution Rules</h2>
+<h3 id="candidate-profile-fields">Candidate profile fields</h3>
+<ul>
+<li>If <code>locked_by_user=true</code>: reject parser/enrichment overwrite.</li>
+<li>If unlocked and parser confidence &gt;= threshold: auto-apply allowed only for non-required enrichment fields.</li>
+<li>Required fields (<code>authorization</code>, <code>location/radius</code>, <code>pay</code>, <code>availability</code>, <code>primary role</code>) always need user confirmation on first set.</li>
+</ul>
+<h3 id="skills-and-certifications">Skills and certifications</h3>
+<ul>
+<li>Preserve multiple evidence sources:<ul>
+<li><code>source=user</code></li>
+<li><code>source=parser</code></li>
+<li><code>source=enrichment</code></li>
+</ul>
+</li>
+<li>UI displays consolidated canonical value; backend stores provenance.</li>
+</ul>
+<h3 id="matchingranking-artifacts">Matching/ranking artifacts</h3>
+<ul>
+<li>Treat as derived, ephemeral artifacts.</li>
+<li>Never allow manual edits to <code>match_score</code> or <code>job_shortlist</code>.</li>
+</ul>
+<h2 id="write-api-guard-requirements">Write API Guard Requirements</h2>
+<ul>
+<li>Every write must include:<ul>
+<li><code>source_type</code> (<code>user|service|parser|enrichment|admin</code>)</li>
+<li><code>entity_version</code> or <code>updated_at</code></li>
+</ul>
+</li>
+<li>Service enforces optimistic concurrency:<ul>
+<li>reject if version mismatch (<code>409</code>).</li>
+</ul>
+</li>
+</ul>
+<h2 id="audit-requirements">Audit Requirements</h2>
+<ul>
+<li>Log conflict rejections with reason:<ul>
+<li><code>SOURCE_PRECEDENCE_BLOCK</code></li>
+<li><code>LOCKED_FIELD_REJECTED</code></li>
+<li><code>STALE_VERSION_REJECTED</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="implementation-notes">Implementation Notes</h2>
+<ul>
+<li>Add provenance columns where missing:<ul>
+<li><code>source_type</code></li>
+<li><code>source_version</code></li>
+<li><code>locked_by_user</code></li>
+<li><code>confidence</code> (for extracted fields)</li>
+</ul>
+</li>
+<li>Add helper service for merge rules to avoid duplicating logic.</li>
+</ul></div></div></body></html>

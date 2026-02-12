@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>36_integration_failure_fallback_playbook_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-integration-failure-and-fallback-playbook-mvp">Jobarium Integration Failure and Fallback Playbook (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define integration fallback behavior across external providers and internal dependencies.</p>
+<p>This closes item 36 in the system completeness gate.</p>
+<h2 id="scope">Scope</h2>
+<ul>
+<li>Email/SMS providers</li>
+<li>Payments provider</li>
+<li>OCR/parser external dependencies</li>
+<li>AI summary/authenticity dependencies</li>
+</ul>
+<h2 id="global-fallback-principles">Global Fallback Principles</h2>
+<ol>
+<li>Protect core user flow first (candidate submit, employer review).</li>
+<li>Degrade gracefully before disabling features.</li>
+<li>Queue and replay recoverable operations.</li>
+<li>Make fallback mode visible to ops.</li>
+</ol>
+<h2 id="failure-classes">Failure Classes</h2>
+<ul>
+<li><code>transient</code> (timeouts, short provider errors)</li>
+<li><code>degraded</code> (partial outage, elevated latency)</li>
+<li><code>hard_down</code> (sustained outage)</li>
+<li><code>data_error</code> (invalid payload/config/credentials)</li>
+</ul>
+<h2 id="per-integration-fallback-matrix">Per-Integration Fallback Matrix</h2>
+<h3 id="emailsms">Email/SMS</h3>
+<ul>
+<li>Primary failure:<ul>
+<li>retry with backoff (3 attempts).</li>
+</ul>
+</li>
+<li>Secondary fallback:<ul>
+<li>switch channel if consent and contact exist.</li>
+</ul>
+</li>
+<li>Hard-down mode:<ul>
+<li>queue non-critical notifications.</li>
+<li>send critical (<code>invite.created</code>, <code>packet.ready</code>) via available channel.</li>
+</ul>
+</li>
+</ul>
+<h3 id="payments">Payments</h3>
+<ul>
+<li>Primary failure:<ul>
+<li>retry checkout session creation.</li>
+</ul>
+</li>
+<li>Fallback:<ul>
+<li>show clear "billing temporarily unavailable" and keep non-destructive access.</li>
+</ul>
+</li>
+<li>Hard-down mode:<ul>
+<li>pause upgrades/downgrades, keep active subscriptions unchanged.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ocrparser-dependency">OCR/Parser Dependency</h3>
+<ul>
+<li>Primary failure:<ul>
+<li>switch to deterministic parser-only mode.</li>
+</ul>
+</li>
+<li>Fallback:<ul>
+<li>require manual field confirmation entry path.</li>
+</ul>
+</li>
+<li>Hard-down mode:<ul>
+<li>disable auto-parse UI CTA and show manual profile workflow.</li>
+</ul>
+</li>
+</ul>
+<h3 id="ai-summaryauthenticity-dependency">AI Summary/Authenticity Dependency</h3>
+<ul>
+<li>Primary failure:<ul>
+<li>retry async jobs.</li>
+</ul>
+</li>
+<li>Fallback:<ul>
+<li>publish transcript-first packet without summary/auth badge.</li>
+</ul>
+</li>
+<li>Hard-down mode:<ul>
+<li>mark packet with "analysis delayed" and queue post-processing.</li>
+</ul>
+</li>
+</ul>
+<h2 id="operational-triggers">Operational Triggers</h2>
+<ul>
+<li>Enter degraded mode when:<ul>
+<li>integration success rate drops below threshold for 10 min.</li>
+</ul>
+</li>
+<li>Exit degraded mode when:<ul>
+<li>success rate recovers for sustained 15 min.</li>
+</ul>
+</li>
+</ul>
+<h2 id="user-messaging-rules">User Messaging Rules</h2>
+<ul>
+<li>show concise status messages in-app.</li>
+<li>avoid technical provider names in user-facing copy.</li>
+<li>provide expected update window when possible.</li>
+</ul>
+<h2 id="replay-rules">Replay Rules</h2>
+<ul>
+<li>replay queued tasks in capped batches.</li>
+<li>preserve original idempotency keys.</li>
+<li>verify side-effect safety before bulk replay.</li>
+</ul>
+<h2 id="ownership">Ownership</h2>
+<ul>
+<li>CTO owns integration incident response.</li>
+<li>CEO owns stakeholder communication during sustained outages.</li>
+</ul>
+<h2 id="validation-checklist">Validation Checklist</h2>
+<ul>
+<li>[ ] simulated provider outage tested in staging</li>
+<li>[ ] degraded mode toggles verified</li>
+<li>[ ] transcript-first fallback validated</li>
+<li>[ ] replay process tested end-to-end</li>
+</ul></div></div></body></html>

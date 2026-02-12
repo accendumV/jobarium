@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>24_authenticity_appeal_ops_flow_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-authenticity-appeal-operations-flow-mvp">Jobarium Authenticity Appeal Operations Flow (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define end-to-end operations workflow for candidate appeals on authenticity assessments.</p>
+<p>This closes item 24 in the system completeness gate.</p>
+<h2 id="policy-baseline">Policy Baseline</h2>
+<ul>
+<li>Authenticity labels are advisory for employers in MVP.</li>
+<li>No automatic rejection based solely on authenticity score.</li>
+<li>Candidates can submit appeal requests for flagged sessions.</li>
+</ul>
+<h2 id="actors">Actors</h2>
+<ul>
+<li>Candidate (appeal submitter)</li>
+<li>Platform admin reviewer</li>
+<li>CTO (technical escalation)</li>
+<li>Employer reviewer (receives status updates, not raw internals)</li>
+</ul>
+<h2 id="appeal-lifecycle-states">Appeal Lifecycle States</h2>
+<ul>
+<li><code>submitted</code></li>
+<li><code>in_review</code></li>
+<li><code>resolved_upheld</code> (original label kept)</li>
+<li><code>resolved_adjusted</code> (label corrected/downgraded)</li>
+<li><code>closed</code></li>
+</ul>
+<h2 id="workflow">Workflow</h2>
+<ol>
+<li>Candidate submits appeal with context.</li>
+<li>System creates <code>appeal_case_id</code> and sets status <code>submitted</code>.</li>
+<li>Admin triage sets <code>in_review</code>.</li>
+<li>Reviewer inspects:
+   - confidence score,
+   - reason codes,
+   - telemetry completeness,
+   - parser/session anomalies.</li>
+<li>Reviewer decides:
+   - uphold label, or
+   - adjust label + reason.</li>
+<li>Candidate and employer receive outcome notification.</li>
+<li>Case transitions to <code>closed</code>.</li>
+</ol>
+<h2 id="sla-targets">SLA Targets</h2>
+<ul>
+<li>Acknowledge appeal: within 24 hours.</li>
+<li>Initial review outcome: within 3 business days.</li>
+<li>Escalated technical review: within 5 business days.</li>
+</ul>
+<h2 id="decision-criteria">Decision Criteria</h2>
+<ul>
+<li>Downgrade/adjust if:<ul>
+<li>low confidence,</li>
+<li>missing/incomplete telemetry,</li>
+<li>detected pipeline anomaly,</li>
+<li>clear mismatch between reason codes and observed behavior.</li>
+</ul>
+</li>
+<li>Uphold if:<ul>
+<li>high confidence and consistent multi-signal evidence.</li>
+</ul>
+</li>
+</ul>
+<h2 id="employer-communication-rule">Employer Communication Rule</h2>
+<ul>
+<li>During active appeal:<ul>
+<li>packet shows "authenticity under review" marker.</li>
+</ul>
+</li>
+<li>On resolved adjustment:<ul>
+<li>update badge and reason codes in packet view.</li>
+</ul>
+</li>
+</ul>
+<h2 id="audit-and-compliance">Audit and Compliance</h2>
+<ul>
+<li>Every appeal action is audit logged:<ul>
+<li>reviewer id</li>
+<li>decision</li>
+<li>rationale</li>
+<li>timestamps</li>
+</ul>
+</li>
+<li>Keep appeal records per retention policy.</li>
+</ul>
+<h2 id="required-admin-ui-capabilities">Required Admin UI Capabilities</h2>
+<ul>
+<li>list/filter appeals by status/date/confidence</li>
+<li>open case detail with linked session and signals</li>
+<li>apply outcome (<code>uphold</code>/<code>adjust</code>) with required reason note</li>
+<li>trigger candidate/employer notification</li>
+</ul>
+<h2 id="metrics">Metrics</h2>
+<ul>
+<li>appeal volume per 100 submitted Q&amp;A sessions</li>
+<li>appeal uphold vs adjust rate</li>
+<li>median time to resolve</li>
+<li>repeat appeals for same role/company</li>
+</ul></div></div></body></html>

@@ -1,0 +1,136 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>00_master_entry_point.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-master-entry-point">Jobarium Master Entry Point</h1>
+<h2 id="why-this-document-exists">Why this document exists</h2>
+<p>This is the single high-level entry point for the entire planning set.</p>
+<p>Use it to:
+- understand the full system quickly,
+- see what is already defined,
+- navigate into deeper documents in the right order.</p>
+<hr />
+<h2 id="1-executive-snapshot">1) Executive Snapshot</h2>
+<p>Jobarium is an automation-first hiring platform:
+- candidates create one profile,
+- employers configure roles once,
+- matching and pre-screening run in the background,
+- employers review completed candidate packets, not application floods.</p>
+<p>Core objective:
+- reduce hiring friction on both sides while preserving trust, explainability, and operational control.</p>
+<hr />
+<h2 id="2-current-planning-status-high-level">2) Current Planning Status (high level)</h2>
+<ul>
+<li>System completeness gate: <code>Pass</code></li>
+<li>Critical gaps (Red): <code>0</code></li>
+<li>Remaining maturity work: document-by-document review/approval with CEO + CTO.</li>
+</ul>
+<p>Primary planning assets already defined:
+- product framing and HR value requirements,
+- architecture and data/event contracts,
+- user flows and UI inventory,
+- security/compliance baseline,
+- operations runbooks and fallback procedures.</p>
+<hr />
+<h2 id="3-how-the-system-works-one-page-view">3) How the System Works (one-page view)</h2>
+<ol>
+<li>Candidate signs up, uploads CV, confirms key fields.</li>
+<li>Employer sets role requirements, question kit, and invite automation.</li>
+<li>Matching pipeline filters and ranks candidates.</li>
+<li>Auto-invites are sent with safeguards (caps/cooldowns/expiry).</li>
+<li>Candidate completes async Q&amp;A.</li>
+<li>Packet builder generates employer-ready packet.</li>
+<li>Employer takes action (interview/clarify/reject).</li>
+<li>Outcome signals feed continuous improvement.</li>
+</ol>
+<p>Trust and safety layers:
+- authenticity risk signals for Q&amp;A,
+- RBAC and audit logging,
+- GDPR workflows and retention policies,
+- incident response and replay runbooks.</p>
+<hr />
+<h2 id="4-read-this-first-recommended-sequence">4) Read This First (recommended sequence)</h2>
+<h3 id="step-a-vision-and-scope">Step A: Vision and scope</h3>
+<ol>
+<li><code>01_product/01_jobarium_one_pager.md</code></li>
+<li><code>01_product/08_hr_value_requirements.md</code></li>
+<li><code>01_product/11_priority_matrix_mvp.md</code></li>
+</ol>
+<h3 id="step-b-architecture-backbone">Step B: Architecture backbone</h3>
+<ol start="4">
+<li><code>02_architecture/02_jobarium_architecture_plan.md</code></li>
+<li><code>02_architecture/12_system_completeness_gate.md</code></li>
+<li><code>02_architecture/13_state_machines_mvp.md</code></li>
+<li><code>02_architecture/14_event_contracts_registry.md</code></li>
+</ol>
+<h3 id="step-c-ux-and-user-experience">Step C: UX and user experience</h3>
+<ol start="8">
+<li><code>03_user_experience_flows/03_candidate_user_flow.md</code></li>
+<li><code>03_user_experience_flows/04_employer_user_flow.md</code></li>
+<li><code>03_user_experience_flows/15_ui_screen_inventory_mvp.md</code></li>
+</ol>
+<h3 id="step-d-security-and-operations">Step D: Security and operations</h3>
+<ol start="11">
+<li><code>02_architecture/17_rbac_matrix_mvp.md</code></li>
+<li><code>06_operations/19_audit_logging_and_retention_mvp.md</code></li>
+<li><code>06_operations/16_pilot_support_runbook.md</code></li>
+</ol>
+<hr />
+<h2 id="5-guided-paths-by-audience">5) Guided Paths by Audience</h2>
+<h3 id="ceo-path-strategy-launch-readiness">CEO path (strategy + launch readiness)</h3>
+<ul>
+<li><code>01_product/01_jobarium_one_pager.md</code></li>
+<li><code>01_product/12_launch_definition_of_done.md</code></li>
+<li><code>04_delivery_and_execution/32_pilot_execution_ready_checklist.md</code></li>
+<li><code>07_decisions_log/07_decisions_log.md</code></li>
+</ul>
+<h3 id="cto-path-build-and-reliability">CTO path (build and reliability)</h3>
+<ul>
+<li><code>02_architecture/02_jobarium_architecture_plan.md</code></li>
+<li><code>02_architecture/13_state_machines_mvp.md</code></li>
+<li><code>02_architecture/14_event_contracts_registry.md</code></li>
+<li><code>02_architecture/21_schema_versioning_and_migrations_mvp.md</code></li>
+<li><code>06_operations/39_alert_thresholds_and_escalation_matrix_mvp.md</code></li>
+</ul>
+<h3 id="hr-reviewer-path-value-validation">HR reviewer path (value validation)</h3>
+<ul>
+<li><code>01_product/08_hr_value_requirements.md</code></li>
+<li><code>01_product/09_user_personas.md</code></li>
+<li><code>03_user_experience_flows/04_employer_user_flow.md</code></li>
+<li><code>03_user_experience_flows/05_end_to_end_golden_flow.md</code></li>
+</ul>
+<h3 id="productux-path">Product/UX path</h3>
+<ul>
+<li><code>01_product/10_user_stories_mvp.md</code></li>
+<li><code>03_user_experience_flows/15_ui_screen_inventory_mvp.md</code></li>
+<li><code>03_user_experience_flows/29_ui_state_standards_mvp.md</code></li>
+<li><code>03_user_experience_flows/30_notification_templates_and_fallbacks_mvp.md</code></li>
+</ul>
+<h3 id="opssupport-path">Ops/Support path</h3>
+<ul>
+<li><code>06_operations/16_pilot_support_runbook.md</code></li>
+<li><code>06_operations/24_authenticity_appeal_ops_flow_mvp.md</code></li>
+<li><code>06_operations/36_integration_failure_fallback_playbook_mvp.md</code></li>
+<li><code>06_operations/40_admin_console_requirements_mvp.md</code></li>
+</ul>
+<hr />
+<h2 id="6-governance-note">6) Governance Note</h2>
+<p>All documents are currently tracked as <code>Draft v1</code> in:
+- <code>00_project_plan_index.md</code></p>
+<p>Review and approve one-by-one with CTO, then update status in the registry.</p>
+<hr />
+<h2 id="7-supporting-navigation">7) Supporting Navigation</h2>
+<ul>
+<li>Registry source of truth: <code>00_project_plan_index.md</code></li>
+<li>HTML navigator: <code>index.html</code></li>
+</ul>
+<p>Use this master entry for orientation, then use the registry and HTML navigator for detailed navigation.</p></div></div></body></html>

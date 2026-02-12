@@ -1,0 +1,104 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>40_admin_console_requirements_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-admin-console-requirements-mvp">Jobarium Admin Console Requirements (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define minimum admin console capabilities required for pilot operations and dispute handling.</p>
+<p>This closes item 40 in the system completeness gate.</p>
+<h2 id="user-role">User Role</h2>
+<ul>
+<li><code>platform_admin</code> only (MVP)</li>
+</ul>
+<h2 id="core-functional-areas">Core Functional Areas</h2>
+<h3 id="1-pipeline-operations">1) Pipeline Operations</h3>
+<ul>
+<li>View failed jobs by pipeline:<ul>
+<li>parse</li>
+<li>enrichment</li>
+<li>invite dispatch</li>
+<li>authenticity assessment</li>
+<li>packet build</li>
+</ul>
+</li>
+<li>See failure reason and last retry attempt.</li>
+<li>Trigger safe retry for eligible failed jobs.</li>
+</ul>
+<h3 id="2-eventdlq-operations">2) Event/DLQ Operations</h3>
+<ul>
+<li>List DLQ events with filters:<ul>
+<li>event name</li>
+<li>age</li>
+<li>error reason</li>
+</ul>
+</li>
+<li>Replay event batch with dry-run preview metadata.</li>
+<li>Track replay job status and completion.</li>
+</ul>
+<h3 id="3-support-case-operations">3) Support Case Operations</h3>
+<ul>
+<li>Open and manage authenticity appeal cases.</li>
+<li>Link candidate, session, packet, and relevant signals.</li>
+<li>Apply case outcomes with mandatory reason notes.</li>
+</ul>
+<h3 id="4-privacy-operations">4) Privacy Operations</h3>
+<ul>
+<li>View GDPR request queue.</li>
+<li>Process export/delete workflow steps with status tracking.</li>
+<li>Capture audit trail for each step.</li>
+</ul>
+<h3 id="5-observability-snapshot">5) Observability Snapshot</h3>
+<ul>
+<li>show key health indicators:<ul>
+<li>invite success</li>
+<li>Q&amp;A submit success</li>
+<li>packet build latency</li>
+<li>parse failure rate</li>
+</ul>
+</li>
+<li>link to detailed logs/traces for incident triage.</li>
+</ul>
+<h2 id="data-access-and-safety">Data Access and Safety</h2>
+<ul>
+<li>No direct raw PII dumps in default list views.</li>
+<li>Every admin action must be audit-logged.</li>
+<li>High-risk actions require confirmation modal + reason input:<ul>
+<li>replay large batch</li>
+<li>override authenticity label</li>
+<li>manual state correction</li>
+</ul>
+</li>
+</ul>
+<h2 id="mvp-non-goals">MVP Non-Goals</h2>
+<ul>
+<li>Full feature-flag management UI.</li>
+<li>Arbitrary SQL/query console.</li>
+<li>Cross-role delegation workflow.</li>
+</ul>
+<h2 id="technical-requirements">Technical Requirements</h2>
+<ul>
+<li>secure admin route with strict RBAC.</li>
+<li>pagination and filtering for all large tables.</li>
+<li>immutable action history for each support case.</li>
+</ul>
+<h2 id="ux-requirements">UX Requirements</h2>
+<ul>
+<li>clear status badges for job/event/case lifecycle.</li>
+<li>one-click path from alert to affected entities.</li>
+<li>bulk actions only where idempotency is guaranteed.</li>
+</ul>
+<h2 id="acceptance-criteria">Acceptance Criteria</h2>
+<ul>
+<li>Admin can resolve common pilot incidents without DB-level manual intervention.</li>
+<li>Replay operations are observable and auditable.</li>
+<li>Appeal and GDPR workflows are executable end-to-end from console.</li>
+</ul></div></div></body></html>

@@ -1,0 +1,170 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>39_alert_thresholds_and_escalation_matrix_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-alert-thresholds-and-escalation-matrix-mvp">Jobarium Alert Thresholds and Escalation Matrix (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define concrete alert thresholds and escalation paths for pilot operations.</p>
+<p>This closes item 39 in the system completeness gate.</p>
+<h2 id="alerting-ownership">Alerting Ownership</h2>
+<ul>
+<li>Primary responder: CTO</li>
+<li>Secondary responder: CEO</li>
+</ul>
+<h2 id="severity-mapping">Severity Mapping</h2>
+<ul>
+<li><code>SEV-1</code>: business-critical outage/data risk</li>
+<li><code>SEV-2</code>: major degradation impacting active workflows</li>
+<li><code>SEV-3</code>: minor degradation with workaround</li>
+</ul>
+<h2 id="core-alert-thresholds">Core Alert Thresholds</h2>
+<h3 id="api-reliability">API Reliability</h3>
+<ul>
+<li>Trigger:<ul>
+<li><code>5xx_rate &gt; 3%</code> for 10 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate, CEO if &gt; 30 minutes</li>
+</ul>
+</li>
+</ul>
+<h3 id="invite-dispatch-health">Invite Dispatch Health</h3>
+<ul>
+<li>Trigger:<ul>
+<li>invite delivery success <code>&lt; 90%</code> for 10 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate, CEO immediate if hard provider down</li>
+</ul>
+</li>
+</ul>
+<h3 id="qa-submission-reliability">Q&amp;A Submission Reliability</h3>
+<ul>
+<li>Trigger:<ul>
+<li>submit failure rate <code>&gt; 5%</code> for 10 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate</li>
+</ul>
+</li>
+</ul>
+<h3 id="packet-build-latency">Packet Build Latency</h3>
+<ul>
+<li>Trigger:<ul>
+<li>packet ready p95 <code>&gt; 5 minutes</code> for 15 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate, CEO if &gt; 60 minutes</li>
+</ul>
+</li>
+</ul>
+<h3 id="cv-parse-failure-spike">CV Parse Failure Spike</h3>
+<ul>
+<li>Trigger:<ul>
+<li>parse failure rate <code>&gt; 15%</code> for 15 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate</li>
+</ul>
+</li>
+</ul>
+<h3 id="dlq-backlog-growth">DLQ Backlog Growth</h3>
+<ul>
+<li>Trigger:<ul>
+<li>DLQ backlog <code>&gt; 100</code> unprocessed events for 30 minutes</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-2</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO immediate</li>
+</ul>
+</li>
+</ul>
+<h3 id="data-integrity-risk">Data Integrity Risk</h3>
+<ul>
+<li>Trigger:<ul>
+<li>failed writes with inconsistency indicators or missing critical events</li>
+</ul>
+</li>
+<li>Severity:<ul>
+<li>SEV-1</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>CTO + CEO immediate, incident bridge required</li>
+</ul>
+</li>
+</ul>
+<h2 id="escalation-timing-matrix">Escalation Timing Matrix</h2>
+<ul>
+<li>SEV-1:<ul>
+<li>acknowledge in 15 minutes</li>
+<li>stakeholder update every 30 minutes</li>
+</ul>
+</li>
+<li>SEV-2:<ul>
+<li>acknowledge in 60 minutes</li>
+<li>stakeholder update every 2 hours</li>
+</ul>
+</li>
+<li>SEV-3:<ul>
+<li>acknowledge next business day</li>
+<li>include in weekly ops review</li>
+</ul>
+</li>
+</ul>
+<h2 id="notification-routing">Notification Routing</h2>
+<ul>
+<li>Primary channel: pager/ops alert channel</li>
+<li>Secondary channel: SMS fallback to on-call</li>
+<li>Tertiary: email digest for non-critical alerts</li>
+</ul>
+<h2 id="alert-hygiene-rules">Alert Hygiene Rules</h2>
+<ul>
+<li>deduplicate repeated alerts for same condition window</li>
+<li>auto-close only after sustained recovery window</li>
+<li>require post-incident note for SEV-1/SEV-2 closures</li>
+</ul>
+<h2 id="weekly-calibration">Weekly Calibration</h2>
+<ul>
+<li>review noisy alerts</li>
+<li>tune thresholds based on pilot traffic baseline</li>
+<li>add/remove alerts with documented rationale</li>
+</ul></div></div></body></html>

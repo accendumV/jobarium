@@ -1,0 +1,319 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>16_pilot_support_runbook.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-pilot-support-runbook-mvp">Jobarium Pilot Support Runbook (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Provide an operational playbook for pilot incidents, service degradation, and user-facing support issues.</p>
+<p>This runbook is designed for a small team (CEO/CTO) operating without a dedicated SRE function.</p>
+<h2 id="scope">Scope</h2>
+<ul>
+<li>Candidate and employer support incidents during pilot.</li>
+<li>Async pipeline failures (parsing, enrichment, invites, Q&amp;A, packet generation).</li>
+<li>Authenticity dispute handling.</li>
+<li>GDPR support requests routing.</li>
+</ul>
+<h2 id="support-model-and-ownership">Support Model and Ownership</h2>
+<ul>
+<li>Primary on-call:<ul>
+<li>CTO (technical incident lead)</li>
+</ul>
+</li>
+<li>Secondary on-call:<ul>
+<li>CEO (communications + prioritization)</li>
+</ul>
+</li>
+<li>Escalation:<ul>
+<li>If incident exceeds SLA or impacts hiring outcomes, CEO + CTO jointly decide mitigation path and stakeholder updates.</li>
+</ul>
+</li>
+</ul>
+<h2 id="severity-classification">Severity Classification</h2>
+<h3 id="sev-1-critical">SEV-1 (Critical)</h3>
+<ul>
+<li>Definition:<ul>
+<li>Core hiring flow unavailable or corrupted for most users.</li>
+</ul>
+</li>
+<li>Examples:<ul>
+<li>Packet generation down for all jobs.</li>
+<li>Invite dispatch halted platform-wide.</li>
+<li>Data loss risk.</li>
+</ul>
+</li>
+<li>Initial response SLA:<ul>
+<li>acknowledge within 15 minutes.</li>
+</ul>
+</li>
+<li>Target recovery:<ul>
+<li>mitigate within 2 hours.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sev-2-major">SEV-2 (Major)</h3>
+<ul>
+<li>Definition:<ul>
+<li>Major feature degraded for a subset of users.</li>
+</ul>
+</li>
+<li>Examples:<ul>
+<li>CV parse failures spike.</li>
+<li>Delayed invites for one region/tenant.</li>
+<li>Q&amp;A submit errors affecting a cohort.</li>
+</ul>
+</li>
+<li>Initial response SLA:<ul>
+<li>acknowledge within 1 hour.</li>
+</ul>
+</li>
+<li>Target recovery:<ul>
+<li>mitigate within 8 hours.</li>
+</ul>
+</li>
+</ul>
+<h3 id="sev-3-minor">SEV-3 (Minor)</h3>
+<ul>
+<li>Definition:<ul>
+<li>Limited issue, workaround available, low business impact.</li>
+</ul>
+</li>
+<li>Examples:<ul>
+<li>Dashboard metric lag.</li>
+<li>Non-critical UI rendering bugs.</li>
+</ul>
+</li>
+<li>Initial response SLA:<ul>
+<li>acknowledge within 1 business day.</li>
+</ul>
+</li>
+<li>Target recovery:<ul>
+<li>fix in next planned release window.</li>
+</ul>
+</li>
+</ul>
+<h2 id="incident-response-workflow">Incident Response Workflow</h2>
+<ol>
+<li>Detect
+   - alert, user ticket, or manual observation.</li>
+<li>Triage
+   - classify severity and affected scope.</li>
+<li>Stabilize
+   - apply mitigation/workaround to stop impact growth.</li>
+<li>Resolve
+   - identify root cause and implement fix.</li>
+<li>Communicate
+   - update affected users/internal stakeholders.</li>
+<li>Review
+   - complete postmortem for SEV-1/SEV-2.</li>
+</ol>
+<h2 id="core-operational-dashboards-to-watch">Core Operational Dashboards to Watch</h2>
+<ul>
+<li>Invite dispatch latency and failure rate.</li>
+<li>Q&amp;A submission success rate.</li>
+<li>Packet build latency and error rate.</li>
+<li>CV parse success/failure ratio.</li>
+<li>DLQ backlog size by topic.</li>
+<li>API error rate (<code>5xx</code>) by service.</li>
+</ul>
+<h2 id="common-incident-playbooks">Common Incident Playbooks</h2>
+<h3 id="playbook-a-cv-parsing-failure-spike">Playbook A: CV Parsing Failure Spike</h3>
+<ul>
+<li>Trigger:<ul>
+<li>parse failure rate &gt; 15% over 15 minutes.</li>
+</ul>
+</li>
+<li>Checks:
+  1. Validate storage access and parser service health.
+  2. Check mime/type rejection and scanner logs.
+  3. Inspect provider dependency (OCR fallback).</li>
+<li>Mitigation:<ul>
+<li>switch to deterministic parser only mode if OCR is degraded.</li>
+<li>queue retries with capped concurrency.</li>
+<li>allow manual profile entry path immediately.</li>
+</ul>
+</li>
+<li>User communication:<ul>
+<li>candidate-facing notice: parsing delayed, manual entry available.</li>
+</ul>
+</li>
+</ul>
+<h3 id="playbook-b-invite-dispatch-failure">Playbook B: Invite Dispatch Failure</h3>
+<ul>
+<li>Trigger:<ul>
+<li>invite send success &lt; 90% over 10 minutes.</li>
+</ul>
+</li>
+<li>Checks:
+  1. notification provider API status.
+  2. Cloud Tasks backlog and retry configuration.
+  3. invalid contact data rate.</li>
+<li>Mitigation:<ul>
+<li>fail over to alternate channel (email &lt;-&gt; SMS) where possible.</li>
+<li>pause new invite generation if queue saturation risks cascade.</li>
+<li>replay failed tasks after provider recovery.</li>
+</ul>
+</li>
+</ul>
+<h3 id="playbook-c-qa-submission-errors">Playbook C: Q&amp;A Submission Errors</h3>
+<ul>
+<li>Trigger:<ul>
+<li><code>qa.submit</code> errors &gt; 5% over 10 minutes.</li>
+</ul>
+</li>
+<li>Checks:
+  1. session expiry logic and clock skew.
+  2. payload validation failures by question type.
+  3. database write latency/errors.</li>
+<li>Mitigation:<ul>
+<li>temporarily extend session TTL.</li>
+<li>relax non-critical validation if safe.</li>
+<li>preserve draft and notify candidates not to re-enter answers.</li>
+</ul>
+</li>
+</ul>
+<h3 id="playbook-d-packet-build-delaysfailures">Playbook D: Packet Build Delays/Failures</h3>
+<ul>
+<li>Trigger:<ul>
+<li>packet readiness p95 &gt; 5 minutes or failure spike.</li>
+</ul>
+</li>
+<li>Checks:
+  1. packet builder queue depth.
+  2. authenticity assessment dependency status.
+  3. summary generation provider latency.</li>
+<li>Mitigation:<ul>
+<li>degrade to "transcript-first packet" while summary retries.</li>
+<li>prioritize oldest submitted sessions first.</li>
+<li>batch retry failed jobs with backoff.</li>
+</ul>
+</li>
+</ul>
+<h3 id="playbook-e-authenticity-dispute-escalation">Playbook E: Authenticity Dispute Escalation</h3>
+<ul>
+<li>Trigger:<ul>
+<li>candidate disputes "heavy assistance suspected" label.</li>
+</ul>
+</li>
+<li>Checks:
+  1. confirm confidence score and reason codes.
+  2. verify telemetry completeness.
+  3. check model/rules version active at assessment time.</li>
+<li>Mitigation:<ul>
+<li>mark assessment "under review."</li>
+<li>provide employer neutral note pending review.</li>
+<li>re-score if data pipeline issue detected.</li>
+</ul>
+</li>
+<li>Policy:<ul>
+<li>no automated rejection based solely on authenticity signal in MVP.</li>
+</ul>
+</li>
+</ul>
+<h3 id="playbook-f-gdpr-request-handling">Playbook F: GDPR Request Handling</h3>
+<ul>
+<li>Trigger:<ul>
+<li>data export or deletion request.</li>
+</ul>
+</li>
+<li>Checks:
+  1. verify requester identity.
+  2. identify all related records and artifacts.</li>
+<li>Mitigation:<ul>
+<li>execute approved export/delete workflow.</li>
+<li>log all actions in audit trail.</li>
+</ul>
+</li>
+<li>SLA:<ul>
+<li>acknowledge within 72 hours; complete within legal policy window.</li>
+</ul>
+</li>
+</ul>
+<h2 id="dlq-and-replay-procedure">DLQ and Replay Procedure</h2>
+<ol>
+<li>Inspect DLQ message metadata (<code>event_name</code>, <code>event_version</code>, error reason).</li>
+<li>Classify root cause:
+   - transient infra
+   - schema mismatch
+   - code defect
+   - bad source data</li>
+<li>Apply fix or temporary filter.</li>
+<li>Replay from DLQ in controlled batches.</li>
+<li>Confirm idempotent processing and side-effect safety.</li>
+<li>Record replay job ID in incident notes.</li>
+</ol>
+<h2 id="manual-fallback-procedures-pilot">Manual Fallback Procedures (Pilot)</h2>
+<ul>
+<li>If packet builder is down:<ul>
+<li>allow transcript-only review mode.</li>
+</ul>
+</li>
+<li>If notifications provider is degraded:<ul>
+<li>route critical notices through backup channel or manual outreach.</li>
+</ul>
+</li>
+<li>If matching is delayed:<ul>
+<li>display "refresh in progress" and prioritize active roles.</li>
+</ul>
+</li>
+</ul>
+<h2 id="communication-templates">Communication Templates</h2>
+<h3 id="internal-incident-update">Internal Incident Update</h3>
+<ul>
+<li>Incident ID:</li>
+<li>Severity:</li>
+<li>Impact:</li>
+<li>Current mitigation:</li>
+<li>Next update ETA:</li>
+<li>Owner:</li>
+</ul>
+<h3 id="employer-facing-message">Employer-Facing Message</h3>
+<ul>
+<li>"We are currently experiencing a delay in [feature]. Your existing data is safe. We expect [ETA] for recovery and will notify you once complete."</li>
+</ul>
+<h3 id="candidate-facing-message">Candidate-Facing Message</h3>
+<ul>
+<li>"We are experiencing a temporary issue with [feature]. Your progress has been saved. Please retry in [ETA] or use [fallback option]."</li>
+</ul>
+<h2 id="postmortem-template-sev-1sev-2">Postmortem Template (SEV-1/SEV-2)</h2>
+<ul>
+<li>Incident ID:</li>
+<li>Timeline (UTC):</li>
+<li>Root cause:</li>
+<li>Customer impact:</li>
+<li>Detection gap:</li>
+<li>What worked:</li>
+<li>What failed:</li>
+<li>Corrective actions:</li>
+<li>Preventive actions:</li>
+<li>Owner and due dates:</li>
+</ul>
+<h2 id="tooling-requirements-minimum">Tooling Requirements (Minimum)</h2>
+<ul>
+<li>Centralized logs with trace IDs.</li>
+<li>Alerting on key SLO breaches.</li>
+<li>DLQ visibility and replay command.</li>
+<li>Admin notes/ticket tracking for support cases.</li>
+</ul>
+<h2 id="pilot-readiness-checklist">Pilot Readiness Checklist</h2>
+<ul>
+<li>[ ] On-call rotation documented and reachable.</li>
+<li>[ ] Alert channels tested.</li>
+<li>[ ] DLQ replay tested in staging.</li>
+<li>[ ] Support communication templates approved.</li>
+<li>[ ] GDPR workflow tested end-to-end.</li>
+<li>[ ] Authenticity dispute review workflow validated.</li>
+</ul>
+<h2 id="review-cadence">Review Cadence</h2>
+<ul>
+<li>Review runbook weekly during pilot.</li>
+<li>Update after every SEV-1/SEV-2 incident.</li>
+</ul></div></div></body></html>

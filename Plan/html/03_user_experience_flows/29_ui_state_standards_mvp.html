@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>29_ui_state_standards_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-ui-state-standards-mvp">Jobarium UI State Standards (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define mandatory UX behavior for loading, empty, error, and success states across all P0 screens.</p>
+<p>This closes item 29 in the system completeness gate.</p>
+<h2 id="scope">Scope</h2>
+<ul>
+<li>Candidate portal</li>
+<li>Employer portal</li>
+<li>Shared components</li>
+</ul>
+<h2 id="global-standard">Global Standard</h2>
+<p>Every P0 screen must implement these states:
+1. <code>loading</code>
+2. <code>empty</code>
+3. <code>error_recoverable</code>
+4. <code>error_blocking</code>
+5. <code>success_feedback</code></p>
+<h2 id="1-loading-state-standard">1) Loading State Standard</h2>
+<ul>
+<li>Show skeleton or spinner within 200ms if content not ready.</li>
+<li>Preserve page structure to prevent layout shift.</li>
+<li>Include contextual label:<ul>
+<li>"Loading invite details..."</li>
+<li>"Preparing your packet..."</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-empty-state-standard">2) Empty State Standard</h2>
+<ul>
+<li>Explain why data is empty.</li>
+<li>Provide one clear next action.</li>
+<li>Example patterns:<ul>
+<li>candidate timeline: "No active invites yet."</li>
+<li>employer inbox: "No completed packets yet."</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-recoverable-error-state-standard">3) Recoverable Error State Standard</h2>
+<ul>
+<li>User can retry without leaving screen.</li>
+<li>Show concise message + retry button.</li>
+<li>If action was idempotent, indicate safe retry.</li>
+<li>Example:<ul>
+<li>"We couldn't load your packet. Please retry."</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-blocking-error-state-standard">4) Blocking Error State Standard</h2>
+<ul>
+<li>Used only when user cannot proceed meaningfully.</li>
+<li>Provide support path and reference id.</li>
+<li>Example:<ul>
+<li>"This invite has expired. Request a new invite if available."</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-success-feedback-standard">5) Success Feedback Standard</h2>
+<ul>
+<li>Show confirmation for mutations:<ul>
+<li>profile saved</li>
+<li>Q&amp;A submitted</li>
+<li>packet action recorded</li>
+</ul>
+</li>
+<li>Use transient toast + persistent confirmation where needed.</li>
+</ul>
+<h2 id="state-ux-copy-guidelines">State UX Copy Guidelines</h2>
+<ul>
+<li>Be specific, not generic ("Failed").</li>
+<li>Avoid blaming language.</li>
+<li>Always suggest the next step.</li>
+<li>Keep messages short (&lt; 140 chars preferred).</li>
+</ul>
+<h2 id="technicaldesign-requirements">Technical/Design Requirements</h2>
+<ul>
+<li>Each state must be represented in component library stories.</li>
+<li>Each P0 screen test plan must include state coverage.</li>
+<li>Analytics events required:<ul>
+<li><code>ui_error_shown</code></li>
+<li><code>ui_retry_clicked</code></li>
+<li><code>ui_empty_state_viewed</code></li>
+<li><code>ui_success_feedback_shown</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="candidate-specific-standards">Candidate-Specific Standards</h2>
+<ul>
+<li>Mobile-first readability for all state messages.</li>
+<li>Preserve draft data when recoverable errors occur.</li>
+<li>Do not lose Q&amp;A input on transient failures.</li>
+</ul>
+<h2 id="employer-specific-standards">Employer-Specific Standards</h2>
+<ul>
+<li>Keep decision actions disabled until required data is loaded.</li>
+<li>If packet summary unavailable, allow transcript fallback with clear notice.</li>
+</ul>
+<h2 id="accessibility-requirements">Accessibility Requirements</h2>
+<ul>
+<li>Error and success messages must be screen-reader announced.</li>
+<li>Actionable controls must be keyboard reachable.</li>
+<li>Color is never the only signal; include icon/text labels.</li>
+</ul>
+<h2 id="verification-checklist">Verification Checklist</h2>
+<ul>
+<li>[ ] All P0 screens have 5 required states.</li>
+<li>[ ] Retry behavior tested for recoverable failures.</li>
+<li>[ ] Blocking errors include support path/reference id.</li>
+<li>[ ] Candidate draft-preservation validated for Q&amp;A.</li>
+</ul></div></div></body></html>

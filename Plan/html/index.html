@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium Plan Navigator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #60a5fa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --border: #374151;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 16px 18px;
+    }
+    h1 {
+      margin: 0 0 6px 0;
+      font-size: 28px;
+    }
+    .sub {
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+    }
+    .meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .badge {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+    .action-btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: #dbeafe;
+    }
+    .area {
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      overflow: hidden;
+    }
+    .area-hd {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-2);
+      font-weight: 600;
+    }
+    .list {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 88px 1.8fr 120px 140px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 14px;
+      border-bottom: 1px solid #1f2937;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .row.active {
+      background: #0f223a;
+      outline: 1px solid #1d4ed8;
+      outline-offset: -1px;
+    }
+    .row:last-child { border-bottom: 0; }
+    .id { color: var(--muted); }
+    .doc-title {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+    .doc-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      word-break: break-word;
+    }
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--warn);
+    }
+    .status-select {
+      width: 120px;
+      padding: 6px 24px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #0f172a;
+      color: var(--text);
+      font-size: 12px;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23cbd5e1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 14px;
+    }
+    .status-select.state-draft {
+      border-color: #334155;
+      background-color: #0f172a;
+      color: #e5e7eb;
+    }
+    .status-select.state-review {
+      border-color: #4a320e;
+      background-color: #4a320e;
+      color: #fde68a;
+    }
+    .status-select.state-approved {
+      border-color: #0e642e;
+      background-color: #1a6139;
+      color: #86efac;
+    }
+    .status-select.state-superseded {
+      border-color: #1f2937;
+      background-color: #0e2512;
+      color: #ffffff;
+    }
+    .owner { color: #cbd5e1; }
+    .next { color: var(--muted); }
+    .empty {
+      padding: 16px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: var(--panel);
+    }
+    .quick {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .quick a {
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 13px;
+    }
+    .quick a:hover {
+      border-color: var(--accent);
+      color: #dbeafe;
+    }
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+      align-items: start;
+      min-height: calc(100vh - 32px);
+    }
+    .left-pane {
+      min-width: 0;
+    }
+    .preview {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      overflow: hidden;
+      position: sticky;
+      top: 8px;
+      height: calc(100vh - 16px);
+      display: flex;
+      flex-direction: column;
+    }
+    .preview-hd {
+      background: var(--panel-2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .preview-title {
+      font-size: 13px;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .preview-hd a {
+      color: var(--accent);
+      font-size: 12px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 8px;
+      background: var(--panel);
+    }
+    .preview-hd a:hover {
+      border-color: var(--accent);
+    }
+    .preview-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #0b1020;
+      flex: 1;
+    }
+    @media (max-width: 980px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .row { grid-template-columns: 1fr; gap: 6px; }
+      .id { font-size: 12px; }
+      .workspace { grid-template-columns: 1fr; }
+      .preview { position: static; }
+      .preview { height: calc(100vh - 16px); }
+      .preview-frame { height: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Jobarium Plan Navigator</h1>
+    <div class="sub">Single entry point for all planning documents.</div>
+
+    <div class="quick">
+      <a href="00_project_plan_index.html">Open Registry Source</a>
+      <a href="02_architecture/12_system_completeness_gate.html">System Completeness Gate</a>
+      <a href="04_delivery_and_execution/32_pilot_execution_ready_checklist.html">Pilot Execution Ready Checklist</a>
+      <a href="07_decisions_log/07_decisions_log.html">Decisions Log</a>
+    </div>
+
+    <div class="toolbar">
+      <input id="q" type="text" placeholder="Search by id, path, owner, next action...">
+      <select id="area"></select>
+      <select id="status"></select>
+      <select id="owner"></select>
+    </div>
+
+    <div class="meta">
+      <div class="badge" id="count"></div>
+      <div class="badge" id="changedCount">Changed: 0</div>
+      <div class="badge">Status target: review with CTO one-by-one</div>
+      <button class="action-btn" id="exportBtn" type="button">Export Updated DB</button>
+      <button class="action-btn" id="resetBtn" type="button">Reset Local Changes</button>
+    </div>
+
+    <div class="workspace">
+      <div class="left-pane">
+        <div id="out"></div>
+      </div>
+      <aside class="preview">
+        <div class="preview-hd">
+          <div class="preview-title" id="previewTitle">Preview: 00_master_entry_point.html</div>
+          <a id="previewOpen" href="00_master_entry_point.html" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+        </div>
+        <iframe id="previewFrame" class="preview-frame" src="00_master_entry_point.html" title="Document preview"></iframe>
+      </aside>
+    </div>
+  </div>
+
+  <script src="../db/document_registry.js"></script>
+  <script>
+    const q = document.getElementById("q");
+    const area = document.getElementById("area");
+    const status = document.getElementById("status");
+    const owner = document.getElementById("owner");
+    const out = document.getElementById("out");
+    const count = document.getElementById("count");
+    const changedCount = document.getElementById("changedCount");
+    const exportBtn = document.getElementById("exportBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const previewFrame = document.getElementById("previewFrame");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewOpen = document.getElementById("previewOpen");
+    let currentPreviewPath = "00_master_entry_point.html";
+    let docs = [];
+    let registryPayload = null;
+    const STATUS_VALUES = ["Draft v1", "In review", "Approved", "Superseded"];
+    const OVERRIDES_KEY = "jobarium_doc_status_overrides";
+
+    function loadOverrides() {
+      try {
+        const raw = localStorage.getItem(OVERRIDES_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOverrides(obj) {
+      localStorage.setItem(OVERRIDES_KEY, JSON.stringify(obj));
+    }
+
+    function unique(list, key) {
+      return [...new Set(list.map(x => x[key]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b)));
+    }
+
+    function fillSelect(el, values, label) {
+      el.innerHTML = "";
+      const all = document.createElement("option");
+      all.value = "";
+      all.textContent = "All " + label;
+      el.appendChild(all);
+      values.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        el.appendChild(opt);
+      });
+    }
+
+    function textMatch(doc, term) {
+      if (!term) return true;
+      const s = term.toLowerCase();
+      return [
+        doc.id, doc.title, doc.path_html, doc.path_md, doc.area, doc.status, doc.owner, doc.next_action
+      ].join(" ").toLowerCase().includes(s);
+    }
+
+    function loadPreview(path) {
+      currentPreviewPath = path;
+      previewFrame.src = path;
+      previewTitle.textContent = `Preview: ${path}`;
+      previewOpen.href = path;
+      document.querySelectorAll(".row.active").forEach(el => el.classList.remove("active"));
+      const active = document.querySelector(`.row[data-path="${CSS.escape(path)}"]`);
+      if (active) active.classList.add("active");
+    }
+
+    function statusClass(statusValue) {
+      if (statusValue === "Approved") return "state-approved";
+      if (statusValue === "In review") return "state-review";
+      if (statusValue === "Superseded") return "state-superseded";
+      return "state-draft";
+    }
+
+    function render() {
+      const term = q.value.trim();
+      const a = area.value;
+      const st = status.value;
+      const ow = owner.value;
+
+      const visibleDocs = docs.filter(d => d.area !== "00 Navigation");
+      const filtered = visibleDocs.filter(d =>
+        textMatch(d, term) &&
+        (!a || d.area === a) &&
+        (!st || d.status === st) &&
+        (!ow || d.owner === ow)
+      );
+
+      count.textContent = `Showing ${filtered.length} of ${visibleDocs.length} docs`;
+      out.innerHTML = "";
+      if (!filtered.length) {
+        out.innerHTML = '<div class="empty">No documents match current filters.</div>';
+        return;
+      }
+
+      const byArea = {};
+      filtered.forEach(d => {
+        if (!byArea[d.area]) byArea[d.area] = [];
+        byArea[d.area].push(d);
+      });
+
+      Object.keys(byArea).sort().forEach(areaName => {
+        const section = document.createElement("section");
+        section.className = "area";
+        section.innerHTML = `<div class="area-hd">${areaName} (${byArea[areaName].length})</div>`;
+        const list = document.createElement("div");
+        list.className = "list";
+
+        byArea[areaName].sort((a, b) => a.id.localeCompare(b.id)).forEach(d => {
+          const path = d.path_html || (d.path_md ? d.path_md.replace(/\.md$/i, ".html") : "");
+          const row = document.createElement("div");
+          row.className = "row";
+          row.dataset.path = path;
+          if (path === currentPreviewPath) row.classList.add("active");
+          row.innerHTML = `
+            <div class="id">${d.id}</div>
+            <div class="path">
+              <div class="doc-title">${d.title || path}</div>
+              <div class="doc-sub">${path}</div>
+            </div>
+            <div>
+              <select class="status-select ${statusClass(d.status || "Draft v1")}" data-id="${d.id}">
+                ${STATUS_VALUES.map(s => `<option value="${s}" ${s === (d.status || "Draft v1") ? "selected" : ""}>${s}</option>`).join("")}
+              </select>
+            </div>
+            <div class="owner">${d.owner || "-"}</div>
+            <div class="next">${d.next_action || ""}</div>
+          `;
+          list.appendChild(row);
+        });
+
+        section.appendChild(list);
+        out.appendChild(section);
+      });
+
+      const overrides = loadOverrides();
+      changedCount.textContent = `Changed: ${Object.keys(overrides).length}`;
+    }
+
+    async function init() {
+      try {
+        const res = await fetch("../db/document_registry.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        registryPayload = data;
+        docs = Array.isArray(data.documents) ? data.documents : [];
+      } catch (err) {
+        const fallback = window.__DOC_REGISTRY__;
+        if (fallback && Array.isArray(fallback.documents)) {
+          registryPayload = fallback;
+          docs = fallback.documents;
+        } else {
+          out.innerHTML = `<div class="empty">Failed to load registry DB (<code>../db/document_registry.json</code>).<br>Please check file location and refresh.</div>`;
+          count.textContent = "Showing 0 of 0 docs";
+          return;
+        }
+      }
+
+      const overrides = loadOverrides();
+      if (Object.keys(overrides).length) {
+        docs = docs.map(d => ({ ...d, status: overrides[d.id] || d.status }));
+      }
+
+      fillSelect(area, unique(docs, "area"), "areas");
+      fillSelect(status, unique(docs, "status"), "statuses");
+      fillSelect(owner, unique(docs, "owner"), "owners");
+
+      [q, area, status, owner].forEach(el => el.addEventListener("input", render));
+      [area, status, owner].forEach(el => el.addEventListener("change", render));
+      out.addEventListener("click", (event) => {
+        if (event.target.closest(".status-select")) return;
+        const row = event.target.closest(".row");
+        if (!row) return;
+        const path = row.getAttribute("data-path");
+        if (path) loadPreview(path);
+      });
+
+      out.addEventListener("change", (event) => {
+        const sel = event.target.closest(".status-select");
+        if (!sel) return;
+        const id = sel.getAttribute("data-id");
+        const val = sel.value;
+        const doc = docs.find(d => d.id === id);
+        if (!doc) return;
+        doc.status = val;
+        const overrides = loadOverrides();
+        overrides[id] = val;
+        saveOverrides(overrides);
+        sel.classList.remove("state-draft", "state-review", "state-approved", "state-superseded");
+        sel.classList.add(statusClass(val));
+        changedCount.textContent = `Changed: ${Object.keys(overrides).length}`;
+      });
+
+      exportBtn.addEventListener("click", () => {
+        const base = registryPayload && typeof registryPayload === "object" ? registryPayload : { schema_version: 1, documents: [], history: [] };
+        const outPayload = {
+          ...base,
+          updated_at: new Date().toISOString(),
+          documents: docs
+        };
+        const blob = new Blob([JSON.stringify(outPayload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "document_registry.updated.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      resetBtn.addEventListener("click", () => {
+        localStorage.removeItem(OVERRIDES_KEY);
+        if (registryPayload && Array.isArray(registryPayload.documents)) {
+          docs = registryPayload.documents.map(d => ({ ...d }));
+        }
+        render();
+      });
+
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>

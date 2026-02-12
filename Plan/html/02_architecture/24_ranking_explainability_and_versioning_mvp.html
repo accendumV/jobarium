@@ -1,0 +1,120 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>24_ranking_explainability_and_versioning_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-ranking-explainability-and-versioning-spec-mvp">Jobarium Ranking Explainability and Versioning Spec (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define:
+1. explainability payload format for match results (item 10),
+2. ranking versioning and rollback strategy (item 12).</p>
+<h2 id="explainability-payload-contract-v1">Explainability Payload Contract (<code>v1</code>)</h2>
+<h3 id="object-match_explainability">Object: <code>match_explainability</code></h3>
+<ul>
+<li><code>candidate_id</code> (string)</li>
+<li><code>job_id</code> (string)</li>
+<li><code>ranking_version</code> (string, e.g. <code>rank_v1_2026_02</code>)</li>
+<li><code>total_score</code> (0-100)</li>
+<li><code>sub_scores</code> (object):<ul>
+<li><code>skills</code></li>
+<li><code>title_role</code></li>
+<li><code>domain</code></li>
+<li><code>experience</code></li>
+<li><code>location</code></li>
+<li><code>pay</code></li>
+<li><code>availability</code></li>
+<li><code>recency</code></li>
+<li><code>profile_quality</code></li>
+</ul>
+</li>
+<li><code>hard_filter_results</code> (object):<ul>
+<li>authorization: <code>pass|fail|unknown</code></li>
+<li>location: <code>pass|fail|unknown</code></li>
+<li>pay_overlap: <code>pass|fail|unknown</code></li>
+<li>start_date: <code>pass|fail|unknown</code></li>
+<li>required_cert: <code>pass|fail|unknown</code></li>
+</ul>
+</li>
+<li><code>why_matched</code> (array[string], min 1, max 5)</li>
+<li><code>gaps_or_unknowns</code> (array[string], min 0, max 5)</li>
+<li><code>computed_at</code> (ISO string)</li>
+</ul>
+<h3 id="ui-guidance">UI Guidance</h3>
+<ul>
+<li>Employer UI must show:<ul>
+<li>top 3 positive reasons from <code>why_matched</code></li>
+<li>top 3 risks from <code>gaps_or_unknowns</code></li>
+<li>sub-score breakdown on demand</li>
+</ul>
+</li>
+</ul>
+<h2 id="ranking-version-model">Ranking Version Model</h2>
+<h3 id="version-identifier">Version Identifier</h3>
+<ul>
+<li>Format: <code>rank_v{major}_{YYYY}_{MM}</code></li>
+<li>Example: <code>rank_v1_2026_02</code></li>
+</ul>
+<h3 id="when-to-bump-version">When to Bump Version</h3>
+<ul>
+<li>major bump:<ul>
+<li>weight changes impacting ordering materially</li>
+<li>scoring formula changes</li>
+<li>hard filter semantics changes</li>
+</ul>
+</li>
+<li>minor metadata change (no ordering impact):<ul>
+<li>keep same ranking version</li>
+</ul>
+</li>
+</ul>
+<h3 id="storage-requirements">Storage Requirements</h3>
+<ul>
+<li>Persist <code>ranking_version</code> with each <code>match_score</code>.</li>
+<li>Persist <code>shortlist_version</code> with each shortlist snapshot.</li>
+<li>Keep previous ranking snapshots for at least 30 days during pilot.</li>
+</ul>
+<h2 id="rollout-and-rollback-strategy">Rollout and Rollback Strategy</h2>
+<h3 id="safe-rollout">Safe Rollout</h3>
+<ol>
+<li>Compute candidate ordering in shadow mode for sample jobs.</li>
+<li>Compare with current version:
+   - overlap,
+   - ordering deltas,
+   - packet/interview conversion proxy.</li>
+<li>Enable new version behind feature flag.</li>
+<li>Promote to default after monitoring window.</li>
+</ol>
+<h3 id="rollback-trigger-conditions">Rollback Trigger Conditions</h3>
+<ul>
+<li>significant drop in packet-&gt;interview rate,</li>
+<li>abnormal shortlist volatility,</li>
+<li>support complaints tied to relevance quality.</li>
+</ul>
+<h3 id="rollback-procedure">Rollback Procedure</h3>
+<ol>
+<li>Switch feature flag to prior <code>ranking_version</code>.</li>
+<li>Recompute shortlist for active jobs.</li>
+<li>Emit <code>matching.shortlist.changed</code> with rollback marker.</li>
+<li>Record decision and incident note.</li>
+</ol>
+<h2 id="governance">Governance</h2>
+<ul>
+<li>Ranking changes require:<ul>
+<li>CTO approval,</li>
+<li>documented rationale,</li>
+<li>decision log entry.</li>
+</ul>
+</li>
+<li>Pilot cadence:<ul>
+<li>evaluate weekly; avoid more than one major ranking change per week.</li>
+</ul>
+</li>
+</ul></div></div></body></html>

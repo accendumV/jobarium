@@ -1,0 +1,331 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>06_authenticity_detection_spec.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-authenticity-detection-specification-mvp-phase-15">Jobarium Authenticity Detection Specification (MVP -&gt; Phase 1.5)</h1>
+<h2 id="1-objective">1. Objective</h2>
+<p>Detect likely heavy AI rewriting or outsourced answer generation in employer Q&amp;A submissions, while preserving fairness and minimizing false positives.</p>
+<p>This module provides <strong>decision support</strong>, not automatic hiring decisions.</p>
+<h2 id="2-product-policy">2. Product Policy</h2>
+<h3 id="21-allowed-vs-not-allowed">2.1 Allowed vs Not Allowed</h3>
+<ul>
+<li>Allowed:<ul>
+<li>grammar and spelling corrections</li>
+<li>short phrasing improvements</li>
+<li>translation assistance (declared or inferred)</li>
+</ul>
+</li>
+<li>Not allowed (policy-flagged):<ul>
+<li>full answer generation with little user involvement</li>
+<li>copy-paste of externally generated full responses</li>
+<li>inconsistent fabricated details that break profile history coherence</li>
+</ul>
+</li>
+</ul>
+<h3 id="22-decision-principle">2.2 Decision Principle</h3>
+<ul>
+<li>MVP must be <strong>human-in-the-loop</strong>.</li>
+<li>Model output can flag risk but cannot auto-reject candidates.</li>
+<li>Employers see confidence and reason codes, not binary guilt labels.</li>
+</ul>
+<h2 id="3-detection-architecture">3. Detection Architecture</h2>
+<h2 id="31-data-sources">3.1 Data Sources</h2>
+<ul>
+<li>Q&amp;A editor telemetry:<ul>
+<li>keystroke timing aggregates (not raw keylogging)</li>
+<li>paste events (count/size/timestamps)</li>
+<li>edit operations (insert/delete bursts)</li>
+<li>focus/blur intervals</li>
+</ul>
+</li>
+<li>Submitted answers:<ul>
+<li>final text</li>
+<li>answer length and structure</li>
+</ul>
+</li>
+<li>Candidate profile baseline:<ul>
+<li>prior written fields</li>
+<li>experience history, certifications, role family</li>
+</ul>
+</li>
+</ul>
+<h3 id="32-processing-steps">3.2 Processing Steps</h3>
+<ol>
+<li>Collect session telemetry and answer content.</li>
+<li>Compute per-answer features.</li>
+<li>Aggregate session-level features.</li>
+<li>Run rule engine to produce reason codes.</li>
+<li>Compute authenticity score + confidence.</li>
+<li>Persist assessment and emit event.</li>
+<li>Attach trust insight to packet.</li>
+</ol>
+<h3 id="33-service-components">3.3 Service Components</h3>
+<ul>
+<li><code>qa-telemetry-collector</code> (Cloud Run endpoint)</li>
+<li><code>qa-signal-extractor</code> (worker)</li>
+<li><code>qa-authenticity-scorer</code> (rule engine in MVP)</li>
+<li><code>packet-trust-enricher</code> (adds badge + reason codes to packet view)</li>
+</ul>
+<h2 id="4-signal-definitions-mvp">4. Signal Definitions (MVP)</h2>
+<p>All features are normalized to [0,1] where possible.</p>
+<h3 id="41-behavioral-signals">4.1 Behavioral Signals</h3>
+<ul>
+<li><code>paste_ratio_chars</code><ul>
+<li>pasted_characters / total_characters</li>
+</ul>
+</li>
+<li><code>full_answer_paste_events</code><ul>
+<li>count of paste events where pasted chunk &gt; 70% of final answer</li>
+</ul>
+</li>
+<li><code>time_to_first_input_sec</code><ul>
+<li>long delay followed by large paste can increase risk</li>
+</ul>
+</li>
+<li><code>edit_churn_ratio</code><ul>
+<li>edits / final_length (very low with large paste can increase risk)</li>
+</ul>
+</li>
+<li><code>typing_burst_entropy</code><ul>
+<li>low entropy patterns may indicate non-human drafting sequence</li>
+</ul>
+</li>
+</ul>
+<h3 id="42-linguistic-consistency-signals">4.2 Linguistic Consistency Signals</h3>
+<ul>
+<li><code>style_shift_score</code><ul>
+<li>difference between candidate historical writing profile and current submission</li>
+</ul>
+</li>
+<li><code>readability_shift</code><ul>
+<li>abrupt jumps in complexity/vocabulary level</li>
+</ul>
+</li>
+<li><code>template_phrase_density</code><ul>
+<li>known generic assistant phrase frequency</li>
+</ul>
+</li>
+</ul>
+<h3 id="43-coherence-and-plausibility-signals">4.3 Coherence and Plausibility Signals</h3>
+<ul>
+<li><code>timeline_conflict_score</code><ul>
+<li>conflicts with known employment chronology</li>
+</ul>
+</li>
+<li><code>domain_depth_mismatch</code><ul>
+<li>answer sophistication inconsistent with profile claims</li>
+</ul>
+</li>
+<li><code>cross_answer_contradiction_score</code><ul>
+<li>logical contradictions between answers in same session</li>
+</ul>
+</li>
+</ul>
+<h3 id="44-contextual-mitigation-signals">4.4 Contextual Mitigation Signals</h3>
+<ul>
+<li><code>non_native_language_indicator</code><ul>
+<li>reduces weight of style-shift-only concerns</li>
+</ul>
+</li>
+<li><code>accessibility_mode_indicator</code><ul>
+<li>allows alternative input behavior patterns</li>
+</ul>
+</li>
+<li><code>declared_assistance_flag</code><ul>
+<li>candidate declares use of writing support tools</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-scoring-model-mvp-rule-based">5. Scoring Model (MVP Rule-Based)</h2>
+<h3 id="51-score">5.1 Score</h3>
+<p><code>ai_assist_likelihood</code> in [0,100]:</p>
+<p><code>score = 100 * (0.40*B + 0.30*L + 0.20*C - 0.10*M)</code></p>
+<p>Where:
+- <code>B</code> = behavioral risk composite
+- <code>L</code> = linguistic inconsistency composite
+- <code>C</code> = coherence risk composite
+- <code>M</code> = mitigation composite</p>
+<p><code>authenticity_score = 100 - ai_assist_likelihood</code></p>
+<h3 id="52-confidence">5.2 Confidence</h3>
+<p>Confidence in [0,1] based on:
+- telemetry completeness
+- answer length sufficiency
+- number of active signals
+- inter-signal agreement</p>
+<p>Low confidence defaults to neutral packet labeling.</p>
+<h3 id="53-policy-buckets">5.3 Policy Buckets</h3>
+<ul>
+<li><code>0-34</code>: <code>likely_self_authored</code></li>
+<li><code>35-64</code>: <code>mixed_assistance</code></li>
+<li><code>65-100</code>: <code>heavy_assistance_suspected</code></li>
+</ul>
+<p>If confidence &lt; 0.55 =&gt; policy result downgraded to <code>mixed_assistance</code> with low-confidence marker.</p>
+<h2 id="6-reason-codes">6. Reason Codes</h2>
+<p>Reason codes are short, explainable tags for employers and support team:
+- <code>RC_PASTE_HEAVY</code>
+- <code>RC_STYLE_SHIFT_ABRUPT</code>
+- <code>RC_TEMPLATE_PHRASE_PATTERN</code>
+- <code>RC_TIMELINE_CONFLICT</code>
+- <code>RC_CROSS_ANSWER_CONTRADICTION</code>
+- <code>RC_LOW_EDIT_INVOLVEMENT</code>
+- <code>RC_LOW_CONFIDENCE_RESULT</code></p>
+<p>Packet UI shows top 1-3 reason codes only.</p>
+<h2 id="7-data-model-additions">7. Data Model Additions</h2>
+<h3 id="qa_response_signal"><code>qa_response_signal</code></h3>
+<ul>
+<li><code>id</code> (uuid)</li>
+<li><code>session_id</code></li>
+<li><code>question_id</code></li>
+<li><code>signal_type</code></li>
+<li><code>signal_value_json</code></li>
+<li><code>captured_at</code></li>
+</ul>
+<p>Indexes:
+- <code>(session_id, question_id)</code>
+- <code>(signal_type, captured_at)</code></p>
+<h3 id="qa_authenticity_assessment"><code>qa_authenticity_assessment</code></h3>
+<ul>
+<li><code>id</code> (uuid)</li>
+<li><code>session_id</code> (unique)</li>
+<li><code>authenticity_score</code> (0-100)</li>
+<li><code>ai_assist_likelihood</code> (0-100)</li>
+<li><code>confidence</code> (0-1)</li>
+<li><code>policy_result</code> (enum)</li>
+<li><code>reason_codes_json</code> (array)</li>
+<li><code>model_version</code></li>
+<li><code>assessed_at</code></li>
+</ul>
+<p>Indexes:
+- <code>(policy_result, assessed_at)</code>
+- <code>(confidence, assessed_at)</code></p>
+<h2 id="8-event-contracts">8. Event Contracts</h2>
+<h3 id="81-qasubmitted-input-trigger">8.1 <code>qa.submitted</code> (input trigger)</h3>
+<p>Payload:
+- <code>event_id</code>
+- <code>session_id</code>
+- <code>candidate_id</code>
+- <code>job_id</code>
+- <code>submitted_at</code></p>
+<h3 id="82-qaauthenticityassessed-output">8.2 <code>qa.authenticity.assessed</code> (output)</h3>
+<p>Payload:
+- <code>event_id</code>
+- <code>session_id</code>
+- <code>candidate_id</code>
+- <code>job_id</code>
+- <code>policy_result</code>
+- <code>authenticity_score</code>
+- <code>confidence</code>
+- <code>reason_codes</code> (max 3)
+- <code>model_version</code>
+- <code>assessed_at</code></p>
+<h2 id="9-employer-ux-output">9. Employer UX Output</h2>
+<h3 id="91-packet-header">9.1 Packet Header</h3>
+<ul>
+<li>Trust badge:<ul>
+<li>Green: likely self-authored</li>
+<li>Yellow: mixed assistance</li>
+<li>Orange: heavy assistance suspected</li>
+</ul>
+</li>
+</ul>
+<h3 id="92-detail-block">9.2 Detail Block</h3>
+<ul>
+<li>"Why flagged" with short reason codes + plain-language translation.</li>
+<li>"Suggested verification prompts" (2-3):<ul>
+<li>scenario-based follow-up</li>
+<li>timeline clarification</li>
+<li>tool/process deep dive</li>
+</ul>
+</li>
+</ul>
+<h3 id="93-guardrail-copy">9.3 Guardrail Copy</h3>
+<ul>
+<li>"This is an automated trust signal and should be used alongside interview judgment."</li>
+</ul>
+<h2 id="10-candidate-ux-and-fairness">10. Candidate UX and Fairness</h2>
+<h3 id="101-pre-session-notice">10.1 Pre-Session Notice</h3>
+<ul>
+<li>Explain accepted assistance boundaries.</li>
+<li>Explain that authenticity checks are applied for employer trust and fairness.</li>
+</ul>
+<h3 id="102-in-session-guidance">10.2 In-Session Guidance</h3>
+<ul>
+<li>Optional soft warning on suspicious full-answer paste behavior:<ul>
+<li>"Please ensure your response reflects your own experience."</li>
+</ul>
+</li>
+</ul>
+<h3 id="103-post-flag-review-path">10.3 Post-Flag Review Path</h3>
+<ul>
+<li>Candidate can request review if they believe the signal is incorrect.</li>
+<li>Support tools show full signal snapshot and confidence.</li>
+</ul>
+<h2 id="11-privacy-security-and-gdpr">11. Privacy, Security, and GDPR</h2>
+<ul>
+<li>Store only aggregate telemetry features; avoid storing raw keystroke content.</li>
+<li>Restrict access to authenticity data to authorized employer/admin roles.</li>
+<li>Include authenticity data in export/delete workflows.</li>
+<li>Retain raw telemetry-derived features for limited period (recommended: 90 days), keep final assessment longer for audit.</li>
+</ul>
+<h2 id="12-mvp-rollout-plan">12. MVP Rollout Plan</h2>
+<h3 id="phase-a-week-6-target">Phase A (Week 6 target)</h3>
+<ul>
+<li>Implement telemetry capture + rule-based scoring.</li>
+<li>Show badge + reason codes internally only (admin/employer pilot group).</li>
+<li>Track false-positive feedback.</li>
+</ul>
+<h3 id="phase-b-week-7-8">Phase B (Week 7-8)</h3>
+<ul>
+<li>Enable badge for all pilot employers.</li>
+<li>Add candidate review path and support tooling.</li>
+<li>Tune thresholds by role family.</li>
+</ul>
+<h3 id="phase-c-phase-15">Phase C (Phase 1.5)</h3>
+<ul>
+<li>Train lightweight classifier using labeled outcomes.</li>
+<li>Keep rule-based fallback for explainability and resilience.</li>
+</ul>
+<h2 id="13-quality-metrics">13. Quality Metrics</h2>
+<ul>
+<li>precision@flag (employer-confirmed suspicious cases)</li>
+<li>false-positive rate (candidate appeals upheld)</li>
+<li>coverage rate (% sessions with confidence &gt;= 0.55)</li>
+<li>employer trust utility score (survey + action correlation)</li>
+<li>impact on packet-&gt;interview conversion (must not degrade unfairly)</li>
+</ul>
+<h2 id="14-test-strategy">14. Test Strategy</h2>
+<h3 id="unit-tests">Unit Tests</h3>
+<ul>
+<li>feature extraction correctness</li>
+<li>score computation and threshold bucketing</li>
+<li>reason code generation</li>
+</ul>
+<h3 id="integration-tests">Integration Tests</h3>
+<ul>
+<li><code>qa.submitted</code> -&gt; assessment persisted -&gt; event emitted</li>
+<li>packet rendering with trust insight</li>
+<li>low-confidence downgrade behavior</li>
+</ul>
+<h3 id="adversarial-tests">Adversarial Tests</h3>
+<ul>
+<li>full copy-paste synthetic cases</li>
+<li>paraphrased AI-generated responses</li>
+<li>multilingual and non-native writing profiles</li>
+<li>accessibility-altered input behavior</li>
+</ul>
+<h2 id="15-open-questions-to-lock">15. Open Questions to Lock</h2>
+<ol>
+<li>Should employers be able to configure strictness per role?</li>
+<li>Do we allow hard block for very high-risk + high-confidence in regulated roles?</li>
+<li>How long should reason-code history be visible to employers?</li>
+<li>Should declared assistance by candidates reduce score or only annotate output?</li>
+</ol></div></div></body></html>

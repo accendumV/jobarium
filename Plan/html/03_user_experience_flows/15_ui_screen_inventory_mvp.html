@@ -1,0 +1,479 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>15_ui_screen_inventory_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-ui-screen-inventory-and-component-spec-mvp">Jobarium UI Screen Inventory and Component Spec (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define a complete MVP screen inventory for candidate and employer portals with component-level requirements.</p>
+<p>This document closes the gap between journey flows and implementation by specifying:
+- all required screens,
+- key components per screen,
+- required states (empty/loading/error),
+- data dependencies,
+- primary analytics events.</p>
+<h2 id="conventions">Conventions</h2>
+<ul>
+<li>Screen ID prefixes:<ul>
+<li><code>CAND-</code> candidate portal</li>
+<li><code>EMP-</code> employer portal</li>
+<li><code>ADMIN-</code> admin/internal</li>
+<li><code>SHARED-</code> cross-portal</li>
+</ul>
+</li>
+<li>Priority:<ul>
+<li><code>P0</code> launch critical</li>
+<li><code>P1</code> post-launch high value</li>
+</ul>
+</li>
+</ul>
+<h2 id="required-global-ux-states-all-p0-screens">Required Global UX States (all P0 screens)</h2>
+<ul>
+<li><code>loading</code></li>
+<li><code>empty</code></li>
+<li><code>error_recoverable</code></li>
+<li><code>error_blocking</code></li>
+<li><code>success_feedback</code> (for submit/save actions)</li>
+</ul>
+<h2 id="candidate-portal-screens">Candidate Portal Screens</h2>
+<h3 id="cand-001-entry-and-sign-up-p0">CAND-001: Entry and Sign-Up (<code>P0</code>)</h3>
+<ul>
+<li>Goal: create account with minimal friction.</li>
+<li>Components:<ul>
+<li>value proposition hero</li>
+<li>sign-up form/OAuth buttons</li>
+<li>login switch link</li>
+<li>legal links</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>auth providers availability</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>loading auth config, invalid credentials, duplicate email</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>candidate_signup_started</code>, <code>candidate_signup_completed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-002-consent-capture-p0">CAND-002: Consent Capture (<code>P0</code>)</h3>
+<ul>
+<li>Goal: collect terms/privacy/GDPR consent.</li>
+<li>Components:<ul>
+<li>consent items checklist</li>
+<li>version label</li>
+<li>accept/decline actions</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>latest consent policy version</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>consent fetch failed, consent submit failed</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>candidate_consent_accepted</code>, <code>candidate_consent_declined</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-003-cv-uploadimport-p0">CAND-003: CV Upload/Import (<code>P0</code>)</h3>
+<ul>
+<li>Goal: bootstrap profile quickly.</li>
+<li>Components:<ul>
+<li>file dropzone (PDF/DOC/DOCX)</li>
+<li>LinkedIn/import actions (if enabled)</li>
+<li>parse status card</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>file upload token, parser status</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>file type invalid, parse failed, parse pending</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>cv_upload_started</code>, <code>cv_upload_success</code>, <code>cv_parse_failed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-004-high-impact-field-confirmation-p0">CAND-004: High-Impact Field Confirmation (<code>P0</code>)</h3>
+<ul>
+<li>Goal: reach matchable profile threshold.</li>
+<li>Components:<ul>
+<li>required fields form (role, location/radius, auth, pay range, availability)</li>
+<li>confidence highlights for parsed fields</li>
+<li>save/continue</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>parsed profile payload + confidence</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>missing required field, validation error</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>candidate_profile_required_completed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-005-profile-completeness-dashboard-p0">CAND-005: Profile Completeness Dashboard (<code>P0</code>)</h3>
+<ul>
+<li>Goal: guide optional enrichment.</li>
+<li>Components:<ul>
+<li>progress meter</li>
+<li>missing fields recommendation list</li>
+<li>profile section cards (skills/certs/history)</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>profile completeness score and section gaps</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>no recommendations, save failure</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>candidate_profile_updated</code>, <code>candidate_profile_completeness_changed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-006-invite-detail-p0">CAND-006: Invite Detail (<code>P0</code>)</h3>
+<ul>
+<li>Goal: informed start/decline decision.</li>
+<li>Components:<ul>
+<li>role summary card</li>
+<li>employer summary card</li>
+<li>pay/location/time estimate block</li>
+<li>start/decline CTAs</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>invite details, expiry, job metadata</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>expired invite, already started/completed invite</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>invite_viewed</code>, <code>invite_started</code>, <code>invite_declined</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-007-qa-session-p0">CAND-007: Q&amp;A Session (<code>P0</code>)</h3>
+<ul>
+<li>Goal: complete async pre-screen reliably.</li>
+<li>Components:<ul>
+<li>question renderer (yes/no, MCQ, short text, numeric, links)</li>
+<li>autosave indicator</li>
+<li>progress bar</li>
+<li>authenticity policy notice</li>
+<li>submit action</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>question kit, prior autosaved answers</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>autosave failed (retry), validation errors, session expired</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>qa_started</code>, <code>qa_autosave</code>, <code>qa_submitted</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-008-submission-confirmation-p0">CAND-008: Submission Confirmation (<code>P0</code>)</h3>
+<ul>
+<li>Goal: close loop and reduce uncertainty.</li>
+<li>Components:<ul>
+<li>success confirmation</li>
+<li>expected response window</li>
+<li>next-step explanation</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>session status and timestamp</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>missing session reference fallback</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>qa_submission_confirmation_viewed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="cand-009-opportunity-status-timeline-p1">CAND-009: Opportunity Status Timeline (<code>P1</code>)</h3>
+<ul>
+<li>Goal: retention and transparency.</li>
+<li>Components:<ul>
+<li>status timeline</li>
+<li>latest action indicator</li>
+<li>optional profile refresh prompt</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>invite/session/packet status summary</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>no active opportunities</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>candidate_timeline_viewed</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="employer-portal-screens">Employer Portal Screens</h2>
+<h3 id="emp-001-organization-onboarding-p0">EMP-001: Organization Onboarding (<code>P0</code>)</h3>
+<ul>
+<li>Goal: initialize employer workspace.</li>
+<li>Components:<ul>
+<li>organization profile form</li>
+<li>timezone + channel preferences</li>
+<li>invite teammates (optional)</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>org settings defaults</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>duplicate org name warning, save failed</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>employer_onboarding_completed</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="emp-002-job-setup-wizard-p0">EMP-002: Job Setup Wizard (<code>P0</code>)</h3>
+<ul>
+<li>Goal: create role quickly with structure.</li>
+<li>Components:<ul>
+<li>template selector</li>
+<li>role basics form</li>
+<li>requirement builder (must/nice/dealbreaker)</li>
+<li>question kit editor</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>template payload, requirement taxonomy</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>required section incomplete, invalid pay/location config</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>job_setup_started</code>, <code>job_setup_completed</code>, <code>template_selected</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="emp-003-automation-settings-p0">EMP-003: Automation Settings (<code>P0</code>)</h3>
+<ul>
+<li>Goal: configure auto-invite safely.</li>
+<li>Components:<ul>
+<li>top N/threshold controls</li>
+<li>cap/cooldown/expiry controls</li>
+<li>policy preview panel</li>
+<li>activate toggle</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>current policy config and guardrails</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>invalid policy combination</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>invite_policy_updated</code>, <code>job_activated</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="emp-004-packet-inbox-p0">EMP-004: Packet Inbox (<code>P0</code>)</h3>
+<ul>
+<li>Goal: review completed packets only.</li>
+<li>Components:<ul>
+<li>packet list/table</li>
+<li>filters (role, date, fit range, authenticity label)</li>
+<li>sorting and quick status</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>packet summary feed</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>no packets yet empty state with guidance</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>packet_inbox_viewed</code>, <code>packet_filter_applied</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="emp-005-packet-detail-p0">EMP-005: Packet Detail (<code>P0</code>)</h3>
+<ul>
+<li>Goal: make decision in one screen.</li>
+<li>Components:<ul>
+<li>fit summary</li>
+<li>dealbreaker checks</li>
+<li>authenticity badge + reason codes + confidence</li>
+<li>evidence snippets</li>
+<li>full transcript</li>
+<li>sticky action bar (<code>Interview</code>, <code>Clarify</code>, <code>Reject</code>)</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>packet payload and related job metadata</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>missing summary fallback, stale packet superseded notice</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>packet_viewed</code>, <code>packet_action_taken</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="emp-006-job-performance-dashboard-p1">EMP-006: Job Performance Dashboard (<code>P1</code>)</h3>
+<ul>
+<li>Goal: monitor flow quality and velocity.</li>
+<li>Components:<ul>
+<li>KPI cards (time to first packet, invite-&gt;completion, packet-&gt;interview)</li>
+<li>trend chart</li>
+<li>role switcher/date filters</li>
+</ul>
+</li>
+<li>Data:<ul>
+<li>analytics aggregates</li>
+</ul>
+</li>
+<li>States:<ul>
+<li>insufficient data notice</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>employer_dashboard_viewed</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="sharedinternal-screens">Shared/Internal Screens</h2>
+<h3 id="shared-001-notification-preferences-p1">SHARED-001: Notification Preferences (<code>P1</code>)</h3>
+<ul>
+<li>Goal: channel control for users.</li>
+<li>Components:<ul>
+<li>email/SMS toggles</li>
+<li>digest/realtime settings</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>notification_preferences_updated</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="shared-002-error-and-retry-surface-p0">SHARED-002: Error and Retry Surface (<code>P0</code>)</h3>
+<ul>
+<li>Goal: recover from transient failures.</li>
+<li>Components:<ul>
+<li>retry CTA</li>
+<li>support contact path</li>
+<li>contextual error message</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>retry_clicked</code>, <code>support_contact_clicked</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="admin-001-pipeline-failures-monitor-p1">ADMIN-001: Pipeline Failures Monitor (<code>P1</code>)</h3>
+<ul>
+<li>Goal: inspect failed parse/enrichment/packet jobs.</li>
+<li>Components:<ul>
+<li>failed jobs table</li>
+<li>retry action</li>
+<li>failure reason panel</li>
+</ul>
+</li>
+<li>Analytics:<ul>
+<li><code>admin_job_retry_triggered</code></li>
+</ul>
+</li>
+</ul>
+<h2 id="component-library-mvp-core">Component Library (MVP Core)</h2>
+<ul>
+<li><code>JobSummaryCard</code></li>
+<li><code>InviteActionPanel</code></li>
+<li><code>ProgressMeter</code></li>
+<li><code>DealbreakerStatusList</code></li>
+<li><code>AuthenticityBadge</code></li>
+<li><code>ReasonCodeList</code></li>
+<li><code>PacketActionBar</code></li>
+<li><code>QuestionRenderer</code></li>
+<li><code>AutosaveIndicator</code></li>
+<li><code>KpiMetricCard</code></li>
+<li><code>EmptyStatePanel</code></li>
+<li><code>RecoverableErrorPanel</code></li>
+</ul>
+<h2 id="data-dependency-map-minimal">Data Dependency Map (Minimal)</h2>
+<ul>
+<li>Candidate onboarding screens depend on:<ul>
+<li>auth service</li>
+<li>candidate profile service</li>
+<li>document parser status API</li>
+</ul>
+</li>
+<li>Employer setup screens depend on:<ul>
+<li>org service</li>
+<li>job service</li>
+<li>template catalog</li>
+</ul>
+</li>
+<li>Packet screens depend on:<ul>
+<li>packet service</li>
+<li>authenticity assessment payload</li>
+<li>action endpoint</li>
+</ul>
+</li>
+</ul>
+<h2 id="ux-readiness-checklist-for-each-p0-screen">UX Readiness Checklist (for each P0 screen)</h2>
+<ol>
+<li>Primary user goal is clear.</li>
+<li>One primary CTA and one safe secondary CTA.</li>
+<li>Loading/empty/error states explicitly designed.</li>
+<li>Analytics events defined.</li>
+<li>Permission checks defined.</li>
+<li>Mobile behavior defined where candidate-facing.</li>
+</ol>
+<h2 id="out-of-scope-post-mvp">Out of Scope (Post-MVP)</h2>
+<ul>
+<li>Advanced personalization/theme settings.</li>
+<li>Dynamic drag-and-drop workflow builders.</li>
+<li>Deep multi-panel admin workflows.</li>
+</ul></div></div></body></html>

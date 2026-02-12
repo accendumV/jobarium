@@ -1,0 +1,506 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>02_jobarium_architecture_plan.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-architecture-plan-mvp">Jobarium Architecture Plan (MVP)</h1>
+<h2 id="scope-and-constraints">Scope and Constraints</h2>
+<ul>
+<li>Architecture is <strong>wedge-agnostic</strong> (domain model does not depend on one profession).</li>
+<li>GTM assumption for rollout planning: <strong>DMV trades</strong>.</li>
+<li>Target: <strong>realistic launch in ~8 weeks</strong>.</li>
+<li>Team: <strong>2 developers</strong> (CEO + CTO) with AI assistance.</li>
+<li>AI posture: <strong>minimal AI in MVP</strong> (embeddings, vector retrieval, packet summaries).</li>
+<li>Compliance target at launch: <strong>OWASP+ best practices + GDPR</strong>; SOC2-ready design later.</li>
+</ul>
+<h2 id="system-architecture-gcp">System Architecture (GCP)</h2>
+<h3 id="core-principles">Core Principles</h3>
+<ol>
+<li>Keep system of record simple and relational.</li>
+<li>Use event-driven processing for asynchronous workflows.</li>
+<li>Isolate expensive/AI tasks behind queues and idempotent workers.</li>
+<li>Prefer managed services to reduce ops overhead for a small team.</li>
+</ol>
+<h3 id="runtime-components">Runtime Components</h3>
+<ul>
+<li><strong>Frontend Web App</strong>: candidate + employer + admin portals.</li>
+<li><strong>API Gateway + HTTPS Load Balancer + Cloud Armor</strong>: edge routing and protection.</li>
+<li><strong>Cloud Run services</strong> (modular monolith style with service boundaries):<ul>
+<li>Identity &amp; Access</li>
+<li>Candidate Profile</li>
+<li>Employer/Organization</li>
+<li>Job &amp; Question Kit</li>
+<li>Matching &amp; Ranking</li>
+<li>Automation &amp; Invitations</li>
+<li>Q&amp;A Session</li>
+<li>Packet Builder</li>
+<li>Notifications</li>
+<li>Billing (basic)</li>
+</ul>
+</li>
+<li><strong>Cloud SQL (PostgreSQL)</strong>: source of truth.</li>
+<li><strong>Memorystore (Redis)</strong>: short-lived cache, rate limits, invite cooldowns, shortlist snapshots.</li>
+<li><strong>Cloud Storage</strong>: resumes, attachments, generated packet exports.</li>
+<li><strong>Pub/Sub</strong>: event backbone.</li>
+<li><strong>Cloud Tasks</strong>: controlled dispatch for notifications/invites.</li>
+<li><strong>Cloud Scheduler</strong>: hourly shortlist recompute + periodic maintenance jobs.</li>
+<li><strong>Document AI (OCR/Form Parser)</strong>: robust extraction fallback for scanned PDFs/images.</li>
+<li><strong>Vertex AI</strong>:<ul>
+<li>Embeddings generation</li>
+<li>Vector index retrieval (or managed vector-capable store)</li>
+<li>Packet summary generation</li>
+</ul>
+</li>
+<li><strong>Cloud Logging + Monitoring + Error Reporting + Trace</strong>: observability.</li>
+<li><strong>Secret Manager + KMS</strong>: secret and key handling.</li>
+</ul>
+<h2 id="high-level-flow">High-Level Flow</h2>
+<ol>
+<li>Candidate updates profile -&gt; profile normalized -&gt; embeddings refreshed -&gt; <code>profile_updated</code> event.</li>
+<li>Employer updates role/question kit -&gt; embeddings refreshed -&gt; <code>job_updated</code> event.</li>
+<li>Matching service processes events + hourly sweeps:
+   - hard filters,
+   - top-K vector retrieval,
+   - deterministic scoring,
+   - shortlist changes emitted.</li>
+<li>Automation service handles shortlist entry events:
+   - enforce caps/cooldowns,
+   - create invite,
+   - dispatch via Cloud Tasks -&gt; notifications.</li>
+<li>Candidate submits Q&amp;A:
+   - persist answers,
+   - trigger packet build,
+   - generate summary,
+   - mark packet ready,
+   - notify HR.</li>
+</ol>
+<h2 id="cv-parsing-and-ingestion-pipeline-pdfdocdocx">CV Parsing and Ingestion Pipeline (PDF/DOC/DOCX)</h2>
+<h3 id="goals">Goals</h3>
+<ul>
+<li>Accept common resume formats with high extraction quality.</li>
+<li>Keep raw document immutable while allowing parser improvements over time.</li>
+<li>Produce both machine-structured and human-readable profile data.</li>
+</ul>
+<h3 id="supported-inputs-mvp">Supported Inputs (MVP)</h3>
+<ul>
+<li><code>.pdf</code> (text and scanned)</li>
+<li><code>.docx</code></li>
+<li><code>.doc</code> (best-effort via conversion)</li>
+</ul>
+<h3 id="processing-stages">Processing Stages</h3>
+<ol>
+<li><strong>Upload and virus scan</strong>
+   - Candidate uploads CV to signed URL.
+   - File lands in Cloud Storage (<code>raw</code> bucket path).
+   - Antivirus and mime/type validation run asynchronously.</li>
+<li><strong>Text extraction</strong>
+   - Primary parser for native text PDFs and DOCX.
+   - Fallback to Document AI OCR for scanned/image-heavy PDFs.</li>
+<li><strong>Section segmentation</strong>
+   - Split into structured blocks: profile header, experience, education, certifications, skills, projects, links.</li>
+<li><strong>Entity extraction + normalization</strong>
+   - Standardize titles, skills, date ranges, employers, certifications, locations.
+   - Resolve synonyms into canonical taxonomy IDs where possible.</li>
+<li><strong>Confidence scoring + review flags</strong>
+   - Assign confidence per field and aggregate quality score.
+   - Low-confidence fields are surfaced for user confirmation in UI.</li>
+<li><strong>Persist and emit events</strong>
+   - Save raw extraction, structured JSON, and normalized entities.
+   - Emit enrichment trigger event for embeddings and ranking refresh.</li>
+</ol>
+<h3 id="parsing-rules-pragmatic">Parsing Rules (Pragmatic)</h3>
+<ul>
+<li>Parser does not overwrite user-confirmed fields automatically.</li>
+<li>Most recent user edit wins unless user chooses "re-apply from CV."</li>
+<li>Keep parser deterministic where possible; use AI extraction only where needed.</li>
+<li>Maintain parser versioning to reprocess old CVs safely.</li>
+</ul>
+<h2 id="background-enrichment-pipeline-continuous">Background Enrichment Pipeline (Continuous)</h2>
+<h3 id="purpose">Purpose</h3>
+<p>Create a reliable "always improving" candidate/job signal layer without blocking user workflows.</p>
+<h3 id="enrichment-tasks">Enrichment Tasks</h3>
+<ul>
+<li>Canonicalize skills and map aliases.</li>
+<li>Infer role families and seniority bands.</li>
+<li>Estimate experience years from timelines (with confidence).</li>
+<li>Derive location compatibility tokens (radius, remote/hybrid fit).</li>
+<li>Recompute embeddings after relevant updates.</li>
+<li>Refresh match candidates for affected jobs/candidates only (delta-based).</li>
+</ul>
+<h3 id="trigger-sources">Trigger Sources</h3>
+<ul>
+<li><code>candidate_document.parsed</code></li>
+<li><code>profile.updated</code></li>
+<li><code>job.updated</code></li>
+<li>scheduled re-enrichment (nightly for stale records)</li>
+<li>taxonomy/model version bumps</li>
+</ul>
+<h3 id="orchestration-pattern">Orchestration Pattern</h3>
+<ul>
+<li>Pub/Sub event fan-out -&gt; dedicated Cloud Run workers.</li>
+<li>Cloud Tasks for throttled heavy jobs (OCR, LLM extraction, re-embedding waves).</li>
+<li>Idempotent jobs with dedupe keys: <code>(entity_id, enrichment_type, version)</code>.</li>
+<li>Dead-letter topics + replay tooling for failed batches.</li>
+</ul>
+<h3 id="freshness-model">Freshness Model</h3>
+<ul>
+<li><strong>Near-real-time path</strong>: user-triggered updates within minutes.</li>
+<li><strong>Batch maintenance path</strong>: nightly backfill and quality repairs.</li>
+<li><strong>SLA targets (initial)</strong>:<ul>
+<li>CV parse completion p95: &lt; 3 minutes</li>
+<li>enrichment completion p95: &lt; 10 minutes</li>
+</ul>
+</li>
+</ul>
+<h3 id="safety-and-cost-controls">Safety and Cost Controls</h3>
+<ul>
+<li>Progressive parsing: cheap deterministic parser first, OCR/AI fallback only if needed.</li>
+<li>Skip unchanged sections using content hashes.</li>
+<li>Apply concurrency caps per tenant to avoid noisy-neighbor effects.</li>
+<li>Cache extraction outputs by document hash.</li>
+</ul>
+<h2 id="domain-entities-core-data-model">Domain Entities (Core Data Model)</h2>
+<h3 id="identity-and-access">Identity and Access</h3>
+<ul>
+<li><code>user</code><ul>
+<li>id, email, phone, password_hash/federated_id, status, created_at</li>
+</ul>
+</li>
+<li><code>user_role</code><ul>
+<li>user_id, role (<code>candidate</code>, <code>employer_admin</code>, <code>hiring_manager</code>, <code>platform_admin</code>)</li>
+</ul>
+</li>
+<li><code>consent_record</code><ul>
+<li>user_id, consent_type, version, accepted_at, revoked_at</li>
+</ul>
+</li>
+</ul>
+<h3 id="organization-and-employer">Organization and Employer</h3>
+<ul>
+<li><code>organization</code><ul>
+<li>id, name, industry, size_band, billing_status</li>
+</ul>
+</li>
+<li><code>organization_member</code><ul>
+<li>organization_id, user_id, role</li>
+</ul>
+</li>
+<li><code>employer_profile</code><ul>
+<li>organization_id, brand/meta preferences, timezone</li>
+</ul>
+</li>
+</ul>
+<h3 id="candidate">Candidate</h3>
+<ul>
+<li><code>candidate_profile</code><ul>
+<li>user_id, headline, summary, years_experience, location, radius_km, remote_pref</li>
+</ul>
+</li>
+<li><code>candidate_skill</code><ul>
+<li>candidate_id, skill_id, level, years</li>
+</ul>
+</li>
+<li><code>candidate_certification</code><ul>
+<li>candidate_id, cert_id, issuer, expires_at</li>
+</ul>
+</li>
+<li><code>candidate_preference</code><ul>
+<li>candidate_id, pay_min, pay_type, shift_pref, availability_date</li>
+</ul>
+</li>
+<li><code>candidate_document</code><ul>
+<li>candidate_id, type, storage_uri, parsed_status</li>
+</ul>
+</li>
+<li><code>document_parse_job</code><ul>
+<li>id, candidate_id, document_id, parser_version, status, attempts, started_at, finished_at</li>
+</ul>
+</li>
+<li><code>document_parse_result</code><ul>
+<li>parse_job_id, extracted_text_uri, structured_json, confidence_json, quality_score</li>
+</ul>
+</li>
+<li><code>candidate_enrichment_state</code><ul>
+<li>candidate_id, enrichment_version, last_enriched_at, stale_reason, status</li>
+</ul>
+</li>
+<li><code>candidate_profile_signal</code><ul>
+<li>candidate_id, signal_type, signal_value_json, confidence, source</li>
+</ul>
+</li>
+</ul>
+<h3 id="job-and-requirements">Job and Requirements</h3>
+<ul>
+<li><code>job_posting</code><ul>
+<li>id, organization_id, title, description, location, remote_policy, pay_min/max, status</li>
+</ul>
+</li>
+<li><code>job_requirement</code><ul>
+<li>job_id, requirement_type (<code>must_have</code>, <code>nice_to_have</code>, <code>dealbreaker</code>), key, value</li>
+</ul>
+</li>
+<li><code>job_question_kit</code><ul>
+<li>id, job_id, status, version</li>
+</ul>
+</li>
+<li><code>job_question</code><ul>
+<li>kit_id, type, prompt, options_json, constraints</li>
+</ul>
+</li>
+</ul>
+<h3 id="matching-and-automation">Matching and Automation</h3>
+<ul>
+<li><code>match_score</code><ul>
+<li>job_id, candidate_id, total_score, sub_scores_json, computed_at</li>
+</ul>
+</li>
+<li><code>job_shortlist</code><ul>
+<li>job_id, candidate_id, rank, entered_at, exited_at</li>
+</ul>
+</li>
+<li><code>invite</code><ul>
+<li>id, job_id, candidate_id, status, expires_at, sent_at, cooldown_key</li>
+</ul>
+</li>
+<li><code>invite_delivery</code><ul>
+<li>invite_id, channel (<code>email</code>, <code>sms</code>), provider_id, state</li>
+</ul>
+</li>
+</ul>
+<h3 id="qa-and-packets">Q&amp;A and Packets</h3>
+<ul>
+<li><code>qa_session</code><ul>
+<li>id, invite_id, status, started_at, submitted_at</li>
+</ul>
+</li>
+<li><code>qa_answer</code><ul>
+<li>session_id, question_id, answer_text/value, evidence_links_json</li>
+</ul>
+</li>
+<li><code>qa_response_signal</code><ul>
+<li>session_id, question_id, signal_type, signal_value_json, captured_at</li>
+</ul>
+</li>
+<li><code>qa_authenticity_assessment</code><ul>
+<li>session_id, authenticity_score, ai_assist_likelihood, confidence, policy_result, assessed_at</li>
+</ul>
+</li>
+<li><code>candidate_packet</code><ul>
+<li>id, job_id, candidate_id, session_id, summary_text, highlights_json, gaps_json, status</li>
+</ul>
+</li>
+<li><code>packet_action</code><ul>
+<li>packet_id, actor_user_id, action (<code>interview</code>, <code>clarify</code>, <code>reject</code>), note, created_at</li>
+</ul>
+</li>
+</ul>
+<h3 id="billing-and-audit">Billing and Audit</h3>
+<ul>
+<li><code>subscription</code><ul>
+<li>organization_id, plan_code, active_jobs_limit, packet_limit, seat_limit</li>
+</ul>
+</li>
+<li><code>usage_counter</code><ul>
+<li>organization_id, month, packets_generated, invites_sent, active_jobs</li>
+</ul>
+</li>
+<li><code>audit_log</code><ul>
+<li>actor_id, action, object_type, object_id, metadata_json, created_at</li>
+</ul>
+</li>
+</ul>
+<h2 id="event-model-pubsub-topics">Event Model (Pub/Sub Topics)</h2>
+<ul>
+<li><code>profile.updated</code></li>
+<li><code>job.updated</code></li>
+<li><code>candidate.document.uploaded</code></li>
+<li><code>candidate.document.parsed</code></li>
+<li><code>candidate.enrichment.requested</code></li>
+<li><code>candidate.enrichment.completed</code></li>
+<li><code>matching.shortlist.changed</code></li>
+<li><code>invite.created</code></li>
+<li><code>invite.expired</code></li>
+<li><code>qa.submitted</code></li>
+<li><code>qa.authenticity.assessed</code></li>
+<li><code>packet.ready</code></li>
+<li><code>billing.usage.updated</code></li>
+</ul>
+<p>Event requirements:
+- idempotency key per event
+- at-least-once consumer design
+- dead-letter topics for failed processing</p>
+<h2 id="matching-and-ranking-design">Matching and Ranking Design</h2>
+<h3 id="stage-1-hard-filters-fail-fast">Stage 1: Hard Filters (fail-fast)</h3>
+<ul>
+<li>authorization eligibility</li>
+<li>location/radius/remote compatibility</li>
+<li>pay overlap</li>
+<li>start-date window</li>
+<li>required cert/license</li>
+</ul>
+<h3 id="stage-2-candidate-retrieval">Stage 2: Candidate Retrieval</h3>
+<ul>
+<li>embedding similarity search to get top K (200-500 typical).</li>
+</ul>
+<h3 id="stage-3-deterministic-score">Stage 3: Deterministic Score</h3>
+<ul>
+<li>weighted normalized score in [0,100], with explainable sub-scores.</li>
+<li>store sub-scores for HR explainability and model tuning.</li>
+</ul>
+<h3 id="stage-4-shortlist-diff-and-trigger">Stage 4: Shortlist Diff and Trigger</h3>
+<ul>
+<li>compare new shortlist to prior snapshot.</li>
+<li>for newly entered candidates, emit automation trigger event.</li>
+</ul>
+<h2 id="qa-authenticity-and-ai-assistance-detection">Q&amp;A Authenticity and AI-Assistance Detection</h2>
+<h3 id="why-it-matters">Why it matters</h3>
+<p>Employers need confidence that submitted answers reflect candidate involvement, not fully AI-generated responses.</p>
+<h3 id="product-policy-balanced">Product policy (balanced)</h3>
+<ul>
+<li>Allow light assistance (grammar fixes, short rewrites).</li>
+<li>Flag likely heavy outsourcing/rewriting.</li>
+<li>Never auto-reject by model alone in MVP; provide trust signals for human decision.</li>
+<li>Show transparent policy notice to candidates before they start Q&amp;A.</li>
+</ul>
+<h3 id="detection-signals-multi-signal-not-single-score-only">Detection signals (multi-signal, not single-score only)</h3>
+<ol>
+<li><strong>Behavioral signals</strong>
+   - time-to-first-keystroke, typing burst patterns, paste ratio, full-answer paste events, edit churn.</li>
+<li><strong>Linguistic consistency</strong>
+   - consistency with candidate profile language level/history, abrupt style shifts across answers.</li>
+<li><strong>Cross-answer coherence</strong>
+   - contradictions in timeline, tools, domain details, and stated experience.</li>
+<li><strong>Prompt leakage patterns</strong>
+   - generic template artifacts and known assistant markers.</li>
+</ol>
+<h3 id="pipeline-flow">Pipeline flow</h3>
+<ol>
+<li>Capture session telemetry and answer events.</li>
+<li>Extract response signals per answer and session.</li>
+<li>Compute authenticity assessment (score + confidence + reason codes).</li>
+<li>Attach "authenticity insight" to candidate packet:
+   - <code>likely_self_authored</code>
+   - <code>mixed_assistance</code>
+   - <code>heavy_assistance_suspected</code></li>
+<li>Emit <code>qa.authenticity.assessed</code> before packet finalization.</li>
+</ol>
+<h3 id="employer-facing-output">Employer-facing output</h3>
+<ul>
+<li>Trust badge in packet header.</li>
+<li>Brief reason codes (example: "high paste ratio", "inconsistent technical depth").</li>
+<li>Recommendation: "ask 2 verification follow-up questions."</li>
+</ul>
+<h3 id="candidate-facing-safeguards">Candidate-facing safeguards</h3>
+<ul>
+<li>Pre-submit notice: acceptable vs unacceptable assistance.</li>
+<li>Soft warning on suspicious behavior during session (optional in MVP).</li>
+<li>Appeal/review path for false positives.</li>
+</ul>
+<h3 id="risk-controls">Risk controls</h3>
+<ul>
+<li>Use confidence thresholds; low-confidence cases default to neutral.</li>
+<li>Keep explainability logs for dispute handling.</li>
+<li>Monitor fairness across candidate language backgrounds.</li>
+</ul>
+<h2 id="data-and-storage-strategy">Data and Storage Strategy</h2>
+<ul>
+<li>Postgres is authoritative for transactional state.</li>
+<li>Redis stores ephemeral values:<ul>
+<li>rate limit tokens,</li>
+<li>invite cooldown locks,</li>
+<li>shortlist cache,</li>
+<li>short TTL read caches.</li>
+</ul>
+</li>
+<li>Cloud Storage stores files and packet artifacts.<ul>
+<li><code>raw/</code> immutable user uploads</li>
+<li><code>processed/</code> extracted text and structured outputs</li>
+<li><code>artifacts/</code> packet exports and generated documents</li>
+</ul>
+</li>
+<li>Vector index stores embeddings with metadata references to canonical records.</li>
+</ul>
+<h2 id="security-and-gdpr-baseline">Security and GDPR Baseline</h2>
+<ul>
+<li>TLS everywhere, strict CORS, Cloud Armor WAF policies.</li>
+<li>RBAC enforced at API layer and query layer.</li>
+<li>PII minimization and field-level classification.</li>
+<li>Encryption at rest (managed keys) + optional CMEK for sensitive stores.</li>
+<li>Audit logging for admin and sensitive actions.</li>
+<li>GDPR controls in MVP:<ul>
+<li>explicit consent records,</li>
+<li>data export endpoint,</li>
+<li>delete/anonymize workflow,</li>
+<li>retention policy jobs.</li>
+</ul>
+</li>
+<li>Q&amp;A telemetry policy:<ul>
+<li>explicit consent notice for anti-fraud/authenticity checks,</li>
+<li>minimize captured behavioral data,</li>
+<li>retention limits and role-restricted access.</li>
+</ul>
+</li>
+</ul>
+<h2 id="proposed-tech-stack-pragmatic">Proposed Tech Stack (Pragmatic)</h2>
+<ul>
+<li>Frontend: Next.js (TypeScript), server actions + API client.</li>
+<li>Backend: TypeScript on Cloud Run (NestJS or Fastify modular architecture).</li>
+<li>Database: Cloud SQL PostgreSQL + Prisma/Drizzle ORM.</li>
+<li>Queue/Event: Pub/Sub + Cloud Tasks.</li>
+<li>Cache: Redis (Memorystore).</li>
+<li>Auth: first-party auth + optional Google OAuth; JWT with short-lived access + rotating refresh.</li>
+<li>Messaging: SendGrid (email), Twilio (SMS) or GCP partner equivalent.</li>
+<li>Payments: Stripe (hybrid model support).</li>
+<li>AI: Vertex AI embeddings + summarization.</li>
+<li>Authenticity scoring:<ul>
+<li>rule-based signal engine first,</li>
+<li>optional lightweight classifier in phase 1.5 after enough labeled data.</li>
+</ul>
+</li>
+<li>Parsing:<ul>
+<li><code>pdf-parse</code>/<code>pdfjs</code> for text PDFs,</li>
+<li><code>mammoth</code> or equivalent for DOCX,</li>
+<li>Document AI OCR fallback for scanned files.</li>
+</ul>
+</li>
+<li>IaC: Terraform (minimum viable modules).</li>
+<li>CI/CD: GitHub Actions -&gt; Artifact Registry -&gt; Cloud Run deploy.</li>
+</ul>
+<h2 id="eight-week-delivery-skeleton-architecture-centric">Eight-Week Delivery Skeleton (Architecture-Centric)</h2>
+<ul>
+<li><strong>Week 1</strong>: repo/platform bootstrap, IaC baseline, auth, org/user model.</li>
+<li><strong>Week 2</strong>: candidate profile + CV upload + parser v1 + job posting + requirements + question kits.</li>
+<li><strong>Week 3</strong>: matching pipeline v1 (hard filters + retrieval + scoring), shortlist persistence.</li>
+<li><strong>Week 4</strong>: enrichment workers (skills/title/location normalization), automation engine (invite rules, caps/cooldowns), email/SMS dispatch.</li>
+<li><strong>Week 5</strong>: Q&amp;A sessions + packet builder + summary generation.</li>
+<li><strong>Week 6</strong>: employer packet inbox/actions + authenticity badge/reason codes + basic billing counters.</li>
+<li><strong>Week 7</strong>: GDPR endpoints, audit logging, hardening, observability, load tuning.</li>
+<li><strong>Week 8</strong>: end-to-end QA, parser/enrichment quality tuning, pilot onboarding tooling, launch readiness.</li>
+</ul>
+<h2 id="architecture-trade-offs-intentional">Architecture Trade-Offs (Intentional)</h2>
+<ul>
+<li>Modular monolith on Cloud Run now, service split later by load and team growth.</li>
+<li>AI-minimal now for speed/reliability; richer AI after metric validation.</li>
+<li>Event-driven internals increase complexity but are required for non-blocking automation.</li>
+<li>Integrations phased to prevent launch delay.</li>
+</ul>
+<h2 id="open-architecture-decisions-to-lock-next">Open Architecture Decisions (to Lock Next)</h2>
+<ol>
+<li>Single backend service vs multiple Cloud Run services at launch.</li>
+<li>Vector storage choice: Vertex index vs Postgres+extension fallback.</li>
+<li>Invite cadence policy defaults per job.</li>
+<li>Final auth strategy (passwordless vs password+OAuth mix).</li>
+<li>Exact billing limits and trial thresholds for hybrid pricing.</li>
+<li>CV parser strategy for <code>.doc</code> legacy files (support now vs convert-only policy).</li>
+<li>Confidence threshold for "auto-apply parsed fields" vs "require user confirmation."</li>
+<li>Default authenticity policy strictness by role type.</li>
+<li>Candidate UX: hard block suspicious submissions vs soft-flag-only (recommended: soft-flag-only in MVP).</li>
+</ol></div></div></body></html>

@@ -1,0 +1,200 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>10_user_stories_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-user-stories-mvp">Jobarium User Stories (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Provide implementation-ready user stories across core personas with clear acceptance criteria.</p>
+<h2 id="story-format">Story Format</h2>
+<ul>
+<li>As a <persona>, I want <capability>, so that <outcome>.</li>
+</ul>
+<h2 id="employer-stories-smb-hiring-manager-recruiter">Employer Stories (SMB Hiring Manager / Recruiter)</h2>
+<h3 id="e-01-job-setup-template">E-01 Job Setup Template</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want to start from a role template, so that I can launch a job in minutes.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Employer can select template and edit all prefilled fields.</li>
+<li>Requirements, question kit, and invite policy are pre-populated.</li>
+<li>Job can be activated without leaving setup flow.</li>
+</ul>
+</li>
+</ul>
+<h3 id="e-02-dealbreaker-control">E-02 Dealbreaker Control</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want to define hard dealbreakers, so that unqualified candidates are filtered early.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Dealbreakers support authorization, location/radius, pay range, availability, and certification.</li>
+<li>Dealbreaker statuses appear in candidate packet summary.</li>
+</ul>
+</li>
+</ul>
+<h3 id="e-03-automation-guardrails">E-03 Automation Guardrails</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want invite caps and cooldowns, so that candidates are not spammed.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Employer can configure top N/threshold, daily cap, cooldown, and expiry.</li>
+<li>Invite log records all dispatches and statuses.</li>
+</ul>
+</li>
+</ul>
+<h3 id="e-04-packet-first-review">E-04 Packet-First Review</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want a packet-first inbox, so that I review only completed pre-screened candidates.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Inbox default view excludes incomplete applications.</li>
+<li>Packet contains summary, evidence snippets, and full Q&amp;A transcript.</li>
+</ul>
+</li>
+</ul>
+<h3 id="e-05-one-click-decision">E-05 One-Click Decision</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want to decide in one click, so that hiring cycle time is reduced.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Employer can choose Interview, Clarify, Reject.</li>
+<li>Action is stored with actor and timestamp.</li>
+</ul>
+</li>
+</ul>
+<h3 id="e-06-authenticity-insight">E-06 Authenticity Insight</h3>
+<ul>
+<li>Story:<ul>
+<li>As an employer, I want authenticity signals on responses, so that I can verify candidate involvement.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Packet shows trust label, reason codes, and confidence marker.</li>
+<li>System provides 2-3 suggested verification prompts.</li>
+<li>No automatic rejection based on authenticity score alone.</li>
+</ul>
+</li>
+</ul>
+<h2 id="candidate-stories-skilled-trade-candidate">Candidate Stories (Skilled Trade Candidate)</h2>
+<h3 id="c-01-fast-profile-bootstrap">C-01 Fast Profile Bootstrap</h3>
+<ul>
+<li>Story:<ul>
+<li>As a candidate, I want to upload my CV and get profile prefill, so that I avoid repetitive form entry.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>CV parser extracts core profile fields.</li>
+<li>Candidate can confirm key fields in one guided step.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-02-matchable-profile-guidance">C-02 Matchable Profile Guidance</h3>
+<ul>
+<li>Story:<ul>
+<li>As a candidate, I want to know what fields matter most, so that I can become visible quickly.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>UI shows profile completion and "high-impact missing fields."</li>
+<li>Candidate becomes matchable after completing required fields.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-03-invite-transparency">C-03 Invite Transparency</h3>
+<ul>
+<li>Story:<ul>
+<li>As a candidate, I want clear invite context, so that I can decide whether to proceed.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Invite includes role, company, pay/location summary, and estimated completion time.</li>
+<li>Candidate can Start or Decline.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-04-mobile-qa-completion">C-04 Mobile Q&amp;A Completion</h3>
+<ul>
+<li>Story:<ul>
+<li>As a candidate, I want mobile-friendly Q&amp;A with autosave, so that I can complete screening reliably.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Autosave persists progress.</li>
+<li>Progress indicator shows remaining steps.</li>
+<li>Submission confirmation shows expected response window.</li>
+</ul>
+</li>
+</ul>
+<h3 id="c-05-fair-authenticity-policy">C-05 Fair Authenticity Policy</h3>
+<ul>
+<li>Story:<ul>
+<li>As a candidate, I want transparent authenticity rules, so that I understand acceptable assistance.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Candidate sees policy notice before submission.</li>
+<li>Candidate has review path for potential false-positive flags.</li>
+</ul>
+</li>
+</ul>
+<h2 id="internal-admin-stories-platform-operations">Internal Admin Stories (Platform Operations)</h2>
+<h3 id="a-01-event-retry-and-observability">A-01 Event Retry and Observability</h3>
+<ul>
+<li>Story:<ul>
+<li>As an admin, I want to inspect and replay failed jobs, so that pipeline failures are recoverable.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Failed parsing/enrichment/authenticity jobs are visible.</li>
+<li>Retry action is available with audit logging.</li>
+</ul>
+</li>
+</ul>
+<h3 id="a-02-gdpr-workflow">A-02 GDPR Workflow</h3>
+<ul>
+<li>Story:<ul>
+<li>As an admin, I want to process data export and deletion requests, so that GDPR obligations are met.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Export and deletion workflows are tracked and auditable.</li>
+<li>Status transitions are visible to authorized users.</li>
+</ul>
+</li>
+</ul>
+<h2 id="mvp-story-prioritization">MVP Story Prioritization</h2>
+<ul>
+<li>P0:<ul>
+<li>E-01, E-02, E-03, E-04, E-05, E-06</li>
+<li>C-01, C-02, C-03, C-04, C-05</li>
+</ul>
+</li>
+<li>P1:<ul>
+<li>A-01, A-02</li>
+</ul>
+</li>
+</ul>
+<h2 id="notes-for-sprint-planning">Notes for Sprint Planning</h2>
+<ul>
+<li>Keep stories vertical and demoable end-to-end.</li>
+<li>For each story, define API contract + UI state + analytics event together.</li>
+<li>Favor narrower P0 completion over partial breadth.</li>
+</ul></div></div></body></html>

@@ -1,0 +1,107 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>21_schema_versioning_and_migrations_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-schema-versioning-and-migration-policy-mvp">Jobarium Schema Versioning and Migration Policy (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define how database schema and event-schema changes are versioned, migrated, rolled out, and rolled back safely.</p>
+<p>This closes item 7 in the system completeness gate.</p>
+<h2 id="versioning-principles">Versioning Principles</h2>
+<ol>
+<li>Backward-compatible first.</li>
+<li>Expand -&gt; migrate -&gt; contract pattern.</li>
+<li>No breaking schema + code deploy in one irreversible step.</li>
+<li>Every migration has rollback or containment strategy.</li>
+</ol>
+<h2 id="database-migration-policy-postgres">Database Migration Policy (Postgres)</h2>
+<h3 id="migration-types">Migration Types</h3>
+<ul>
+<li><code>expand</code>:<ul>
+<li>add nullable columns</li>
+<li>add new tables/indexes</li>
+<li>add non-blocking constraints</li>
+</ul>
+</li>
+<li><code>migrate</code>:<ul>
+<li>backfill data in controlled batches</li>
+<li>dual-write when needed</li>
+</ul>
+</li>
+<li><code>contract</code>:<ul>
+<li>remove legacy columns/tables after code cutover and validation</li>
+</ul>
+</li>
+</ul>
+<h3 id="required-metadata-per-migration">Required Metadata per Migration</h3>
+<ul>
+<li>migration id</li>
+<li>owner</li>
+<li>category (<code>expand|migrate|contract</code>)</li>
+<li>estimated runtime</li>
+<li>rollback plan</li>
+<li>verification query checklist</li>
+</ul>
+<h3 id="rollout-rules">Rollout Rules</h3>
+<ul>
+<li>Apply <code>expand</code> before app code that reads new fields.</li>
+<li>Release app code supporting both old and new representations.</li>
+<li>Execute backfill jobs with throttling.</li>
+<li>Remove legacy fields only after stability window (minimum 2 releases).</li>
+</ul>
+<h2 id="event-schema-versioning-policy">Event Schema Versioning Policy</h2>
+<ul>
+<li>Additive optional fields: same <code>v1</code>.</li>
+<li>Breaking change: new version (<code>v2</code>) with dual-consume period.</li>
+<li>Producers must emit declared <code>event_version</code>.</li>
+<li>Consumers must validate version and reject unknown when strict.</li>
+</ul>
+<h2 id="backward-compatibility-rules">Backward Compatibility Rules</h2>
+<ul>
+<li>App must tolerate missing optional fields.</li>
+<li>New required DB columns must be nullable until backfill complete.</li>
+<li>Never repurpose existing field semantics silently.</li>
+</ul>
+<h2 id="rollback-strategy">Rollback Strategy</h2>
+<ul>
+<li>For failed app deploy:<ul>
+<li>roll back app image first.</li>
+</ul>
+</li>
+<li>For failed backfill:<ul>
+<li>pause backfill job, keep dual-read compatibility.</li>
+</ul>
+</li>
+<li>For migration causing impact:<ul>
+<li>use feature flag to disable dependent feature path.</li>
+</ul>
+</li>
+</ul>
+<h2 id="migration-testing-requirements">Migration Testing Requirements</h2>
+<ul>
+<li>Staging dry-run with realistic data volumes.</li>
+<li>Check index creation impact and lock behavior.</li>
+<li>Verify read/write behavior before and after migration.</li>
+<li>Validate rollback path at least once for major changes.</li>
+</ul>
+<h2 id="operational-checklist-per-migration">Operational Checklist (Per Migration)</h2>
+<ul>
+<li>[ ] Migration reviewed by CTO.</li>
+<li>[ ] Rollback/containment documented.</li>
+<li>[ ] Alert thresholds for DB errors prepared.</li>
+<li>[ ] Post-deploy verification queries executed.</li>
+<li>[ ] Decision log entry added for breaking changes.</li>
+</ul>
+<h2 id="ownership">Ownership</h2>
+<ul>
+<li>CTO owns migration execution.</li>
+<li>CEO approves high-risk migration windows during pilot.</li>
+</ul></div></div></body></html>

@@ -1,0 +1,273 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>08_hr_value_requirements.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-hr-value-requirements-validation-draft">Jobarium HR Value Requirements (Validation Draft)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>This document translates HR pain points into concrete product expectations and acceptance criteria for MVP validation.</p>
+<p>Audience:
+- HR professionals reviewing product-market fit
+- CEO/CTO prioritizing MVP scope</p>
+<h2 id="how-to-review">How to Review</h2>
+<p>For each requirement, ask:
+1. Does this solve a real day-to-day HR pain point?
+2. Is the acceptance criteria practical and measurable?
+3. Is this required for pilot launch, or can it be phased?</p>
+<h2 id="hr-jobs-to-be-done-core">HR Jobs-To-Be-Done (Core)</h2>
+<ol>
+<li>Reduce time spent screening unqualified applicants.</li>
+<li>Surface qualified candidates faster and more consistently.</li>
+<li>Avoid late-stage disqualifiers (authorization, pay, location, availability, certs).</li>
+<li>Keep candidate quality high without adding recruiter workload.</li>
+<li>Maintain compliance, fairness, and auditability.</li>
+</ol>
+<h2 id="requirements-matrix">Requirements Matrix</h2>
+<h3 id="r-01-packet-first-hiring-inbox">R-01: Packet-First Hiring Inbox</h3>
+<ul>
+<li>Pain point:<ul>
+<li>HR teams drown in large applicant queues and repetitive resume review.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Employer receives completed candidate packets, not raw applicant floods.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>For active jobs, default employer inbox view shows only submitted packets.</li>
+<li>Packet includes standardized summary and full Q&amp;A transcript.</li>
+<li>Employer can complete decision action in one screen.</li>
+</ul>
+</li>
+<li>Priority: P0 (MVP must-have)</li>
+</ul>
+<h3 id="r-02-dealbreaker-validation-upfront">R-02: Dealbreaker Validation Upfront</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Recruiters discover disqualifiers too late and waste interview time.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Hard constraints are checked before packet reaches employer.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Packet clearly shows status for authorization, location/radius, pay overlap, availability, and required cert/license.</li>
+<li>Dealbreaker mismatches are visible and filterable.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-03-consistent-candidate-comparability">R-03: Consistent Candidate Comparability</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Comparing candidates is inconsistent and subjective across reviewers.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Standardized packet structure with explainable fit dimensions.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Every packet follows same section order and scoring format.</li>
+<li>Fit highlights map to explicit must-have/nice-to-have fields.</li>
+<li>Reviewer can compare at least two packets with same criteria labels.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-04-fast-job-setup-via-role-templates">R-04: Fast Job Setup via Role Templates</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Job setup is repetitive and error-prone, especially for recurring roles.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Employer can start from role templates and edit quickly.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Template selection pre-fills requirements, question kit, and invite policy.</li>
+<li>Median job setup time for templated role &lt;= 10 minutes in pilot.</li>
+<li>"Blank from scratch" option remains available.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-05-automation-with-recruiter-control">R-05: Automation with Recruiter Control</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Recruiters want less manual outreach, but still need control and guardrails.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Auto-invite workflow with configurable caps/cooldowns/expiry.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Employer can set and edit invite threshold/top N, caps, cooldowns, and expiry.</li>
+<li>Invite activity log shows who was invited and when.</li>
+<li>System prevents repeated invite spam via cooldown policy.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-06-candidate-authenticity-trust-signals">R-06: Candidate Authenticity Trust Signals</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Employers worry about heavily AI-generated or outsourced responses.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Trust insight appears in packet as advisory signal with reasons.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Packet displays authenticity label + top reason codes + confidence marker.</li>
+<li>No automatic rejection is triggered by authenticity score in MVP.</li>
+<li>Employer receives suggested verification follow-up prompts.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-07-explainable-match-reasons">R-07: Explainable Match Reasons</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Recruiters distrust black-box rankings and need explainability.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Each packet explains why candidate matched this role.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Packet includes "Why matched" section with at least 3 concrete attributes.</li>
+<li>Mismatch or unknown fields are explicitly shown.</li>
+</ul>
+</li>
+<li>Priority: P1 (high)</li>
+</ul>
+<h3 id="r-08-one-click-workflow-actions">R-08: One-Click Workflow Actions</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Fragmented tools slow decisions and increase admin work.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Decision actions happen inside packet workflow.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Employer can choose: Interview, Clarify, Reject.</li>
+<li>Action is persisted with timestamp and user.</li>
+<li>Optional note can be added without leaving packet view.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-09-sla-visibility-and-hiring-throughput-metrics">R-09: SLA Visibility and Hiring Throughput Metrics</h3>
+<ul>
+<li>Pain point:<ul>
+<li>HR cannot tell if hiring flow is improving or stalling.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Dashboard tracks speed and conversion metrics tied to value.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Dashboard includes:</li>
+<li>time to first completed packet</li>
+<li>invite -&gt; completion rate</li>
+<li>packet -&gt; interview rate</li>
+<li>repeat job activation rate</li>
+<li>Metrics are filterable by job and date range.</li>
+</ul>
+</li>
+<li>Priority: P1</li>
+</ul>
+<h3 id="r-10-workflow-integrations-pragmatic-mvp">R-10: Workflow Integrations (Pragmatic MVP)</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Recruiters avoid tools that do not fit existing communication habits.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Core integrations support real daily workflow without overbuilding.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Email and SMS notifications functional in MVP.</li>
+<li>Calendar link support for interview handoff.</li>
+<li>Basic export endpoint/format for ATS handoff.</li>
+</ul>
+</li>
+<li>Priority: P1</li>
+</ul>
+<h3 id="r-11-candidate-experience-quality">R-11: Candidate Experience Quality</h3>
+<ul>
+<li>Pain point:<ul>
+<li>Poor candidate UX lowers completion rates and harms employer brand.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>Fast, transparent, mobile-friendly candidate flow.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Candidate sees estimated completion time before starting Q&amp;A.</li>
+<li>Q&amp;A supports autosave and progress indicators.</li>
+<li>Candidate receives confirmation and expected response window after submit.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h3 id="r-12-compliance-and-auditability">R-12: Compliance and Auditability</h3>
+<ul>
+<li>Pain point:<ul>
+<li>HR needs defensible processes for legal/privacy scrutiny.</li>
+</ul>
+</li>
+<li>Expected capability:<ul>
+<li>GDPR baseline controls and action audit trail.</li>
+</ul>
+</li>
+<li>Acceptance criteria:<ul>
+<li>Consent capture and retention policy enforcement exist.</li>
+<li>Data export and deletion/anonymization workflows exist.</li>
+<li>HR decisions and admin actions are auditable.</li>
+</ul>
+</li>
+<li>Priority: P0</li>
+</ul>
+<h2 id="mvp-validation-questions-for-hr-reviewer">MVP Validation Questions for HR Reviewer</h2>
+<p>Ask reviewer to score each from 1 (low value) to 5 (critical):
+1. Does this reduce your screening workload materially?
+2. Does this improve candidate quality entering interviews?
+3. Would this fit your current recruiter workflow?
+4. Is anything critical missing for pilot adoption?
+5. What would block real usage in week one?</p>
+<h2 id="non-goals-for-initial-pilot">Non-Goals for Initial Pilot</h2>
+<ul>
+<li>Full ATS replacement.</li>
+<li>Enterprise custom workflow builder.</li>
+<li>Fully automated hiring decisions without human review.</li>
+</ul>
+<h2 id="sign-off-section-for-hr-validation">Sign-Off Section (for HR Validation)</h2>
+<ul>
+<li>Reviewer name:</li>
+<li>Role/company type:</li>
+<li>Date:</li>
+<li>Overall fit score (1-10):</li>
+<li>Top 3 must-have requirements:</li>
+<li>Top 3 concerns:</li>
+<li>Recommended pilot conditions:</li>
+</ul></div></div></body></html>

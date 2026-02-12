@@ -1,0 +1,375 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>jobarium_comprehensive_document.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-comprehensive-working-document-chat-summary">Jobarium — Comprehensive Working Document (Chat Summary)</h1>
+<p>This document consolidates everything defined in the conversation from the start, in a structured form you can use for planning, pitching, and scoping V1.</p>
+<hr />
+<h2 id="1-the-core-concept">1) The core concept</h2>
+<p>Jobarium is a two-sided hiring platform where:</p>
+<ul>
+<li>Job seekers build a comprehensive profile once and keep it updated.</li>
+<li>Employers set up a position once.</li>
+<li>Matching and pre-screening run in the background.</li>
+<li>HR receives only ready-to-review candidate packets when candidates complete the “interview” (predefined questions).</li>
+</ul>
+<p>Guiding idea:
+- Flip hiring from “people apply to jobs” to “jobs find the right people.”</p>
+<p>Primary positioning:
+- <strong>Jobarium is Uber for hiring.</strong></p>
+<hr />
+<h2 id="2-the-user-problems-two-sided">2) The user problems (two-sided)</h2>
+<h3 id="21-employer-problems-hr-hiring-managers">2.1 Employer problems (HR / hiring managers)</h3>
+<ul>
+<li>Too many low-signal applications.</li>
+<li>Screening consumes hours every week.</li>
+<li>Dealbreakers discovered late (salary, location, authorization, start date, required certs).</li>
+<li>First-round calls repeat the same questions.</li>
+<li>Difficult to compare candidates consistently.</li>
+<li>Candidates drop off while scheduling drags.</li>
+</ul>
+<h3 id="22-candidate-problems-job-seekers">2.2 Candidate problems (job seekers)</h3>
+<ul>
+<li>Re-entering the same data across many platforms: LinkedIn, Indeed, Workday portals, company ATS websites, niche boards.</li>
+<li>Rewriting and tailoring application materials repeatedly.</li>
+<li>Missing perfect-fit jobs because postings are fragmented across proprietary platforms and different boards.</li>
+<li>Being buried as applicant #2000 for high-visibility roles and never being reviewed.</li>
+<li>Limited clarity on why they were filtered out.</li>
+</ul>
+<p>Core pain statement:
+- <strong>There is always a job you fit perfectly. You miss it because you never saw it, or you were buried in a massive queue.</strong></p>
+<hr />
+<h2 id="3-the-agreed-product-workflow-v1">3) The agreed product workflow (V1)</h2>
+<p>The central agreement:
+- HR should set up everything once when creating the role.
+- After that, the system is fully automated.
+- HR only receives updates when candidates complete the “interview” (structured Q&amp;A).</p>
+<h3 id="31-employer-setup-one-time-per-role">3.1 Employer setup (one-time per role)</h3>
+<p>Employer defines:
+- Must-haves vs nice-to-haves.
+- Dealbreakers:
+    - work authorization
+    - location / radius / remote policy
+    - salary range
+    - start date window
+    - required license/certification (if applicable)
+- <strong>Question Kit</strong> (5–10 questions).
+- Automation rule:
+    - Trigger: candidate enters shortlist for this job.
+    - Top N and/or score threshold.
+    - Caps and cooldowns.
+    - Invite expiry.</p>
+<p>After setup:
+- HR does not click “invite.”
+- HR does not run searches.
+- HR does not manage floods of applicants.
+- HR receives “packets only.”</p>
+<h3 id="32-candidate-flow">3.2 Candidate flow</h3>
+<p>Candidate does:
+- Creates profile once (multi-step comprehensive form).
+- Updates only changes later.</p>
+<p>When shortlisted:
+- Candidate receives an invitation to answer employer’s predefined questions.
+- Candidate chooses to start or decline.
+- Candidate answers asynchronously and submits.
+- System generates a summary packet for HR.</p>
+<p>Candidate value:
+- Less repetitive applications.
+- Higher visibility to jobs they might miss.
+- Less time spent tailoring.
+- More time spent responding only when shortlisted.</p>
+<hr />
+<h2 id="4-the-interview-system-question-kits">4) The “interview” system (Question Kits)</h2>
+<h3 id="41-what-it-is">4.1 What it is</h3>
+<p>A structured, asynchronous Q&amp;A that feels like an interview step but is:
+- faster than scheduling live calls
+- standardized
+- role-specific
+- “packetized” for HR review</p>
+<h3 id="42-question-kit-rules-v1">4.2 Question Kit rules (V1)</h3>
+<ul>
+<li>5–10 questions max.</li>
+<li>Supported question types:<ul>
+<li>Yes/No</li>
+<li>Multiple choice</li>
+<li>Short text (150–300 words)</li>
+<li>Numeric fields (years, salary, quotas, etc.)</li>
+<li>Link upload (portfolio/work samples)</li>
+</ul>
+</li>
+</ul>
+<h3 id="43-consent-step">4.3 Consent step</h3>
+<p>Even though the system auto-triggers invitations:
+- Candidate must opt in (“Start” vs “Decline”).
+- This avoids spam feelings and builds trust.</p>
+<h3 id="44-hr-output-the-packet">4.4 HR output (the packet)</h3>
+<p>HR receives a ready-to-review packet:
+- One-page summary:
+    - fit highlights tied to must-haves
+    - confirmed constraints (auth, location, salary, start date)
+    - evidence snippets from answers
+    - gaps/unknowns
+    - suggested follow-up questions (3–5)
+- Full Q&amp;A transcript below.
+- Next actions:
+    - invite to live interview
+    - request clarification
+    - reject</p>
+<hr />
+<h2 id="5-voluntary-pre-scan-profile-enrichment">5) Voluntary “pre-scan” (profile enrichment)</h2>
+<p>We defined an optional step:
+- It is <strong>voluntary</strong>.
+- It is <strong>not gating</strong> in V1.
+- It improves the profile summary and comparisons.</p>
+<p>Outputs stored and cached:
+1. Raw answers (source of truth)
+2. Structured extraction (JSON)
+3. Human-readable profile brief and follow-ups</p>
+<p>Purpose:
+- Improve matching signal and packet quality without forcing candidates to do extra work.</p>
+<hr />
+<h2 id="6-matching-scoring-and-shortlisting">6) Matching, scoring, and shortlisting</h2>
+<h3 id="61-the-ranking-pipeline-scalable">6.1 The ranking pipeline (scalable)</h3>
+<p>We agreed on a practical cascade that avoids N×M matching:</p>
+<p>1) Hard filters (dealbreakers)
+2) Retrieve top K by semantic similarity (vector search)
+3) Deterministic scoring on top K
+4) Shortlist top N</p>
+<p>This is why the system does not “explode” when there are 10k employers and 10k job seekers.</p>
+<h3 id="62-hard-filters-passfail">6.2 Hard filters (pass/fail)</h3>
+<p>Examples:
+- work authorization eligibility
+- location compatibility (onsite radius, hybrid rules, remote allowed)
+- pay overlap
+- start date window
+- required cert/license</p>
+<p>Fail any: candidate excluded for the job.</p>
+<h3 id="63-retrieval-top-k">6.3 Retrieval (top K)</h3>
+<ul>
+<li>Convert candidate profile and job requirements into embeddings.</li>
+<li>Use cosine similarity to fetch top K candidates (or jobs) from a vector index.</li>
+<li>Typical K: 200–500</li>
+</ul>
+<h3 id="64-deterministic-scoring">6.4 Deterministic scoring</h3>
+<p>We defined a scoring function in [0,100]:</p>
+<p>Score(c, j) = 100 × (
+  w_s * S_skills +
+  w_t * S_title +
+  w_d * S_domain +
+  w_e * S_experience +
+  w_l * S_location +
+  w_p * S_pay +
+  w_a * S_availability +
+  w_r * S_recency +
+  w_q * S_quality
+)</p>
+<p>All sub-scores normalized to [0,1]. Weights sum to 1.</p>
+<p>Suggested starting weights:
+- skills: 0.35
+- title/role: 0.15
+- domain: 0.10
+- experience: 0.10
+- location: 0.10
+- pay: 0.10
+- availability: 0.05
+- recency: 0.03
+- profile quality: 0.02</p>
+<p>Skills score example:
+- Must-have coverage M and nice-to-have coverage N
+- S_skills = 0.7<em>M + 0.3</em>N</p>
+<p>Tie-breakers:
+1) Must-have coverage
+2) semantic similarity
+3) recency</p>
+<h3 id="65-how-the-shortlist-triggers-automation">6.5 How the shortlist triggers automation</h3>
+<ul>
+<li>Every job has a shortlist (top N).</li>
+<li>When a candidate newly enters top N:<ul>
+<li>automation triggers invitation</li>
+<li>caps/cooldowns prevent spam</li>
+<li>expiry prevents stale invites</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h2 id="7-fast-background-mode">7) “Fast background” mode</h2>
+<p>Your requirement:
+- No specific “runs.”
+- Background process should be continuous.</p>
+<p>We defined:
+- Hourly refresh (fast background) as a practical baseline:
+    - recompute shortlist per active job hourly
+    - or trigger on events (job_updated, profile_updated)</p>
+<p>This creates:
+- “magic behind the scenes”
+- HR sees only outcomes (packets completed)</p>
+<hr />
+<h2 id="8-unit-economics-early-view">8) Unit economics (early view)</h2>
+<p>Key idea:
+- Keep background matching cheap.
+- Spend AI compute when value is created.</p>
+<p>Cost drivers:
+- embeddings when profiles/jobs change (low)
+- vector search retrieval (moderate)
+- summarization only on submitted Q&amp;A (bounded, cached)</p>
+<p>Pricing should align with value:
+- active jobs
+- packets/month (completed interview packets)
+- seats
+- overage packs</p>
+<p>Reason:
+- HR experiences value only when completed packets arrive.
+- Your costs also concentrate at packet generation.</p>
+<hr />
+<h2 id="9-investor-narrative">9) Investor narrative</h2>
+<h3 id="91-what-stands-out">9.1 What stands out</h3>
+<ul>
+<li>You are not an apply-first board.</li>
+<li>You are not an ATS.</li>
+<li>You are “Uber for hiring”: set-and-forget matching + structured pre-screen packets.</li>
+</ul>
+<h3 id="92-two-sided-value">9.2 Two-sided value</h3>
+<p>Employers:
+- less screening time
+- fewer wasted interviews
+- consistent comparison</p>
+<p>Candidates:
+- one profile replaces repeated applications
+- discovered for roles they missed
+- no queue disadvantage when they match perfectly</p>
+<h3 id="93-slide-drafts-we-refined">9.3 Slide drafts we refined</h3>
+<p>Slide 1 — The problem:
+- employer screening overload
+- candidate busywork + missed opportunities + queues
+- “perfect fit exists but gets missed”</p>
+<p>Slide 2 — The win-win solution:
+- Jobarium is Uber for hiring
+- setup once on both sides
+- background matching and auto pre-screen
+- HR receives completed packets only</p>
+<h3 id="94-elevator-pitch-short">9.4 Elevator pitch (short)</h3>
+<p>Jobarium is Uber for hiring: employers set up a role once, candidates set up a profile once, and the platform matches and pre-screens in the background, delivering HR only completed candidate packets.</p>
+<hr />
+<h2 id="10-competitors-and-differentiation-high-level">10) Competitors and differentiation (high level)</h2>
+<p>We clarified:
+- Some platforms can surface candidates before they apply.
+- However, in most cases, a recruiter still needs to click “invite,” search, message, or manage a flow.</p>
+<p>Your differentiator:
+- after initial setup, the system runs without recruiter actions
+- auto-invites are triggered automatically when shortlist changes
+- HR sees completed packets rather than queues</p>
+<p>Strategic framing:
+- LinkedIn can be treated as a partner channel rather than an enemy:
+    - identity + credibility + distribution
+    - Jobarium owns the deeper workflow layer</p>
+<hr />
+<h2 id="11-moat-what-makes-this-defensible">11) Moat (what makes this defensible)</h2>
+<p>The moat is not “AI matching.”</p>
+<p>The moat is:
+- proprietary structured signals earned through your workflow:
+    - standardized profile fields
+    - employer must-haves and dealbreakers
+    - Q&amp;A packets tied to a role
+    - outcomes (views, interviews, hires)
+- outcome-driven ranking improvement over time
+- employer lock-in via role templates + kits + “packets-only” habit
+- candidate lock-in as a living career record
+- trust and quality controls that improve conversion</p>
+<p>What investors will challenge:
+- cold start and liquidity
+- trust and packet quality
+- proof of outcomes</p>
+<p>How to address:
+- start narrow (role family + region)
+- publish early proof metrics:
+    - packet completion rate
+    - packet-to-interview rate
+    - time to first completed packet
+    - employer retention</p>
+<hr />
+<h2 id="12-strategy-discussion-building-supply-first">12) Strategy discussion: building supply first</h2>
+<p>You proposed:
+- candidate acquisition first is easier because candidates join many platforms.
+- once enough candidate density exists:
+    - advertise to HR
+    - offer free trial (one job setup + limited completed packets free)
+    - convert based on experience of hands-off flow</p>
+<p>We refined:
+- “signups” are not enough; you need usable profiles and retention.
+- a structured “core profile fast, enrich later” approach improves completion.
+- employer pilots should start as soon as you have density in one wedge (not necessarily after 10k).</p>
+<hr />
+<h2 id="13-geography-and-role-family">13) Geography and role family</h2>
+<p>We discussed Raleigh, NC and DMV.</p>
+<p>Key agreement:
+- role family + SMB focus matter more than geography early.</p>
+<h3 id="dmv-discussion-your-direction">DMV discussion (your direction)</h3>
+<p>You asked about non-clearance roles and suggested HVAC/electrician.</p>
+<p>We identified high-demand, clearance-free wedges that fit your structured matching:
+- HVAC
+- Electricians
+- Plumbing
+- Maintenance/repair
+- other frontline roles (as potential expansions)</p>
+<p>These roles are SMB-friendly and map cleanly to dealbreakers:
+- licensing/certs
+- service area / commuting radius
+- schedule/shift availability
+- years of experience
+- pay expectations</p>
+<hr />
+<h2 id="14-gcp-based-architecture-direction-overview">14) GCP-based architecture direction (overview)</h2>
+<p>We mapped the system to GCP services:</p>
+<ul>
+<li>Cloud Run for microservices (Profile, Jobs, Matching, Automation, Q&amp;A, Packet Builder, Notifications, Billing)</li>
+<li>API Gateway + Cloud Load Balancer + Cloud Armor + Cloud CDN</li>
+<li>Cloud SQL (Postgres) for system of record</li>
+<li>Memorystore (Redis) for caching, caps, cooldowns, shortlist cache</li>
+<li>Cloud Storage for files (resumes, attachments)</li>
+<li>Pub/Sub for events (profile_updated, job_updated, shortlist_changed, answers_submitted, packet_ready)</li>
+<li>Cloud Scheduler for hourly triggers</li>
+<li>Cloud Tasks for throttled invite dispatch</li>
+<li>Vertex AI for embeddings, vector search, and summaries</li>
+</ul>
+<p>We also produced a C4 model describing the system context, containers, and key components.</p>
+<hr />
+<h2 id="15-what-we-produced-as-artifacts">15) What we produced as artifacts</h2>
+<ul>
+<li>A V1 specification in Markdown.</li>
+<li>An architecture diagram (image).</li>
+<li>A Mermaid diagram for text-based rendering.</li>
+<li>A full C4 model in DSL form.</li>
+</ul>
+<hr />
+<h2 id="16-next-step-decisions-ready-to-lock">16) Next-step decisions (ready to lock)</h2>
+<p>To proceed into a concrete build and go-to-market plan, the next decisions are:</p>
+<p>1) First role family wedge:
+- Trades (HVAC/electrician/plumbing/maintenance) for DMV SMBs
+- or a different wedge if you prefer</p>
+<p>2) First geography:
+- Raleigh
+- DMV
+- or parallel pilots once wedge is fixed</p>
+<p>3) V1 scope boundaries:
+- written Q&amp;A only (recommended)
+- no tests in V1
+- no “automated decisions,” human decides based on packet</p>
+<p>4) Trial offer definition:
+- not “one run”
+- “one job setup + up to X completed packets free”</p>
+<p>5) The first metrics to track:
+- invite → packet completion
+- packet → interview requested
+- time to first completed packet
+- employer retention and repeat jobs</p>
+<hr />
+<p>End of document.</p></div></div></body></html>

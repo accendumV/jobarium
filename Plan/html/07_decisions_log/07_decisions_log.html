@@ -1,0 +1,185 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>07_decisions_log.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-decisions-log">Jobarium Decisions Log</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Capture high-impact decisions with rationale to prevent repeated debates and document trade-offs.</p>
+<h2 id="how-to-use">How to Use</h2>
+<ul>
+<li>Add one entry per decision.</li>
+<li>Keep entries brief and explicit.</li>
+<li>Link impacted docs.</li>
+<li>Do not delete old decisions; mark them superseded when replaced.</li>
+</ul>
+<h2 id="decision-status-values">Decision Status Values</h2>
+<ul>
+<li>Proposed</li>
+<li>Accepted</li>
+<li>Superseded</li>
+<li>Rejected</li>
+</ul>
+<hr />
+<h2 id="entries">Entries</h2>
+<h3 id="dec-0001-use-wedge-agnostic-architecture-for-mvp">DEC-0001: Use wedge-agnostic architecture for MVP</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CEO</li>
+<li>Context: GTM wedge is still under discussion, but implementation timeline is short.</li>
+<li>Decision: Keep core architecture wedge-agnostic; use DMV/North Carolina trades as GTM assumption only.</li>
+<li>Alternatives considered:<ul>
+<li>hard-code trade-specific model now</li>
+<li>delay architecture until wedge fully finalized</li>
+</ul>
+</li>
+<li>Why this option: keeps velocity high and avoids rework while preserving early GTM flexibility.</li>
+<li>Consequences:<ul>
+<li>requires configurable requirement taxonomy</li>
+<li>slight upfront modeling effort</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>02_architecture/02_jobarium_architecture_plan.md</code></li>
+<li><code>01_product/01_jobarium_one_pager.md</code></li>
+</ul>
+</li>
+<li>Review date: after first pilot onboarding</li>
+</ul>
+<h3 id="dec-0002-ai-minimal-mvp-with-authenticity-detection-guardrails">DEC-0002: AI-minimal MVP with authenticity detection guardrails</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CEO</li>
+<li>Context: Need trust and speed in first release.</li>
+<li>Decision: Keep AI scope minimal (embeddings/retrieval/summaries) and add authenticity risk signals for Q&amp;A.</li>
+<li>Alternatives considered:<ul>
+<li>extensive AI agents in MVP</li>
+<li>no authenticity controls in MVP</li>
+</ul>
+</li>
+<li>Why this option: balances trust, cost, and implementation speed.</li>
+<li>Consequences:<ul>
+<li>rule-based scoring first, classifier later</li>
+<li>human-in-the-loop packet decisions required</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>02_architecture/02_jobarium_architecture_plan.md</code></li>
+<li><code>02_architecture/06_authenticity_detection_spec.md</code></li>
+<li><code>03_user_experience_flows/03_candidate_user_flow.md</code></li>
+<li><code>03_user_experience_flows/04_employer_user_flow.md</code></li>
+</ul>
+</li>
+<li>Review date: 30 days post-launch</li>
+</ul>
+<h3 id="dec-0003-lock-first-launch-wedge-and-geography">DEC-0003: Lock first launch wedge and geography</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CEO</li>
+<li>Context: GTM assumption existed but was not explicitly locked for launch execution.</li>
+<li>Decision: Launch wedge is DMV skilled trades (HVAC/electrical/plumbing/maintenance), with architecture remaining wedge-agnostic.</li>
+<li>Alternatives considered:<ul>
+<li>Raleigh-first launch</li>
+<li>multi-wedge launch in parallel</li>
+</ul>
+</li>
+<li>Why this option: improves focus, speeds pilot learning, and aligns with structured dealbreaker model.</li>
+<li>Consequences:<ul>
+<li>template and outreach strategy should prioritize DMV trades first</li>
+<li>expansion to other wedges remains supported by current architecture</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>01_product/01_jobarium_one_pager.md</code></li>
+<li><code>01_product/09_user_personas.md</code></li>
+<li><code>02_architecture/02_jobarium_architecture_plan.md</code></li>
+</ul>
+</li>
+<li>Review date: after first 10 active employers</li>
+</ul>
+<h3 id="dec-0004-adopt-launch-definition-of-done-gate">DEC-0004: Adopt launch Definition-of-Done gate</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CEO/CTO</li>
+<li>Context: Launch quality criteria existed across docs but were not centralized.</li>
+<li>Decision: Use <code>01_product/12_launch_definition_of_done.md</code> as mandatory go/no-go gate.</li>
+<li>Alternatives considered:<ul>
+<li>ad hoc launch readiness check</li>
+<li>engineering-only release checklist</li>
+</ul>
+</li>
+<li>Why this option: creates clear cross-functional release accountability.</li>
+<li>Consequences:<ul>
+<li>launch requires explicit sign-off against P0 criteria</li>
+<li>exceptions must be logged and owned</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>01_product/12_launch_definition_of_done.md</code></li>
+<li><code>02_architecture/12_system_completeness_gate.md</code></li>
+</ul>
+</li>
+<li>Review date: one week before pilot go-live</li>
+</ul>
+<h3 id="dec-0005-lock-invite-anti-spam-defaults-for-mvp">DEC-0005: Lock invite anti-spam defaults for MVP</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CEO/CTO</li>
+<li>Context: Invite controls existed, but default values were not locked.</li>
+<li>Decision: Adopt default invite values defined in <code>02_architecture/18_invite_and_provider_defaults_mvp.md</code>.</li>
+<li>Alternatives considered:<ul>
+<li>employer-config-only without platform defaults</li>
+<li>strict low-volume defaults</li>
+</ul>
+</li>
+<li>Why this option: balances candidate experience protection and hiring throughput.</li>
+<li>Consequences:<ul>
+<li>safer automation behavior at launch</li>
+<li>policy review needed every 2 weeks during pilot</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>02_architecture/18_invite_and_provider_defaults_mvp.md</code></li>
+<li><code>03_user_experience_flows/04_employer_user_flow.md</code></li>
+</ul>
+</li>
+<li>Review date: after first 100 invites</li>
+</ul>
+<h3 id="dec-0006-provider-strategy-for-mvp-integrations">DEC-0006: Provider strategy for MVP integrations</h3>
+<ul>
+<li>Date: 2026-02-12</li>
+<li>Status: Accepted</li>
+<li>Owner: CTO</li>
+<li>Context: Needed explicit direction on provider abstraction depth.</li>
+<li>Decision: Use direct provider SDKs behind thin internal adapters for email/SMS/payments.</li>
+<li>Alternatives considered:<ul>
+<li>full provider abstraction layer from day one</li>
+<li>hard-coupled direct SDK usage without adapters</li>
+</ul>
+</li>
+<li>Why this option: fastest to ship while preserving switchability.</li>
+<li>Consequences:<ul>
+<li>adapter contracts must be stable and tested</li>
+<li>can migrate providers with limited service-level change</li>
+</ul>
+</li>
+<li>Affected docs:<ul>
+<li><code>02_architecture/18_invite_and_provider_defaults_mvp.md</code></li>
+<li><code>06_operations/16_pilot_support_runbook.md</code></li>
+</ul>
+</li>
+<li>Review date: end of pilot month 1</li>
+</ul></div></div></body></html>

@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>18_invite_and_provider_defaults_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-invite-defaults-and-provider-strategy-mvp">Jobarium Invite Defaults and Provider Strategy (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Lock two decision areas for MVP:
+1. default invite anti-spam policy values,
+2. integration provider strategy (direct SDK vs abstraction depth).</p>
+<h2 id="a-invite-anti-spam-policy-defaults-mvp">A) Invite Anti-Spam Policy Defaults (MVP)</h2>
+<h3 id="default-values-per-active-job">Default Values (per active job)</h3>
+<ul>
+<li>shortlist trigger mode: <code>top_n</code></li>
+<li>default <code>top_n</code>: <code>25</code></li>
+<li>invite expiry: <code>72h</code></li>
+<li>candidate re-invite cooldown: <code>7 days</code></li>
+<li>daily invite cap per job: <code>20</code></li>
+<li>weekly invite cap per job: <code>80</code></li>
+<li>max active outstanding invites per job: <code>40</code></li>
+</ul>
+<h3 id="guardrails">Guardrails</h3>
+<ul>
+<li>prevent new invite if candidate has:<ul>
+<li>active invite for same job</li>
+<li>submitted Q&amp;A for same job in last 30 days (unless manual override)</li>
+</ul>
+</li>
+<li>enforce quiet hours for outbound SMS (timezone-aware).</li>
+</ul>
+<h3 id="override-policy">Override Policy</h3>
+<ul>
+<li>Employer can tune values within safe ranges:<ul>
+<li><code>top_n</code>: 10-50</li>
+<li>expiry: 24h-7d</li>
+<li>cooldown: 3-30 days</li>
+<li>daily cap: 5-50</li>
+</ul>
+</li>
+<li>Out-of-range values require admin approval in MVP.</li>
+</ul>
+<h3 id="why-these-defaults">Why these defaults</h3>
+<ul>
+<li>Avoid invite spam.</li>
+<li>Preserve enough throughput for early hiring outcomes.</li>
+<li>Keep behavior predictable for small teams.</li>
+</ul>
+<h2 id="b-provider-strategy-mvp">B) Provider Strategy (MVP)</h2>
+<h3 id="decision">Decision</h3>
+<ul>
+<li>Use <strong>direct provider SDKs with a thin internal adapter interface</strong>.</li>
+</ul>
+<h3 id="initial-providers">Initial Providers</h3>
+<ul>
+<li>Email: <code>SendGrid</code></li>
+<li>SMS: <code>Twilio</code></li>
+<li>Payments: <code>Stripe</code></li>
+</ul>
+<h3 id="adapter-interface-requirement">Adapter Interface Requirement</h3>
+<ul>
+<li>Standard internal methods only:<ul>
+<li><code>sendEmail()</code></li>
+<li><code>sendSms()</code></li>
+<li><code>createCheckoutSession()</code></li>
+<li><code>getDeliveryStatus()</code></li>
+</ul>
+</li>
+<li>Provider-specific payload mapping stays behind adapter.</li>
+</ul>
+<h3 id="why-this-approach">Why this approach</h3>
+<ul>
+<li>Faster MVP implementation than full abstraction platform.</li>
+<li>Keeps an upgrade path to switch providers later.</li>
+<li>Avoids vendor lock in high-level business flows.</li>
+</ul>
+<h3 id="fallback-rules">Fallback Rules</h3>
+<ul>
+<li>If SMS provider degraded:<ul>
+<li>fallback to email where candidate consent exists.</li>
+</ul>
+</li>
+<li>If email provider degraded:<ul>
+<li>queue retries and escalate; use SMS for critical invites if allowed.</li>
+</ul>
+</li>
+<li>Provider outage &gt; 30 min:<ul>
+<li>trigger incident runbook path.</li>
+</ul>
+</li>
+</ul>
+<h2 id="c-ownership-and-review">C) Ownership and Review</h2>
+<ul>
+<li>Owners: CEO/CTO</li>
+<li>Review cadence: every 2 weeks during pilot</li>
+<li>Revisit triggers:<ul>
+<li>invite completion rate degradation</li>
+<li>complaint/spam signal increase</li>
+<li>provider incident frequency above threshold</li>
+</ul>
+</li>
+</ul></div></div></body></html>

@@ -1,0 +1,234 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>11_priority_matrix_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-priority-matrix-mvp">Jobarium Priority Matrix (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Prioritize features for the 8-week launch using a practical matrix:
+- business impact,
+- user pain reduction,
+- implementation effort,
+- delivery risk.</p>
+<h2 id="scoring-model">Scoring Model</h2>
+<ul>
+<li>Impact: 1-5 (higher is better)</li>
+<li>Pain Reduction: 1-5 (higher is better)</li>
+<li>Effort: 1-5 (lower is better)</li>
+<li>Risk: 1-5 (lower is better)</li>
+</ul>
+<p>Priority score (simple):
+<code>(Impact + Pain Reduction) - (Effort + Risk)</code></p>
+<p>This matrix is directional, not absolute. CEO/CTO can override with rationale.</p>
+<h2 id="feature-priority-table">Feature Priority Table</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th style="text-align: right;">Impact</th>
+<th style="text-align: right;">Pain Reduction</th>
+<th style="text-align: right;">Effort</th>
+<th style="text-align: right;">Risk</th>
+<th style="text-align: right;">Score</th>
+<th>Priority</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Candidate onboarding + CV prefill</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Employer job setup + templates</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Dealbreaker filtering</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Matching + deterministic scoring</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Auto-invite with caps/cooldowns</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Async Q&amp;A session flow</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Packet builder (summary + transcript)</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">4</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Authenticity insight badge</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Employer packet actions</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Email/SMS notifications</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>GDPR baseline workflows</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td>P0</td>
+</tr>
+<tr>
+<td>Core dashboard metrics</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>ATS export basics</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>Calendar handoff links</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">3</td>
+<td>P1</td>
+</tr>
+<tr>
+<td>Advanced AI coaching</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-4</td>
+<td>P2</td>
+</tr>
+<tr>
+<td>Enterprise ATS deep integrations</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">5</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">-4</td>
+<td>P2</td>
+</tr>
+</tbody>
+</table>
+<h2 id="priority-buckets">Priority Buckets</h2>
+<h3 id="p0-launch-critical">P0 (Launch Critical)</h3>
+<ul>
+<li>Candidate onboarding + CV parsing prefill</li>
+<li>Employer setup templates</li>
+<li>Dealbreaker filters</li>
+<li>Matching/scoring</li>
+<li>Auto-invite automation controls</li>
+<li>Async Q&amp;A + packet generation</li>
+<li>Authenticity insights (advisory only)</li>
+<li>Employer decision actions</li>
+<li>Notifications</li>
+<li>GDPR baseline and audit trail</li>
+</ul>
+<h3 id="p1-post-launch-high-value">P1 (Post-Launch, High Value)</h3>
+<ul>
+<li>Metrics dashboard enhancements</li>
+<li>ATS export basics</li>
+<li>Calendar workflow polish</li>
+</ul>
+<h3 id="p2-later">P2 (Later)</h3>
+<ul>
+<li>Advanced AI features</li>
+<li>Deep enterprise integrations</li>
+</ul>
+<h2 id="dependency-notes">Dependency Notes</h2>
+<ul>
+<li>Packet builder depends on Q&amp;A submission model.</li>
+<li>Authenticity insights depend on Q&amp;A telemetry capture.</li>
+<li>Auto-invite depends on shortlist delta events.</li>
+<li>Templates depend on requirement taxonomy stability.</li>
+</ul>
+<h2 id="decision-rules">Decision Rules</h2>
+<ol>
+<li>If P0 scope slips, cut P1 first, not P0 quality.</li>
+<li>Do not add new P0 items without removing another P0 item.</li>
+<li>Every P0 feature must map to at least one documented HR pain point.</li>
+<li>Any exception requires a decision log entry.</li>
+</ol>
+<h2 id="review-cadence">Review Cadence</h2>
+<ul>
+<li>Re-score weekly (Friday).</li>
+<li>Capture changes in decisions log if priority shifts materially.</li>
+</ul></div></div></body></html>

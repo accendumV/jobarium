@@ -1,0 +1,102 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>01_jobarium_one_pager.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-one-pager">Jobarium One-Pager</h1>
+<h2 id="what-jobarium-is">What Jobarium Is</h2>
+<p>Jobarium is a two-sided hiring platform that changes hiring from "apply-first" to "match-first."</p>
+<ul>
+<li>Candidates create one structured profile and update it over time.</li>
+<li>Employers set up a job once with must-haves, dealbreakers, and a question kit.</li>
+<li>Matching runs continuously in the background.</li>
+<li>When a candidate newly enters a shortlist, the system auto-invites them to complete role-specific asynchronous pre-screen questions.</li>
+<li>HR reviews only completed candidate packets, not large applicant queues.</li>
+</ul>
+<p>Core positioning: <strong>"Uber for hiring"</strong> - setup once, then hands-off, outcome-focused flow.</p>
+<h2 id="problem-it-solves">Problem It Solves</h2>
+<p>Current hiring is high-friction on both sides:</p>
+<ul>
+<li><strong>For employers</strong>: too many low-signal applications, repetitive first-round screening, late discovery of disqualifiers, inconsistent candidate comparisons.</li>
+<li><strong>For candidates</strong>: repetitive data entry across platforms, poor visibility into ideal jobs, low review probability in high-volume queues.</li>
+</ul>
+<p>Jobarium addresses this by combining structured data, automated shortlisting, and packet-first screening.</p>
+<h2 id="why-this-can-work">Why This Can Work</h2>
+<ol>
+<li><strong>Strong workflow fit for SMB hiring teams</strong>
+   - Reduces repetitive recruiter work and time-to-first-valuable-candidate.</li>
+<li><strong>Clear two-sided value</strong>
+   - Employers get higher-signal packets; candidates avoid repetitive applications.</li>
+<li><strong>Defensible data exhaust</strong>
+   - Structured profile fields, role constraints, Q&amp;A answers, and outcomes create proprietary training signal over time.</li>
+<li><strong>Operationally practical MVP</strong>
+   - Hard filters + top-K retrieval + deterministic scoring is cheaper and more explainable than black-box matching.</li>
+<li><strong>Automation aligned with economics</strong>
+   - More compute spent when value is created (completed packets), less spent on low-value workflow.</li>
+</ol>
+<h2 id="known-weaknesses-and-realistic-risks">Known Weaknesses and Realistic Risks</h2>
+<ol>
+<li><strong>Cold-start liquidity</strong>
+   - Without enough active candidates in a local niche, employers may not see early value.</li>
+<li><strong>Trust in automation</strong>
+   - Recruiters may resist fully hands-off invite flow until quality is proven.</li>
+<li><strong>Packet quality variance</strong>
+   - Weak candidate responses reduce packet usefulness even if matching is good.</li>
+<li><strong>Marketplace asymmetry</strong>
+   - Candidate acquisition and employer conversion may scale at different speeds.</li>
+<li><strong>Integration drag</strong>
+   - Rich integrations (ATS, calendars, external profiles) can delay launch if over-scoped.</li>
+</ol>
+<h2 id="balanced-approach-skeptical-but-constructive">Balanced Approach (Skeptical but Constructive)</h2>
+<p>The idea is compelling, but execution should stay disciplined:</p>
+<ul>
+<li>Start with a narrow GTM wedge (assumption: DMV trades) while keeping architecture wedge-agnostic.</li>
+<li>Launch with AI-minimal principles: embeddings + ranking + packet summaries only.</li>
+<li>Treat automation as configurable, with clear caps, cooldowns, and opt-in controls.</li>
+<li>Prove value with hard metrics early rather than feature breadth.</li>
+<li>Expand integrations and advanced AI only after base conversion metrics are healthy.</li>
+</ul>
+<h2 id="v1-scope-8-week-target">V1 Scope (8-Week Target)</h2>
+<p>Must-have:</p>
+<ul>
+<li>Candidate profile creation and updates</li>
+<li>Employer role setup (must-haves, dealbreakers, question kits)</li>
+<li>Matching + scoring + shortlisting</li>
+<li>Auto-invite orchestration</li>
+<li>Asynchronous Q&amp;A completion flow</li>
+<li>Candidate packet generation (summary + full transcript)</li>
+<li>Email/SMS notifications</li>
+<li>Authentication and role-based access</li>
+<li>Basic admin tooling</li>
+<li>GDPR-ready controls (consent, export/delete, retention policies)</li>
+</ul>
+<p>Out of scope for initial launch:</p>
+<ul>
+<li>Heavily agentic AI features</li>
+<li>Full SOC2 certification activities (design for SOC2-ready future state)</li>
+<li>Broad enterprise ATS depth</li>
+</ul>
+<h2 id="success-criteria-for-first-90-days-post-launch">Success Criteria for First 90 Days Post-Launch</h2>
+<p>Primary:</p>
+<ul>
+<li>Invite -&gt; packet completion rate</li>
+<li>Packet -&gt; interview-request rate</li>
+<li>Time to first completed packet per job</li>
+<li>Employer repeat job creation / retention</li>
+</ul>
+<p>Secondary:</p>
+<ul>
+<li>Candidate profile completion rate</li>
+<li>Invite acceptance rate</li>
+<li>Cost per completed packet</li>
+</ul>
+<h2 id="strategic-conclusion">Strategic Conclusion</h2>
+<p>Jobarium should be built as an automation-first, packet-first hiring workflow product, not as another job board or ATS. If launch discipline is maintained (narrow wedge, clear metrics, minimal AI, strong workflow quality), it has a credible path to product-market fit and defensibility.</p></div></div></body></html>

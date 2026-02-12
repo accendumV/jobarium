@@ -1,0 +1,119 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>12_launch_definition_of_done.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-launch-definition-of-done-mvp">Jobarium Launch Definition of Done (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define explicit launch readiness criteria across product, quality, security/compliance, and operations.</p>
+<p>A launch is approved only when all P0 criteria below are met or an exception is documented in the decisions log.</p>
+<h2 id="1-product-and-workflow-criteria-p0">1) Product and Workflow Criteria (P0)</h2>
+<ul>
+<li>Candidate can complete end-to-end flow:<ul>
+<li>sign-up -&gt; profile bootstrap -&gt; invite -&gt; Q&amp;A submit -&gt; confirmation.</li>
+</ul>
+</li>
+<li>Employer can complete end-to-end flow:<ul>
+<li>org setup -&gt; job setup -&gt; automation config -&gt; packet review -&gt; action.</li>
+</ul>
+</li>
+<li>Packet-first behavior is active:<ul>
+<li>employer inbox defaults to completed packets.</li>
+</ul>
+</li>
+<li>Dealbreaker checks visible in packet:<ul>
+<li>authorization, location/radius, pay overlap, availability, required cert/license.</li>
+</ul>
+</li>
+<li>Authenticity insight displayed as advisory signal only (no auto-reject).</li>
+</ul>
+<h2 id="2-functional-quality-criteria-p0">2) Functional Quality Criteria (P0)</h2>
+<ul>
+<li>Zero known blocker bugs in candidate/employer P0 flows.</li>
+<li>Core APIs meet baseline reliability under pilot load.</li>
+<li>Parser failures degrade gracefully to manual profile entry.</li>
+<li>Packet build retries work and failed jobs are observable.</li>
+</ul>
+<h2 id="3-security-and-compliance-criteria-p0">3) Security and Compliance Criteria (P0)</h2>
+<ul>
+<li>OWASP baseline controls enabled (auth/session/input validation/rate limiting).</li>
+<li>GDPR workflows functional:<ul>
+<li>consent capture</li>
+<li>export request handling</li>
+<li>delete/anonymize request handling</li>
+<li>retention policy execution</li>
+</ul>
+</li>
+<li>Audit logs exist for sensitive and admin actions.</li>
+</ul>
+<h2 id="4-operational-readiness-criteria-p0">4) Operational Readiness Criteria (P0)</h2>
+<ul>
+<li>On-call ownership and incident severities defined.</li>
+<li>Alerts configured for:<ul>
+<li>invite dispatch failures</li>
+<li>parse failure spike</li>
+<li>packet build delay/failure</li>
+<li>API 5xx spike</li>
+</ul>
+</li>
+<li>DLQ inspection and replay tested in staging.</li>
+<li>Pilot support communication templates approved.</li>
+</ul>
+<h2 id="5-data-and-analytics-criteria-p0">5) Data and Analytics Criteria (P0)</h2>
+<ul>
+<li>Core events emitted and validated for:<ul>
+<li>profile/job updates</li>
+<li>shortlist changes</li>
+<li>invite lifecycle</li>
+<li>q&amp;a submission</li>
+<li>packet readiness</li>
+</ul>
+</li>
+<li>Dashboard metrics available:<ul>
+<li>time to first completed packet</li>
+<li>invite -&gt; completion</li>
+<li>packet -&gt; interview action</li>
+</ul>
+</li>
+</ul>
+<h2 id="6-performanceslo-criteria-p0">6) Performance/SLO Criteria (P0)</h2>
+<ul>
+<li>CV parse completion p95 &lt; 3 minutes.</li>
+<li>matching refresh p95 &lt; 10 minutes after major update.</li>
+<li>invite dispatch p95 &lt; 2 minutes after shortlist entry.</li>
+<li>packet generation p95 &lt; 90 seconds after Q&amp;A submission.</li>
+</ul>
+<h2 id="7-gono-go-process">7) Go/No-Go Process</h2>
+<ul>
+<li>Readiness review participants:<ul>
+<li>CEO, CTO</li>
+</ul>
+</li>
+<li>Inputs:<ul>
+<li>this DoD checklist</li>
+<li>system completeness gate</li>
+<li>open incident/risk summary</li>
+</ul>
+</li>
+<li>Decision outcomes:<ul>
+<li><code>Go</code></li>
+<li><code>Go with exceptions</code> (must be logged with owner/date)</li>
+<li><code>No-Go</code> (blocked criteria and remediation date)</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-launch-sign-off">8) Launch Sign-Off</h2>
+<ul>
+<li>Target launch date:</li>
+<li>CEO sign-off:</li>
+<li>CTO sign-off:</li>
+<li>Exceptions approved (if any):</li>
+</ul></div></div></body></html>

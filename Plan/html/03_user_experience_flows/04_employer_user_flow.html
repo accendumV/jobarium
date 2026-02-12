@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>04_employer_user_flow.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-employer-user-flow-mvp">Jobarium Employer User Flow (MVP)</h1>
+<h2 id="goal">Goal</h2>
+<p>Give employers a hands-off hiring workflow where setup is short and review quality is high.</p>
+<h2 id="experience-principles">Experience Principles</h2>
+<ul>
+<li>Setup once, automation by default.</li>
+<li>No queue overload: only completed packets reach the inbox.</li>
+<li>Explainable matching and consistent packet structure.</li>
+<li>One-click decision actions to reduce cycle time.</li>
+</ul>
+<h2 id="employer-journey-primary-path">Employer Journey (Primary Path)</h2>
+<h3 id="stage-1-organization-onboarding">Stage 1: Organization Onboarding</h3>
+<ol>
+<li>Employer creates organization account.</li>
+<li>Adds organization details and team members (optional in MVP).</li>
+<li>Configures notification channels and timezone.</li>
+</ol>
+<p>Success condition:
+- Employer workspace is active and can create jobs.</p>
+<h3 id="stage-2-job-setup-wizard">Stage 2: Job Setup Wizard</h3>
+<ol>
+<li>Employer creates role with title, location, pay band, schedule details.</li>
+<li>Defines requirements:
+   - must-haves
+   - nice-to-haves
+   - dealbreakers</li>
+<li>Selects or edits question kit template (5-10 questions).</li>
+</ol>
+<p>Success condition:
+- Role is publish-ready with structured requirements and screening kit.</p>
+<h3 id="stage-3-automation-configuration">Stage 3: Automation Configuration</h3>
+<ol>
+<li>Employer enables auto-invite rules:
+   - shortlist threshold/top N
+   - invite caps
+   - cooldown windows
+   - expiry duration</li>
+<li>Employer activates job.</li>
+</ol>
+<p>Success condition:
+- Matching and invite automation are live without manual sourcing.</p>
+<h3 id="stage-4-packet-inbox-review">Stage 4: Packet Inbox Review</h3>
+<ol>
+<li>Employer receives only completed candidate packets.</li>
+<li>For each packet, employer sees:
+   - fit highlights tied to must-haves
+   - dealbreaker confirmations
+   - authenticity insight badge (self-authored/mixed/heavy-assistance-suspected)
+   - summarized risks/gaps
+   - full Q&amp;A transcript</li>
+<li>Employer takes one action:
+   - request interview
+   - request clarification
+   - reject</li>
+</ol>
+<p>Success condition:
+- Decisions are fast and consistent with less screening effort.</p>
+<h3 id="stage-5-feedback-and-optimization">Stage 5: Feedback and Optimization</h3>
+<ol>
+<li>Employer actions feed ranking outcomes.</li>
+<li>Employer adjusts requirements and question kit when needed.</li>
+<li>Dashboard shows efficiency and conversion metrics.</li>
+</ol>
+<p>Success condition:
+- Better packet quality and conversion over time.</p>
+<h2 id="screen-level-requirements">Screen-Level Requirements</h2>
+<h3 id="employer-setup-screens">Employer Setup Screens</h3>
+<ul>
+<li>Organization onboarding</li>
+<li>Job creation wizard</li>
+<li>Requirement and dealbreaker builder</li>
+<li>Question kit editor</li>
+<li>Automation settings panel</li>
+</ul>
+<h3 id="employer-operational-screens">Employer Operational Screens</h3>
+<ul>
+<li>Packet inbox</li>
+<li>Packet detail view</li>
+<li>Job performance dashboard</li>
+<li>Template management (future-safe)</li>
+</ul>
+<h2 id="required-vs-optional-employer-inputs-mvp">Required vs Optional Employer Inputs (MVP)</h2>
+<p>Required:
+- role title/description
+- location and remote policy
+- pay range
+- must-haves and dealbreakers
+- question kit</p>
+<p>Optional (but recommended):
+- ideal candidate traits
+- preferred start window detail
+- team reviewer assignments</p>
+<h2 id="employer-delight-opportunities">Employer Delight Opportunities</h2>
+<ul>
+<li>First packet ETA shown after job activation.</li>
+<li>Smart defaults prefilled for invite policy.</li>
+<li>Packet side-by-side comparison view (phase 1.5 if feasible).</li>
+<li>Built-in verification prompts when authenticity risk is flagged.</li>
+</ul>
+<h2 id="failure-and-edge-flows">Failure and Edge Flows</h2>
+<ul>
+<li>Zero packet output after activation:</li>
+<li>suggest requirement relaxation candidates.</li>
+<li>Too many low-quality packets:</li>
+<li>tighten must-haves or update question kit quality.</li>
+<li>Notification delivery failures:</li>
+<li>fallback channels and retry strategy.</li>
+<li>Policy misconfiguration:</li>
+<li>guardrails/warnings before activation.</li>
+<li>False-positive authenticity flag:</li>
+<li>employer sees confidence and reason codes, not binary reject recommendation.</li>
+</ul>
+<h2 id="employer-kpis">Employer KPIs</h2>
+<ul>
+<li>time to first completed packet</li>
+<li>packet -&gt; interview rate</li>
+<li>interview -&gt; hire proxy rate</li>
+<li>reviewer time saved per role</li>
+<li>repeat job activation rate</li>
+</ul>
+<h2 id="non-goals-for-mvp">Non-Goals for MVP</h2>
+<ul>
+<li>Full ATS replacement</li>
+<li>Complex interview panel workflows</li>
+<li>Enterprise-grade workflow customization</li>
+</ul></div></div></body></html>

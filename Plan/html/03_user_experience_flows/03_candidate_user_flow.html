@@ -1,0 +1,148 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>03_candidate_user_flow.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-candidate-user-flow-mvp">Jobarium Candidate User Flow (MVP)</h1>
+<h2 id="goal">Goal</h2>
+<p>Give candidates a low-effort path to relevant opportunities with high transparency and minimal repetitive work.</p>
+<h2 id="experience-principles">Experience Principles</h2>
+<ul>
+<li>Fast onboarding: first meaningful setup in under 3 minutes.</li>
+<li>Progressive profiling: ask only what improves matching now.</li>
+<li>Trust-first automation: explain why invites appear.</li>
+<li>Mobile-friendly completion for interview Q&amp;A.</li>
+</ul>
+<h2 id="candidate-journey-primary-path">Candidate Journey (Primary Path)</h2>
+<h3 id="stage-1-entry-and-account-creation">Stage 1: Entry and Account Creation</h3>
+<ol>
+<li>Candidate lands on value page: "Create one profile, get matched automatically."</li>
+<li>Candidate signs up (email/password or OAuth).</li>
+<li>Candidate accepts required terms/privacy/GDPR consent.</li>
+</ol>
+<p>Success condition:
+- Authenticated user and baseline consent recorded.</p>
+<h3 id="stage-2-profile-bootstrap-fast-start">Stage 2: Profile Bootstrap (Fast Start)</h3>
+<ol>
+<li>Candidate uploads CV (PDF/DOC/DOCX) and/or imports from LinkedIn.</li>
+<li>System parses and pre-fills profile fields.</li>
+<li>Candidate confirms only high-impact fields first:
+   - desired role/title
+   - location + commute radius
+   - work authorization
+   - pay expectation range
+   - availability/start date</li>
+</ol>
+<p>Success condition:
+- Candidate reaches "matchable profile" threshold.</p>
+<h3 id="stage-3-guided-profile-completion">Stage 3: Guided Profile Completion</h3>
+<ol>
+<li>UI shows profile completeness meter and "what improves matching" tips.</li>
+<li>Candidate adds optional enrichments:
+   - skills
+   - certifications/licenses
+   - work history detail
+   - portfolio links</li>
+<li>Candidate sets communication preferences (email/SMS).</li>
+</ol>
+<p>Success condition:
+- Candidate can be reliably scored for shortlist eligibility.</p>
+<h3 id="stage-4-discovery-and-invite">Stage 4: Discovery and Invite</h3>
+<ol>
+<li>Background matching runs continuously.</li>
+<li>If candidate enters a job shortlist, invite is sent.</li>
+<li>Invite includes:
+   - role summary
+   - company name
+   - location/pay range
+   - time estimate to complete Q&amp;A</li>
+<li>Candidate chooses Start or Decline.</li>
+</ol>
+<p>Success condition:
+- Candidate opts in with clear expectations.</p>
+<h3 id="stage-5-asynchronous-qa-submission">Stage 5: Asynchronous Q&amp;A Submission</h3>
+<ol>
+<li>Candidate answers 5-10 role-specific questions.</li>
+<li>Autosave prevents loss; progress bar shows remaining effort.</li>
+<li>Candidate sees "authentic response" policy note:
+   - light assistance is acceptable,
+   - fully outsourced/auto-generated answers may be flagged.</li>
+<li>Candidate submits once complete.</li>
+</ol>
+<p>Success condition:
+- Completed submission creates an HR-ready packet.</p>
+<h3 id="stage-6-post-submission-and-retention">Stage 6: Post-Submission and Retention</h3>
+<ol>
+<li>Candidate receives submission confirmation and expected response window.</li>
+<li>Candidate gets optional profile improvement suggestions.</li>
+<li>Candidate can track status (submitted/reviewed/interview requested).</li>
+</ol>
+<p>Success condition:
+- Candidate remains engaged and keeps profile fresh.</p>
+<h2 id="screen-level-requirements">Screen-Level Requirements</h2>
+<h3 id="candidate-onboarding-screens">Candidate Onboarding Screens</h3>
+<ul>
+<li>Landing + signup</li>
+<li>Consent capture</li>
+<li>CV upload/import</li>
+<li>Field confirmation (high-impact)</li>
+<li>Profile completeness dashboard</li>
+</ul>
+<h3 id="candidate-action-screens">Candidate Action Screens</h3>
+<ul>
+<li>Invite detail page</li>
+<li>Q&amp;A session page</li>
+<li>Submission confirmation</li>
+<li>Opportunity status timeline</li>
+</ul>
+<h2 id="required-vs-optional-data-mvp">Required vs Optional Data (MVP)</h2>
+<p>Required to become matchable:
+- authorization
+- location/radius or remote preference
+- pay expectation range
+- start availability
+- one primary role/title</p>
+<p>Optional (high value):
+- certifications/licenses
+- detailed work bullets
+- portfolio/project links
+- shift preferences</p>
+<h2 id="candidate-delight-opportunities">Candidate Delight Opportunities</h2>
+<ul>
+<li>"You are now visible to matching employers" feedback at completion milestone.</li>
+<li>Clear match explanations ("Why this role is relevant").</li>
+<li>One-tap profile refresh prompts when data becomes stale.</li>
+</ul>
+<h2 id="failure-and-edge-flows">Failure and Edge Flows</h2>
+<ul>
+<li>Parse failure: user continues with manual entry; retry parser in background.</li>
+<li>Low-confidence extraction: highlight uncertain fields for confirmation.</li>
+<li>Invite expired: allow reactivation request where policy allows.</li>
+<li>Duplicate account detection: guided merge flow (future-safe).</li>
+<li>Authenticity false-positive:<ul>
+<li>user can request review and provide clarifying context.</li>
+</ul>
+</li>
+</ul>
+<h2 id="candidate-kpis">Candidate KPIs</h2>
+<ul>
+<li>signup -&gt; matchable profile conversion</li>
+<li>invite open rate</li>
+<li>invite accept rate</li>
+<li>invite -&gt; Q&amp;A completion rate</li>
+<li>profile update frequency (monthly)</li>
+</ul>
+<h2 id="non-goals-for-mvp">Non-Goals for MVP</h2>
+<ul>
+<li>Full career coaching assistant</li>
+<li>Heavy AI rewriting of candidate answers</li>
+<li>Deep social-graph-driven ranking</li>
+</ul></div></div></body></html>

@@ -1,0 +1,165 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>25_candidate_disclosure_and_consent_copy_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-candidate-disclosure-and-consent-copy-package-mvp">Jobarium Candidate Disclosure and Consent Copy Package (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Provide finalized candidate-facing copy for:
+- privacy/consent,
+- authenticity checks disclosure,
+- communication permissions,
+- data rights (GDPR).</p>
+<p>This closes item 25 in the system completeness gate.</p>
+<h2 id="copy-principles">Copy Principles</h2>
+<ul>
+<li>Plain language over legal jargon.</li>
+<li>Clear "why" for each consent.</li>
+<li>Actionable user choices (accept/decline where applicable).</li>
+<li>No dark patterns.</li>
+</ul>
+<h2 id="a-account-creation-consent-copy">A) Account Creation Consent Copy</h2>
+<h3 id="terms-and-privacy-consent-required">Terms and Privacy Consent (Required)</h3>
+<ul>
+<li>Title:<ul>
+<li>"Before you continue"</li>
+</ul>
+</li>
+<li>Body:<ul>
+<li>"To use Jobarium, please review and accept our Terms of Use and Privacy Notice."</li>
+<li>"We use your profile data to match you with roles and deliver interview invitations."</li>
+</ul>
+</li>
+<li>Checkbox label:<ul>
+<li>"I agree to the Terms of Use and Privacy Notice."</li>
+</ul>
+</li>
+<li>Blocking behavior:<ul>
+<li>required for account creation.</li>
+</ul>
+</li>
+</ul>
+<h2 id="b-matching-and-profile-processing-disclosure">B) Matching and Profile Processing Disclosure</h2>
+<h3 id="candidate-profile-processing-required">Candidate Profile Processing (Required)</h3>
+<ul>
+<li>Title:<ul>
+<li>"How your profile is used"</li>
+</ul>
+</li>
+<li>Body:<ul>
+<li>"Jobarium analyzes your profile information to identify job matches."</li>
+<li>"You can edit your profile at any time."</li>
+<li>"Required match fields (such as location and work eligibility) are always shown for your confirmation."</li>
+</ul>
+</li>
+<li>CTA:<ul>
+<li>"Continue"</li>
+</ul>
+</li>
+</ul>
+<h2 id="c-authenticity-check-disclosure-required-for-qa">C) Authenticity Check Disclosure (Required for Q&amp;A)</h2>
+<h3 id="pre-qa-notice">Pre-Q&amp;A Notice</h3>
+<ul>
+<li>Title:<ul>
+<li>"Response authenticity notice"</li>
+</ul>
+</li>
+<li>Body:<ul>
+<li>"To help employers evaluate responses fairly, Jobarium applies automated authenticity checks."</li>
+<li>"Light assistance (such as grammar fixes) is allowed."</li>
+<li>"Fully outsourced or auto-generated responses may be flagged for review."</li>
+<li>"This does not automatically reject your application."</li>
+</ul>
+</li>
+<li>Checkbox label:<ul>
+<li>"I understand the authenticity policy."</li>
+</ul>
+</li>
+<li>Blocking behavior:<ul>
+<li>required before Q&amp;A submission.</li>
+</ul>
+</li>
+</ul>
+<h2 id="d-communication-consent-channel-specific">D) Communication Consent (Channel-Specific)</h2>
+<h3 id="email-notifications">Email Notifications</h3>
+<ul>
+<li>Label:<ul>
+<li>"Receive job and interview updates by email."</li>
+</ul>
+</li>
+<li>Default:<ul>
+<li>enabled</li>
+</ul>
+</li>
+</ul>
+<h3 id="sms-notifications">SMS Notifications</h3>
+<ul>
+<li>Label:<ul>
+<li>"Receive time-sensitive updates by SMS."</li>
+</ul>
+</li>
+<li>Default:<ul>
+<li>disabled (opt-in)</li>
+</ul>
+</li>
+<li>Note:<ul>
+<li>"Standard carrier rates may apply. You can opt out anytime."</li>
+</ul>
+</li>
+</ul>
+<h2 id="e-data-rights-gdpr-copy">E) Data Rights (GDPR) Copy</h2>
+<h3 id="data-rights-panel">Data Rights Panel</h3>
+<ul>
+<li>Title:<ul>
+<li>"Your data rights"</li>
+</ul>
+</li>
+<li>Body:<ul>
+<li>"You can request a copy of your data or request deletion from your account settings."</li>
+<li>"Some records may be retained where required for legal/compliance reasons."</li>
+</ul>
+</li>
+<li>Actions:<ul>
+<li>"Request data export"</li>
+<li>"Request account/data deletion"</li>
+</ul>
+</li>
+</ul>
+<h2 id="f-error-and-recovery-copy">F) Error and Recovery Copy</h2>
+<h3 id="consent-save-failure">Consent Save Failure</h3>
+<ul>
+<li>Message:<ul>
+<li>"We couldn't save your consent settings right now. Please try again."</li>
+</ul>
+</li>
+</ul>
+<h3 id="qa-authenticity-notice-not-accepted">Q&amp;A Authenticity Notice Not Accepted</h3>
+<ul>
+<li>Message:<ul>
+<li>"Please confirm the authenticity notice before submitting your responses."</li>
+</ul>
+</li>
+</ul>
+<h2 id="g-localizationaccessibility-notes">G) Localization/Accessibility Notes</h2>
+<ul>
+<li>Keep reading level near plain-English business language.</li>
+<li>Support screen readers with clear heading labels.</li>
+<li>Avoid ambiguous negatives in consent labels.</li>
+</ul>
+<h2 id="h-approval-and-change-control">H) Approval and Change Control</h2>
+<ul>
+<li>Owner: CEO</li>
+<li>Reviewer: CTO</li>
+<li>Update rule:<ul>
+<li>any legal/compliance wording change requires version bump and date annotation.</li>
+</ul>
+</li>
+</ul></div></div></body></html>

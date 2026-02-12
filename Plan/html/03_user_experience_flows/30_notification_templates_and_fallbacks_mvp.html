@@ -1,0 +1,211 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>30_notification_templates_and_fallbacks_mvp.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-notification-templates-and-fallbacks-mvp">Jobarium Notification Templates and Fallbacks (MVP)</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Define message templates, channel strategy, and fallback behavior for critical notifications.</p>
+<p>This closes item 30 in the system completeness gate.</p>
+<h2 id="channel-strategy">Channel Strategy</h2>
+<ul>
+<li>Primary channels:<ul>
+<li>Email (default)</li>
+<li>SMS (opt-in for candidate, optional for employer)</li>
+</ul>
+</li>
+<li>Channel priority:
+  1. Preferred user channel if configured and healthy
+  2. Secondary channel if primary fails
+  3. In-app notification fallback where available</li>
+</ul>
+<h2 id="template-rules">Template Rules</h2>
+<ul>
+<li>Keep subject/body concise and action-oriented.</li>
+<li>Include role/job context and clear CTA.</li>
+<li>Include unsubscribe/preferences link where required.</li>
+<li>Never include sensitive personal data in message body.</li>
+</ul>
+<h2 id="event-to-template-map-p0">Event-to-Template Map (P0)</h2>
+<h3 id="n-01-candidate-invite-sent">N-01 Candidate Invite Sent</h3>
+<ul>
+<li>Trigger:<ul>
+<li><code>invite.created</code></li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>candidate</li>
+</ul>
+</li>
+<li>Email subject:<ul>
+<li>"You have a new interview invitation on Jobarium"</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>role title</li>
+<li>employer name</li>
+<li>pay/location summary</li>
+<li>invite expiry</li>
+<li><code>Start</code> CTA</li>
+</ul>
+</li>
+<li>SMS fallback:<ul>
+<li>"New Jobarium invite: [Role] at [Employer]. Expires [time]. Open app/link."</li>
+</ul>
+</li>
+</ul>
+<h3 id="n-02-invite-expiring-soon">N-02 Invite Expiring Soon</h3>
+<ul>
+<li>Trigger:<ul>
+<li>invite expiry - 24h reminder</li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>candidate</li>
+</ul>
+</li>
+<li>Email subject:<ul>
+<li>"Reminder: your Jobarium invite expires soon"</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>remaining time</li>
+<li>direct start link</li>
+</ul>
+</li>
+</ul>
+<h3 id="n-03-qa-submission-confirmation">N-03 Q&amp;A Submission Confirmation</h3>
+<ul>
+<li>Trigger:<ul>
+<li><code>qa.submitted</code></li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>candidate</li>
+</ul>
+</li>
+<li>Email subject:<ul>
+<li>"Your responses were submitted"</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>confirmation timestamp</li>
+<li>expected review window</li>
+</ul>
+</li>
+</ul>
+<h3 id="n-04-packet-ready-for-employer">N-04 Packet Ready for Employer</h3>
+<ul>
+<li>Trigger:<ul>
+<li><code>packet.ready</code></li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>employer reviewers</li>
+</ul>
+</li>
+<li>Email subject:<ul>
+<li>"New candidate packet is ready to review"</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>role title</li>
+<li>candidate initials/identifier (privacy-safe)</li>
+<li><code>Review packet</code> CTA</li>
+</ul>
+</li>
+</ul>
+<h3 id="n-05-packet-action-notification">N-05 Packet Action Notification</h3>
+<ul>
+<li>Trigger:<ul>
+<li>packet action <code>interview|clarify|reject</code></li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>candidate</li>
+</ul>
+</li>
+<li>Email subject examples:<ul>
+<li>"Next step requested for your Jobarium submission"</li>
+<li>"Update on your Jobarium submission"</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>action type</li>
+<li>next step instructions</li>
+</ul>
+</li>
+</ul>
+<h3 id="n-06-system-delay-notice-operational">N-06 System Delay Notice (Operational)</h3>
+<ul>
+<li>Trigger:<ul>
+<li>incident requiring user communication</li>
+</ul>
+</li>
+<li>Audience:<ul>
+<li>affected candidates/employers</li>
+</ul>
+</li>
+<li>Body essentials:<ul>
+<li>affected feature</li>
+<li>status summary</li>
+<li>expected update time</li>
+</ul>
+</li>
+</ul>
+<h2 id="fallback-behavior">Fallback Behavior</h2>
+<h3 id="delivery-failure-handling">Delivery Failure Handling</h3>
+<ol>
+<li>Attempt primary channel.</li>
+<li>Retry with backoff per provider policy.</li>
+<li>If retries exhausted:
+   - attempt secondary channel (if consent exists).</li>
+<li>If both fail:
+   - mark delivery failed and create support-visible log entry.</li>
+</ol>
+<h3 id="outage-mode">Outage Mode</h3>
+<ul>
+<li>If provider outage &gt; 30 minutes:<ul>
+<li>switch to degraded mode:</li>
+<li>send only critical notifications (<code>N-01</code>, <code>N-04</code>, <code>N-06</code>).</li>
+<li>queue non-critical notifications for later replay.</li>
+</ul>
+</li>
+</ul>
+<h2 id="consent-and-compliance">Consent and Compliance</h2>
+<ul>
+<li>Respect channel opt-in/opt-out preferences.</li>
+<li>Respect quiet hours for SMS by recipient timezone.</li>
+<li>Include legal footer and preference management in email templates.</li>
+</ul>
+<h2 id="template-variables-safe-set">Template Variables (Safe Set)</h2>
+<ul>
+<li><code>recipient_first_name</code></li>
+<li><code>role_title</code></li>
+<li><code>employer_name</code></li>
+<li><code>invite_expiry_at</code></li>
+<li><code>cta_url</code></li>
+<li><code>support_url</code></li>
+</ul>
+<p>No raw sensitive fields (full personal identifiers, full transcripts, etc.) in notifications.</p>
+<h2 id="monitoring-metrics">Monitoring Metrics</h2>
+<ul>
+<li>delivery success rate by channel</li>
+<li>send latency by event type</li>
+<li>fallback activation rate</li>
+<li>bounce/failure rate</li>
+</ul>
+<h2 id="ownership">Ownership</h2>
+<ul>
+<li>Product copy owner: CEO</li>
+<li>Technical delivery owner: CTO</li>
+<li>Review cadence: biweekly during pilot</li>
+</ul></div></div></body></html>

@@ -1,0 +1,75 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>32_pilot_execution_ready_checklist.md - Jobarium Plan</title><style>
+:root { --bg:#0b1020; --text:#e5e7eb; --muted:#9ca3af; --link:#60a5fa; }
+* { box-sizing:border-box; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; background:var(--bg); color:var(--text); }
+.wrap { max-width:1000px; margin:0 auto; padding:20px; }
+.content { overflow:auto; }
+a { color:var(--link); }
+code, pre { background:#0f172a; border-radius:6px; }
+code { padding:2px 5px; }
+pre { padding:12px; overflow:auto; }
+table { border-collapse:collapse; width:100%; }
+th, td { border:1px solid #374151; padding:8px; text-align:left; }
+blockquote { border-left:3px solid #374151; margin:8px 0; padding:4px 12px; color:var(--muted); }
+</style></head><body><div class="wrap"><div class="content"><h1 id="jobarium-pilot-execution-ready-checklist">Jobarium Pilot Execution Ready Checklist</h1>
+<h2 id="purpose">Purpose</h2>
+<p>Provide a final operational checklist to confirm the team is ready to start pilot execution with approved planning artifacts.</p>
+<h2 id="how-to-use">How to Use</h2>
+<ul>
+<li>Mark each item <code>Done</code>, <code>Blocked</code>, or <code>N/A</code>.</li>
+<li>Capture blockers with owner + target date.</li>
+<li>Review weekly during pilot rollout.</li>
+</ul>
+<h2 id="a-governance-and-planning">A) Governance and Planning</h2>
+<ul>
+<li>[ ] <code>12_system_completeness_gate.md</code> remains Green/Pass.</li>
+<li>[ ] Core approved docs are locked and linked in the index.</li>
+<li>[ ] Any scope change since approval has a decision log entry.</li>
+<li>[ ] MVP P0 scope is frozen for pilot window.</li>
+</ul>
+<h2 id="b-product-and-ux">B) Product and UX</h2>
+<ul>
+<li>[ ] Candidate P0 screens mapped to implementation tickets.</li>
+<li>[ ] Employer P0 screens mapped to implementation tickets.</li>
+<li>[ ] UI state standards (<code>loading/empty/error/success</code>) applied to all P0 screens.</li>
+<li>[ ] Notification templates integrated for all critical events.</li>
+<li>[ ] Candidate consent/disclosure copy integrated in onboarding + Q&amp;A.</li>
+</ul>
+<h2 id="c-architecture-and-data">C) Architecture and Data</h2>
+<ul>
+<li>[ ] State machines implemented for job/invite/q&amp;a/packet transitions.</li>
+<li>[ ] Event contracts validated in producer + consumer services.</li>
+<li>[ ] Entity ownership/precedence rules enforced in write paths.</li>
+<li>[ ] Parser thresholds and reprocessing safeguards implemented.</li>
+<li>[ ] Ranking explainability payload and version tracking implemented.</li>
+</ul>
+<h2 id="d-security-and-compliance">D) Security and Compliance</h2>
+<ul>
+<li>[ ] RBAC checks applied on all protected endpoints.</li>
+<li>[ ] Audit logging enabled for sensitive/admin actions.</li>
+<li>[ ] GDPR workflows tested end-to-end in staging.</li>
+<li>[ ] Retention jobs scheduled and verified.</li>
+</ul>
+<h2 id="e-operations-and-reliability">E) Operations and Reliability</h2>
+<ul>
+<li>[ ] Pilot support runbook reviewed by CEO/CTO.</li>
+<li>[ ] Alert thresholds configured and tested.</li>
+<li>[ ] DLQ replay workflow tested in staging.</li>
+<li>[ ] Integration fallback modes tested (email/SMS/parser/AI).</li>
+<li>[ ] Admin console minimum ops capabilities implemented.</li>
+<li>[ ] Authenticity appeal workflow operational.</li>
+</ul>
+<h2 id="f-launch-readiness-gate">F) Launch Readiness Gate</h2>
+<ul>
+<li>[ ] Launch Definition of Done checklist reviewed and signed.</li>
+<li>[ ] Known risks documented with mitigation owner.</li>
+<li>[ ] First-wave pilot employers/candidates identified.</li>
+<li>[ ] Incident communication templates prepared.</li>
+</ul>
+<h2 id="g-sign-off">G) Sign-Off</h2>
+<ul>
+<li>Pilot readiness review date:</li>
+<li>CEO sign-off:</li>
+<li>CTO sign-off:</li>
+<li>Blockers (if any):</li>
+</ul></div></div></body></html>
