@@ -46,6 +46,7 @@ Success condition:
 2. For each packet, employer sees:
    - fit highlights tied to must-haves
    - dealbreaker confirmations
+   - authenticity insight badge (self-authored/mixed/heavy-assistance-suspected)
    - summarized risks/gaps
    - full Q&A transcript
 3. Employer takes one action:
@@ -97,6 +98,7 @@ Optional (but recommended):
 - First packet ETA shown after job activation.
 - Smart defaults prefilled for invite policy.
 - Packet side-by-side comparison view (phase 1.5 if feasible).
+- Built-in verification prompts when authenticity risk is flagged.
 
 ## Failure and Edge Flows
 - Zero packet output after activation:
@@ -107,6 +109,8 @@ Optional (but recommended):
    - fallback channels and retry strategy.
 - Policy misconfiguration:
    - guardrails/warnings before activation.
+- False-positive authenticity flag:
+   - employer sees confidence and reason codes, not binary reject recommendation.
 
 ## Employer KPIs
 - time to first completed packet

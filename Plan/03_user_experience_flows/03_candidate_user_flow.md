@@ -60,6 +60,9 @@ Success condition:
 ### Stage 5: Asynchronous Q&A Submission
 1. Candidate answers 5-10 role-specific questions.
 2. Autosave prevents loss; progress bar shows remaining effort.
+3. Candidate sees "authentic response" policy note:
+   - light assistance is acceptable,
+   - fully outsourced/auto-generated answers may be flagged.
 3. Candidate submits once complete.
 
 Success condition:
@@ -113,6 +116,8 @@ Optional (high value):
 - Low-confidence extraction: highlight uncertain fields for confirmation.
 - Invite expired: allow reactivation request where policy allows.
 - Duplicate account detection: guided merge flow (future-safe).
+- Authenticity false-positive:
+  - user can request review and provide clarifying context.
 
 ## Candidate KPIs
 - signup -> matchable profile conversion

@@ -4,7 +4,7 @@
 - Architecture is **wedge-agnostic** (domain model does not depend on one profession).
 - GTM assumption for rollout planning: **DMV trades**.
 - Target: **realistic launch in ~8 weeks**.
-- Team: **2 developers** (founder + senior engineer) with AI assistance.
+- Team: **2 developers** (CEO + CTO) with AI assistance.
 - AI posture: **minimal AI in MVP** (embeddings, vector retrieval, packet summaries).
 - Compliance target at launch: **OWASP+ best practices + GDPR**; SOC2-ready design later.
 
@@ -203,6 +203,10 @@ Create a reliable "always improving" candidate/job signal layer without blocking
   - id, invite_id, status, started_at, submitted_at
 - `qa_answer`
   - session_id, question_id, answer_text/value, evidence_links_json
+- `qa_response_signal`
+  - session_id, question_id, signal_type, signal_value_json, captured_at
+- `qa_authenticity_assessment`
+  - session_id, authenticity_score, ai_assist_likelihood, confidence, policy_result, assessed_at
 - `candidate_packet`
   - id, job_id, candidate_id, session_id, summary_text, highlights_json, gaps_json, status
 - `packet_action`
@@ -227,6 +231,7 @@ Create a reliable "always improving" candidate/job signal layer without blocking
 - `invite.created`
 - `invite.expired`
 - `qa.submitted`
+- `qa.authenticity.assessed`
 - `packet.ready`
 - `billing.usage.updated`
 
@@ -255,6 +260,52 @@ Event requirements:
 - compare new shortlist to prior snapshot.
 - for newly entered candidates, emit automation trigger event.
 
+## Q&A Authenticity and AI-Assistance Detection
+
+### Why it matters
+Employers need confidence that submitted answers reflect candidate involvement, not fully AI-generated responses.
+
+### Product policy (balanced)
+- Allow light assistance (grammar fixes, short rewrites).
+- Flag likely heavy outsourcing/rewriting.
+- Never auto-reject by model alone in MVP; provide trust signals for human decision.
+- Show transparent policy notice to candidates before they start Q&A.
+
+### Detection signals (multi-signal, not single-score only)
+1. **Behavioral signals**
+   - time-to-first-keystroke, typing burst patterns, paste ratio, full-answer paste events, edit churn.
+2. **Linguistic consistency**
+   - consistency with candidate profile language level/history, abrupt style shifts across answers.
+3. **Cross-answer coherence**
+   - contradictions in timeline, tools, domain details, and stated experience.
+4. **Prompt leakage patterns**
+   - generic template artifacts and known assistant markers.
+
+### Pipeline flow
+1. Capture session telemetry and answer events.
+2. Extract response signals per answer and session.
+3. Compute authenticity assessment (score + confidence + reason codes).
+4. Attach "authenticity insight" to candidate packet:
+   - `likely_self_authored`
+   - `mixed_assistance`
+   - `heavy_assistance_suspected`
+5. Emit `qa.authenticity.assessed` before packet finalization.
+
+### Employer-facing output
+- Trust badge in packet header.
+- Brief reason codes (example: "high paste ratio", "inconsistent technical depth").
+- Recommendation: "ask 2 verification follow-up questions."
+
+### Candidate-facing safeguards
+- Pre-submit notice: acceptable vs unacceptable assistance.
+- Soft warning on suspicious behavior during session (optional in MVP).
+- Appeal/review path for false positives.
+
+### Risk controls
+- Use confidence thresholds; low-confidence cases default to neutral.
+- Keep explainability logs for dispute handling.
+- Monitor fairness across candidate language backgrounds.
+
 ## Data and Storage Strategy
 - Postgres is authoritative for transactional state.
 - Redis stores ephemeral values:
@@ -279,6 +330,10 @@ Event requirements:
   - data export endpoint,
   - delete/anonymize workflow,
   - retention policy jobs.
+- Q&A telemetry policy:
+  - explicit consent notice for anti-fraud/authenticity checks,
+  - minimize captured behavioral data,
+  - retention limits and role-restricted access.
 
 ## Proposed Tech Stack (Pragmatic)
 - Frontend: Next.js (TypeScript), server actions + API client.
@@ -290,6 +345,9 @@ Event requirements:
 - Messaging: SendGrid (email), Twilio (SMS) or GCP partner equivalent.
 - Payments: Stripe (hybrid model support).
 - AI: Vertex AI embeddings + summarization.
+- Authenticity scoring:
+  - rule-based signal engine first,
+  - optional lightweight classifier in phase 1.5 after enough labeled data.
 - Parsing:
   - `pdf-parse`/`pdfjs` for text PDFs,
   - `mammoth` or equivalent for DOCX,
@@ -303,7 +361,7 @@ Event requirements:
 - **Week 3**: matching pipeline v1 (hard filters + retrieval + scoring), shortlist persistence.
 - **Week 4**: enrichment workers (skills/title/location normalization), automation engine (invite rules, caps/cooldowns), email/SMS dispatch.
 - **Week 5**: Q&A sessions + packet builder + summary generation.
-- **Week 6**: employer packet inbox/actions + basic billing counters.
+- **Week 6**: employer packet inbox/actions + authenticity badge/reason codes + basic billing counters.
 - **Week 7**: GDPR endpoints, audit logging, hardening, observability, load tuning.
 - **Week 8**: end-to-end QA, parser/enrichment quality tuning, pilot onboarding tooling, launch readiness.
 
@@ -321,3 +379,5 @@ Event requirements:
 5. Exact billing limits and trial thresholds for hybrid pricing.
 6. CV parser strategy for `.doc` legacy files (support now vs convert-only policy).
 7. Confidence threshold for "auto-apply parsed fields" vs "require user confirmation."
+8. Default authenticity policy strictness by role type.
+9. Candidate UX: hard block suspicious submissions vs soft-flag-only (recommended: soft-flag-only in MVP).
