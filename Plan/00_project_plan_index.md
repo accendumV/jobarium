@@ -46,6 +46,7 @@ Use it to:
 | D-005 | `03_user_experience_flows/05_end_to_end_golden_flow.md` | 03 UX Flows | Draft v1 | CEO/CTO | add failure-state flow |
 | D-006 | `02_architecture/06_authenticity_detection_spec.md` | 02 Architecture | Draft v1 | CEO/CTO | define thresholds per role |
 | D-007 | `99_archive/jobarium_comprehensive_document.md` | 99 Archive/Input | Reference | CEO | keep as source transcript |
+| D-008 | `01_product/08_hr_value_requirements.md` | 01 Product | Draft v1 | CEO | get HR validation feedback |
 
 ## Mandatory Rules for New Documents
 1. Add every new planning document to this registry.
