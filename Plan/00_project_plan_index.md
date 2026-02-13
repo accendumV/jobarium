@@ -71,7 +71,7 @@ Use it to:
 | D-030 | `06_operations/39_alert_thresholds_and_escalation_matrix_mvp.md` | 06 Operations | Draft v1 | CTO | configure and tune alert thresholds for pilot traffic |
 | D-031 | `06_operations/40_admin_console_requirements_mvp.md` | 06 Operations | Draft v1 | CEO/CTO | implement minimum admin console capabilities for pilot ops |
 | D-032 | `04_delivery_and_execution/32_pilot_execution_ready_checklist.md` | 04 Delivery | Draft v1 | CEO/CTO | use as weekly pilot execution gate |
-| D-033 | `index.html` | 00 Navigation | Draft v1 | CEO/CTO | keep navigator links in sync with registry |
+| D-033 | `../Wiki/index.html` | 00 Navigation | Draft v1 | CEO/CTO | keep wiki links in sync with registry |
 | D-034 | `00_master_entry_point.md` | 00 Navigation | Draft v1 | CEO/CTO | use as single high-level starting point |
 
 ## Mandatory Rules for New Documents

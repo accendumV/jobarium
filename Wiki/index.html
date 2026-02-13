@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Jobarium Plan Navigator</title>
+    <title>Jobarium Wiki</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -267,7 +267,7 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Jobarium Plan Navigator</h1>
+    <h1>Jobarium Wiki</h1>
     <div class="sub">Single entry point for all planning documents.</div>
 
     <div class="quick">
@@ -306,7 +306,7 @@
     </div>
   </div>
 
-  <script src="../db/document_registry.js"></script>
+  <script src="./db/document_registry.js"></script>
   <script>
     const q = document.getElementById("q");
     const area = document.getElementById("area");
@@ -451,7 +451,7 @@
 
     async function init() {
       try {
-        const res = await fetch("../db/document_registry.json", { cache: "no-store" });
+        const res = await fetch("./db/document_registry.json", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         registryPayload = data;
@@ -462,7 +462,7 @@
           registryPayload = fallback;
           docs = fallback.documents;
         } else {
-          out.innerHTML = `<div class="empty">Failed to load registry DB (<code>../db/document_registry.json</code>).<br>Please check file location and refresh.</div>`;
+          out.innerHTML = `<div class="empty">Failed to load registry DB (<code>./db/document_registry.json</code>).<br>Please check file location and refresh.</div>`;
           count.textContent = "Showing 0 of 0 docs";
           return;
         }

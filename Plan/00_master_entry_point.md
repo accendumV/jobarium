@@ -124,6 +124,6 @@ Review and approve one-by-one with CTO, then update status in the registry.
 
 ## 7) Supporting Navigation
 - Registry source of truth: `00_project_plan_index.md`
-- HTML navigator: `index.html`
+- Wiki navigator: `../Wiki/index.html`
 
-Use this master entry for orientation, then use the registry and HTML navigator for detailed navigation.
+Use this master entry for orientation, then use the registry and Wiki navigator for detailed navigation.

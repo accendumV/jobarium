@@ -20,7 +20,7 @@ def main() -> None:
     parser.add_argument("--note", default="", help="Optional change note")
     parser.add_argument(
         "--db",
-        default=str(Path(__file__).resolve().parents[1] / "db" / "document_registry.json"),
+        default=str(Path(__file__).resolve().parents[2] / "Wiki" / "db" / "document_registry.json"),
         help="Path to registry JSON DB",
     )
     args = parser.parse_args()
