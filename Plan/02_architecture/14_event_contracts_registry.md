@@ -55,6 +55,7 @@ For each event:
 ## E-01 `profile.updated` (`v1`)
 - Producer: `candidate-profile-service`
 - Consumers: `matching-service`, `enrichment-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Candidate Profile → Matching & Ranking; Candidate Profile (enrichment); analytics.
 - Trigger: candidate profile create/update confirmed
 - Required payload:
   - `candidate_id` (string)
@@ -71,6 +72,7 @@ For each event:
 ## E-02 `job.updated` (`v1`)
 - Producer: `job-service`
 - Consumers: `matching-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Job & Question Kit → Matching & Ranking; analytics.
 - Trigger: job create/update/activation/pause/close
 - Required payload:
   - `job_id`
@@ -87,6 +89,7 @@ For each event:
 ## E-03 `candidate.document.uploaded` (`v1`)
 - Producer: `candidate-document-service`
 - Consumers: `parser-service`, `security-scan-service`
+- **Comm:** Async. **BCs involved:** Candidate Profile → Candidate Profile (parser); security-scan (shared).
 - Trigger: resume upload finalized
 - Required payload:
   - `candidate_id`
@@ -102,6 +105,7 @@ For each event:
 ## E-04 `candidate.document.parsed` (`v1`)
 - Producer: `parser-service`
 - Consumers: `enrichment-service`, `candidate-profile-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Candidate Profile → Candidate Profile (enrichment, profile update); analytics.
 - Trigger: parse completed (success path)
 - Required payload:
   - `candidate_id`
@@ -119,6 +123,7 @@ For each event:
 ## E-05 `candidate.enrichment.requested` (`v1`)
 - Producer: `enrichment-orchestrator`
 - Consumers: `enrichment-worker`
+- **Comm:** Async. **BCs involved:** Candidate Profile → Candidate Profile (worker).
 - Trigger: profile/job/parser update requiring enrichment
 - Required payload:
   - `candidate_id`
@@ -133,6 +138,7 @@ For each event:
 ## E-06 `candidate.enrichment.completed` (`v1`)
 - Producer: `enrichment-worker`
 - Consumers: `matching-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Candidate Profile → Matching & Ranking; analytics.
 - Trigger: enrichment finishes
 - Required payload:
   - `candidate_id`
@@ -147,6 +153,7 @@ For each event:
 ## E-07 `matching.shortlist.changed` (`v1`)
 - Producer: `matching-service`
 - Consumers: `automation-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Matching & Ranking → Invitations & Automation; analytics.
 - Trigger: shortlist diff computed for a job
 - Required payload:
   - `job_id`
@@ -162,6 +169,7 @@ For each event:
 ## E-08 `invite.created` (`v1`)
 - Producer: `automation-service`
 - Consumers: `notification-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Invitations & Automation → Notifications (shared); analytics.
 - Trigger: invite record created and queued
 - Required payload:
   - `invite_id`
@@ -177,6 +185,7 @@ For each event:
 ## E-09 `invite.expired` (`v1`)
 - Producer: `automation-service`
 - Consumers: `analytics-service`, `candidate-experience-service`
+- **Comm:** Async. **BCs involved:** Invitations & Automation → analytics; candidate-facing UX (optional).
 - Trigger: invite reached expiry and not started
 - Required payload:
   - `invite_id`
@@ -189,6 +198,7 @@ For each event:
 ## E-10 `qa.submitted` (`v1`)
 - Producer: `qa-service`
 - Consumers: `authenticity-service`, `packet-builder-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Q&A Session → Q&A Session (authenticity); Candidate Packet; analytics.
 - Trigger: candidate submits all required answers
 - Required payload:
   - `session_id`
@@ -204,6 +214,7 @@ For each event:
 ## E-11 `qa.authenticity.assessed` (`v1`)
 - Producer: `authenticity-service`
 - Consumers: `packet-builder-service`, `analytics-service`, `admin-ops-service`
+- **Comm:** Async. **BCs involved:** Q&A Session → Candidate Packet; analytics; admin/platform.
 - Trigger: authenticity scoring complete
 - Required payload:
   - `session_id`
@@ -222,6 +233,7 @@ For each event:
 ## E-12 `packet.ready` (`v1`)
 - Producer: `packet-builder-service`
 - Consumers: `employer-inbox-service`, `notification-service`, `analytics-service`
+- **Comm:** Async. **BCs involved:** Candidate Packet → Candidate Packet (inbox); Notifications (shared); Organization & Billing (usage); analytics.
 - Trigger: packet build success
 - Required payload:
   - `packet_id`
@@ -238,6 +250,7 @@ For each event:
 ## E-13 `billing.usage.updated` (`v1`)
 - Producer: `billing-service`
 - Consumers: `billing-service` (aggregator), `analytics-service`
+- **Comm:** Async. **BCs involved:** Organization & Billing → Organization & Billing (aggregator); analytics.
 - Trigger: metered usage increments
 - Required payload:
   - `organization_id`
