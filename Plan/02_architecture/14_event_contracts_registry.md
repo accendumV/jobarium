@@ -3,11 +3,7 @@
 ## Purpose
 Define versioned event contracts for all asynchronous workflows so producers and consumers can evolve safely.
 
-This registry is the source of truth for:
-- payload schemas,
-- producer/consumer ownership,
-- idempotency and ordering assumptions,
-- compatibility and versioning policy.
+This registry is the source of truth for: payload schemas, producer/consumer ownership, idempotency and ordering, versioning. All events are async (Pub/Sub). Producer/consumer names map to BCs in [03_bounded_contexts_mvp.md](03_bounded_contexts_mvp.md).
 
 ## Global Envelope (applies to all events)
 

@@ -19,17 +19,17 @@
 ### Runtime Components
 - **Frontend Web App**: candidate + employer + admin portals.
 - **API Gateway + HTTPS Load Balancer + Cloud Armor**: edge routing and protection.
-- **Cloud Run services** (modular monolith style with service boundaries):
+- **Cloud Run services** (modular monolith style; boundaries align with [bounded contexts](03_bounded_contexts_mvp.md)):
   - Identity & Access
   - Candidate Profile
-  - Employer/Organization
+  - Organization (employer/org)
+  - Billing (subscription, usage, limits)
   - Job & Question Kit
   - Matching & Ranking
-  - Automation & Invitations
+  - Invitations & Automation
   - Q&A Session
-  - Packet Builder
-  - Notifications
-  - Billing (basic)
+  - Candidate Packet (Packet Builder)
+  - *(Notifications and audit are shared capabilities, not separate services.)*
 - **Cloud SQL (PostgreSQL)**: source of truth.
 - **Memorystore (Redis)**: short-lived cache, rate limits, invite cooldowns, shortlist snapshots.
 - **Cloud Storage**: resumes, attachments, generated packet exports.
