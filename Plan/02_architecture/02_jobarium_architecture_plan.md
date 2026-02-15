@@ -22,7 +22,8 @@
 - **Cloud Run services** (modular monolith style; boundaries align with [bounded contexts](03_bounded_contexts_mvp.md)):
   - Identity & Access
   - Candidate Profile
-  - Organization & Billing (employer/org + subscription + usage)
+  - Organization (employer/org)
+  - Billing (subscription, usage, limits)
   - Job & Question Kit
   - Matching & Ranking
   - Invitations & Automation
