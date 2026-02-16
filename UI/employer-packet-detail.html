@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Packet Detail</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+        <a href="employer-clarification-queue.html">Clarification Queue</a>
+        <a href="employer-performance-dashboard.html">Performance Dashboard</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>EMP-005: Packet Detail</h1>
+        <p class="muted">Make decisions with fit, authenticity, and transcript context in one place.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div id="packetPane" class="stack" style="margin-top:12px;"></div>
+
+        <label for="reviewNote">Reviewer note (optional)</label>
+        <textarea id="reviewNote" class="input" placeholder="Add a note for your team..."></textarea>
+
+        <div class="actions">
+          <button class="btn success" id="interviewBtn" type="button">Interview</button>
+          <button class="btn secondary" id="clarifyBtn" type="button">Clarify</button>
+          <button class="btn danger" id="rejectBtn" type="button">Reject</button>
+          <a class="btn secondary" href="employer-packet-inbox.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function renderPacket() {
+      const packet = UIFlow.getEmployerPacket();
+      const state = UIFlow.readState();
+      const candidateAnswers = state.candidate && state.candidate.screening
+        ? state.candidate.screening.qaAnswers || {}
+        : {};
+
+      const packetQaResults = Array.isArray(packet.qaResults) && packet.qaResults.length
+        ? packet.qaResults
+        : [];
+
+      // Prefer packet-bound QA results; fallback to latest candidate session answers if present.
+      let qaResults = packetQaResults;
+      if (!qaResults.length && Object.keys(candidateAnswers).length) {
+        qaResults = [
+          { q: "Tell us about your most relevant recent role.", a: candidateAnswers.answer1 || "Not answered" },
+          { q: "Are you available for evening shifts?", a: candidateAnswers.answer2 || "Not answered" },
+          { q: "Proof of work link", a: candidateAnswers.answer3 || "Not provided" }
+        ];
+      }
+
+      // Final fallback for seeded packets without captured session results.
+      if (!qaResults.length) {
+        const fallbackByPacket = {
+          p1: [
+            { q: "Describe a process improvement you led.", a: "Reduced pick-pack errors by 18% in 90 days by standardizing shift handoff checks." },
+            { q: "Availability for evening shifts", a: "Yes, available 3 evenings per week." },
+            { q: "Team size managed", a: "12 associates across inbound and inventory control." }
+          ],
+          p2: [
+            { q: "How do you manage maintenance backlog?", a: "Prioritize by risk and downtime impact, then run daily triage with technicians." },
+            { q: "Active certifications", a: "OSHA 30; EPA 608 certification renewal pending this quarter." },
+            { q: "Preferred shift", a: "Day shift preferred, flexible for emergency rotations." }
+          ],
+          p3: [
+            { q: "Inventory accuracy method", a: "Cycle counts by ABC class with discrepancy root-cause tracking." },
+            { q: "WMS systems used", a: "SAP EWM, Manhattan WMS." },
+            { q: "Leadership examples", a: "Coached 2 team leads into supervisor roles in 12 months." }
+          ]
+        };
+        qaResults = fallbackByPacket[packet.id] || [];
+      }
+
+      document.getElementById("packetPane").innerHTML = `
+        <div class="match-card">
+          <strong>${packet.candidateName}</strong>
+          <div class="small muted">Role: ${packet.role}</div>
+          <div class="small muted">Fit score: ${packet.fitScore}%</div>
+          <div class="small muted">Authenticity: ${packet.authenticity}</div>
+        </div>
+        <div class="match-card">
+          <strong>Summary</strong>
+          <div class="small muted">${packet.summary || "Summary unavailable."}</div>
+          ${packet.transcriptFallback ? '<div class="small muted">Transcript fallback mode enabled.</div>' : ""}
+        </div>
+        <div class="match-card">
+          <strong>Q&A Session Results</strong>
+          <div class="small muted" style="margin-bottom:8px;">Structured answers from the candidate pre-screen session.</div>
+          ${qaResults.length ? qaResults.map((item) => `
+            <div style="margin-bottom:10px;">
+              <div class="small"><strong>Q:</strong> ${item.q}</div>
+              <div class="small muted"><strong>A:</strong> ${item.a}</div>
+            </div>
+          `).join("") : '<div class="small muted">No Q&A answers available.</div>'}
+        </div>
+      `;
+      if (packet.transcriptFallback) {
+        UIFlow.showStatus("error-recoverable", "Summary unavailable. Transcript fallback is shown with Q&A results.");
+      } else {
+        UIFlow.showStatus("success", "Packet loaded and ready for action.");
+      }
+    }
+
+    function actionPacket(action) {
+      const packet = UIFlow.getEmployerPacket();
+      const s = UIFlow.readState();
+      const items = s.employer.packets.items.map((p) =>
+        p.id === packet.id ? { ...p, status: "actioned" } : p
+      );
+      const nextEmployer = {
+        ...s.employer,
+        packets: { ...s.employer.packets, items }
+      };
+
+      if (action === "clarify") {
+        nextEmployer.clarifications = {
+          ...s.employer.clarifications,
+          queue: [
+            ...s.employer.clarifications.queue,
+            {
+              id: `cq${Date.now()}`,
+              packetId: packet.id,
+              candidateName: packet.candidateName,
+              role: packet.role,
+              status: "open"
+            }
+          ]
+        };
+      }
+
+      UIFlow.updateState({ employer: nextEmployer });
+      UIFlow.showToast(`Packet action saved: ${action}`);
+      const messages = {
+        interview: "Interview request sent to candidate.",
+        clarify: "Clarification request queued.",
+        reject: "Candidate marked as rejected for this role."
+      };
+      UIFlow.showStatus("success", messages[action] || "Action recorded.");
+      renderPacket();
+    }
+
+    document.getElementById("interviewBtn").addEventListener("click", () => actionPacket("interview"));
+    document.getElementById("clarifyBtn").addEventListener("click", () => actionPacket("clarify"));
+    document.getElementById("rejectBtn").addEventListener("click", () => actionPacket("reject"));
+
+    renderPacket();
+  </script>
+</body>
+</html>

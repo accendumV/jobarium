@@ -1,0 +1,352 @@
+window.__UI_READINESS_DB__ = {
+  "schema_version": 1,
+  "updated_at": null,
+  "checklist": [
+    {
+      "id": "CAND-001",
+      "area": "Candidate",
+      "screen": "Start / Role Select",
+      "priority": "P0",
+      "elements": "Role switch, entry fields, CTA to candidate/employer account creation, legal links",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-002",
+      "area": "Candidate",
+      "screen": "Candidate Account Creation",
+      "priority": "P0",
+      "elements": "Email/password form, Google/LinkedIn sign-up, consent text, validation errors, submit CTA",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-003",
+      "area": "Candidate",
+      "screen": "Candidate Login",
+      "priority": "P0",
+      "elements": "Login form, SSO buttons, forgot-password link, invalid credentials and lockout states",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-004",
+      "area": "Candidate",
+      "screen": "Email Verification + First Login Gate",
+      "priority": "P0",
+      "elements": "Verification status, resend action, onboarding-required notice, support fallback",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-005",
+      "area": "Candidate",
+      "screen": "Password Recovery",
+      "priority": "P1",
+      "elements": "Reset request, token verification, new password form, expiry/error states",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-006",
+      "area": "Candidate",
+      "screen": "Candidate Onboarding Wizard",
+      "priority": "P0",
+      "elements": "Stepper, source intake, CV/doc upload + parse, completeness summary, enrichment fields, visibility default Active, final review, gated next/back",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-007",
+      "area": "Candidate",
+      "screen": "Candidate Dashboard",
+      "priority": "P0",
+      "elements": "KPI cards, shortcuts, alert/attention module, flow step links, empty/error placeholders",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-008",
+      "area": "Candidate",
+      "screen": "Matching (Parent View)",
+      "priority": "P0",
+      "elements": "Shortlist-only list, fit + why matched, nested invitation/screening/outcome statuses, TTFM card, cap controls",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-009",
+      "area": "Candidate",
+      "screen": "Invite Detail (Nested)",
+      "priority": "P0",
+      "elements": "Role/company summary, compensation/location/timebox, expiry, start/decline CTAs",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-010",
+      "area": "Candidate",
+      "screen": "Screening / Q&A (Nested)",
+      "priority": "P0",
+      "elements": "Question renderer, autosave, progress, authenticity disclosure, validation and submit",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-011",
+      "area": "Candidate",
+      "screen": "Match Outcome Detail (Nested)",
+      "priority": "P0",
+      "elements": "Outcome timeline/status, explanation, next actions",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-012",
+      "area": "Candidate",
+      "screen": "Interviews",
+      "priority": "P0",
+      "elements": "Interview list, slot picker, calendar connect/sync, confirm/reschedule/cancel",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-013",
+      "area": "Candidate",
+      "screen": "Job Offers",
+      "priority": "P0",
+      "elements": "Offer list, offer detail, accept/decline CTAs, expiry banner, confirmation",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-014",
+      "area": "Candidate",
+      "screen": "Candidate Profile",
+      "priority": "P0",
+      "elements": "Editable profile sections, readiness score, docs list, visibility control, save feedback",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-015",
+      "area": "Candidate",
+      "screen": "Notification Preferences",
+      "priority": "P1",
+      "elements": "Email/SMS/in-app toggles, digest vs realtime controls, save feedback",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-016",
+      "area": "Candidate",
+      "screen": "Privacy + Consent Center",
+      "priority": "P1",
+      "elements": "Consent version history, export/delete/anonymize actions, retention notices",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "CAND-017",
+      "area": "Candidate",
+      "screen": "Candidate Support + Appeals",
+      "priority": "P1",
+      "elements": "Issue form, authenticity appeal flow, case status timeline, attachments",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-001",
+      "area": "Employer",
+      "screen": "Employer Account Creation",
+      "priority": "P0",
+      "elements": "Work email/password/company/role form, terms acceptance, SSO options, submit CTA",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-002",
+      "area": "Employer",
+      "screen": "Employer Login",
+      "priority": "P0",
+      "elements": "Login form, SSO, forgot-password, lockout/invalid credential states",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-003",
+      "area": "Employer",
+      "screen": "Verification + First Login Gate",
+      "priority": "P0",
+      "elements": "Verification status, resend action, required onboarding route",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-004",
+      "area": "Employer",
+      "screen": "Employer Onboarding Wizard",
+      "priority": "P0",
+      "elements": "Stepper, org data, RBAC bootstrap, compliance acknowledgments, integrations setup, defaults, completion gate",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-005",
+      "area": "Employer",
+      "screen": "Employer Dashboard (includes Performance)",
+      "priority": "P0",
+      "elements": "KPI cards, pending workload, shortcuts, integrated performance metrics and recommendations",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-006",
+      "area": "Employer",
+      "screen": "Job Setup Wizard",
+      "priority": "P0",
+      "elements": "Multi-step setup with inferred completion (no manual checkboxes), basics, requirements, question kit, validation summary",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-007",
+      "area": "Employer",
+      "screen": "Automation Center",
+      "priority": "P0",
+      "elements": "Policy controls, read-only internal validation statuses, activation gating, save/activate actions",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-008",
+      "area": "Employer",
+      "screen": "Jobs Program Management",
+      "priority": "P1",
+      "elements": "Jobs table, status filters, create/clone/archive actions, health indicators per job",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-009",
+      "area": "Employer",
+      "screen": "Packets Workspace - List",
+      "priority": "P0",
+      "elements": "Packet list, role/date/fit/authenticity filters, sort controls, packet job reference, open detail action",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-010",
+      "area": "Employer",
+      "screen": "Packets Workspace - Detail",
+      "priority": "P0",
+      "elements": "Packet/candidate/job reference block, fit summary, dealbreakers, authenticity reason codes, evidence, actions",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-011",
+      "area": "Employer",
+      "screen": "Packets Workspace - Setup",
+      "priority": "P0",
+      "elements": "Packet composition controls, decision rules, save setup, return to packet list",
+      "checks": { "ia_flow": true, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-012",
+      "area": "Employer",
+      "screen": "Team + RBAC Management",
+      "priority": "P1",
+      "elements": "Member list, invite teammate, role assignment and revocation, access history",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-013",
+      "area": "Employer",
+      "screen": "Integration Health Center",
+      "priority": "P1",
+      "elements": "Provider status cards (ATS/calendar/comms), reconnect actions, failure diagnostics",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-014",
+      "area": "Employer",
+      "screen": "Audit Log Explorer",
+      "priority": "P1",
+      "elements": "Immutable audit table, filters by actor/action/time/job, export action",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-015",
+      "area": "Employer",
+      "screen": "Billing + Usage",
+      "priority": "P1",
+      "elements": "Plan card, usage counters, invoices, subscription controls",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "EMP-016",
+      "area": "Employer",
+      "screen": "Employer Support + Incident View",
+      "priority": "P1",
+      "elements": "Incident banner, degraded mode guidance, escalation/support actions",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "SHARED-001",
+      "area": "Shared",
+      "screen": "Notification Center",
+      "priority": "P1",
+      "elements": "Notification feed, unread/read controls, deep links to match/invite/packet/interview/offer",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "SHARED-002",
+      "area": "Shared",
+      "screen": "Global Search",
+      "priority": "P1",
+      "elements": "Search input, entity filters, grouped results, keyboard navigation",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "SHARED-003",
+      "area": "Shared",
+      "screen": "Error + Retry Surface",
+      "priority": "P0",
+      "elements": "Contextual error panel, retry CTA, safe fallback action, support link",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": null, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "SHARED-004",
+      "area": "Shared",
+      "screen": "Session + Security",
+      "priority": "P1",
+      "elements": "Active session list, device history, revoke session, optional MFA controls",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "ADMIN-001",
+      "area": "Admin",
+      "screen": "Pipeline Monitor",
+      "priority": "P1",
+      "elements": "Failed jobs table (parse/enrichment/match/notify), reason panel, retry actions",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "ADMIN-002",
+      "area": "Admin",
+      "screen": "Authenticity Ops Console",
+      "priority": "P1",
+      "elements": "Flagged assessment queue, reason breakdown, reviewer decisions, appeal linkage",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "ADMIN-003",
+      "area": "Admin",
+      "screen": "Integration Failures Console",
+      "priority": "P1",
+      "elements": "Provider incident timeline, impacted entities, fallback state, rerun actions",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "ADMIN-004",
+      "area": "Admin",
+      "screen": "Alerting + Escalation Matrix",
+      "priority": "P1",
+      "elements": "Threshold config, route matrix, alert history, acknowledge/escalate actions",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    },
+    {
+      "id": "ADMIN-005",
+      "area": "Admin",
+      "screen": "Template Governance",
+      "priority": "P1",
+      "elements": "Template library (question kits/notifications), versioning, publish controls",
+      "checks": { "ia_flow": false, "states": false, "data_api": false, "analytics": false, "rbac": false, "copy": false, "a11y": false, "qa": false }
+    }
+  ],
+  "global_gates": [
+    { "id": "G-001", "label": "One primary CTA and one safe secondary CTA.", "checked": false },
+    { "id": "G-002", "label": "Required UX states defined: loading, empty, error_recoverable, error_blocking, success_feedback.", "checked": false },
+    { "id": "G-003", "label": "Input validation and error messaging copy are present.", "checked": false },
+    { "id": "G-004", "label": "Data contract and payload shape confirmed with backend.", "checked": false },
+    { "id": "G-005", "label": "Analytics events mapped to screen actions.", "checked": false },
+    { "id": "G-006", "label": "Permission checks and unauthorized behavior defined.", "checked": false },
+    { "id": "G-007", "label": "Accessibility baseline implemented (keyboard, labels, contrast, focus states).", "checked": false },
+    { "id": "G-008", "label": "Mobile behavior verified for candidate-facing screens.", "checked": false }
+  ]
+};

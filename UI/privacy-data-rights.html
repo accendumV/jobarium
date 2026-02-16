@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Privacy and Data Rights</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="candidate-onboarding-entry.html">Candidate Entry</a>
+        <a href="employer-onboarding-entry.html">Employer Entry</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>Privacy and Data Rights</h1>
+        <p class="muted">GDPR-ready export and deletion request controls.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <h3>Data export</h3>
+        <p class="small muted">Request a packaged export of account and profile data.</p>
+        <div class="actions">
+          <button class="btn" id="exportBtn">Request export</button>
+        </div>
+        <p class="small">Export status: <span id="exportStatus" class="badge info">none</span></p>
+
+        <hr style="border-color:#2f3b6f; margin:16px 0;">
+
+        <h3>Data deletion</h3>
+        <p class="small muted">Delete account and personal data (legal retention exceptions may apply).</p>
+        <div class="checkbox-row">
+          <input type="checkbox" id="deleteConfirm">
+          <label for="deleteConfirm">I understand this is a destructive action.</label>
+        </div>
+        <div class="actions">
+          <button class="btn danger" id="deleteBtn">Request deletion</button>
+        </div>
+        <p class="small">Deletion status: <span id="deleteStatus" class="badge warning">none</span></p>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    function renderStatuses() {
+      const s = UIFlow.readState();
+      document.getElementById("exportStatus").textContent = s.privacyRequests.exportStatus;
+      document.getElementById("deleteStatus").textContent = s.privacyRequests.deletionStatus;
+    }
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      UIFlow.showStatus("loading", "Submitting export request...");
+      setTimeout(() => {
+        const s = UIFlow.readState();
+        UIFlow.updateState({
+          privacyRequests: {
+            ...s.privacyRequests,
+            exportStatus: "pending"
+          }
+        });
+        renderStatuses();
+        UIFlow.showStatus("success", "Export request submitted.");
+        UIFlow.showToast("Export request created.");
+      }, 480);
+    });
+
+    document.getElementById("deleteBtn").addEventListener("click", () => {
+      if (!document.getElementById("deleteConfirm").checked) {
+        UIFlow.showStatus("error-recoverable", "Please confirm deletion acknowledgement first.");
+        return;
+      }
+      UIFlow.showStatus("loading", "Submitting deletion request...");
+      setTimeout(() => {
+        const s = UIFlow.readState();
+        UIFlow.updateState({
+          privacyRequests: {
+            ...s.privacyRequests,
+            deletionStatus: "pending"
+          }
+        });
+        renderStatuses();
+        UIFlow.showStatus("success", "Deletion request submitted.");
+        UIFlow.showToast("Deletion request created.");
+      }, 600);
+    });
+
+    renderStatuses();
+    UIFlow.showStatus("success", "Privacy center loaded.");
+  </script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Q and A Session</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-invite-detail.html">Invite Detail</a>
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 920px;">
+        <h1>CAND-007: Q and A Session</h1>
+        <p class="muted">Complete the async pre-screen with autosave and progress tracking.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="kpi">
+          <strong>Progress</strong>
+          <div class="progress-track"><div id="progressBar" class="progress-value" style="width:0%;"></div></div>
+          <span id="progressLabel" class="small muted">0% complete</span>
+        </div>
+
+        <div class="status-box info" style="margin-top:12px;">
+          Authenticity policy: writing assistance for grammar is allowed. Full generated answers are not allowed.
+        </div>
+
+        <label for="answer1">1) Tell us about your most relevant recent role.</label>
+        <textarea id="answer1" class="input" placeholder="Provide a concise response..."></textarea>
+
+        <label for="answer2">2) Are you available for evening shifts?</label>
+        <select id="answer2">
+          <option value="">Select...</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+          <option value="depends">Depends on schedule pattern</option>
+        </select>
+
+        <label for="answer3">3) Link to one proof of work (optional)</label>
+        <input id="answer3" class="input" placeholder="https://">
+
+        <div class="actions">
+          <button class="btn secondary" id="saveBtn" type="button">Autosave now</button>
+          <button class="btn success" id="submitBtn" type="button">Submit answers</button>
+          <a class="btn secondary" href="candidate-invite-detail.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+
+    function calcProgress() {
+      let score = 0;
+      if (document.getElementById("answer1").value.trim()) score += 45;
+      if (document.getElementById("answer2").value.trim()) score += 45;
+      if (document.getElementById("answer3").value.trim()) score += 10;
+      return score;
+    }
+
+    function persist() {
+      const answers = {
+        answer1: document.getElementById("answer1").value,
+        answer2: document.getElementById("answer2").value,
+        answer3: document.getElementById("answer3").value
+      };
+      const progress = calcProgress();
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          screening: {
+            ...s.candidate.screening,
+            qaAnswers: answers,
+            qaProgress: progress
+          }
+        }
+      });
+      document.getElementById("progressBar").style.width = `${progress}%`;
+      document.getElementById("progressLabel").textContent = `${progress}% complete`;
+      return progress;
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const progress = persist();
+      UIFlow.showStatus("success", `Autosaved at ${progress}% progress.`);
+      UIFlow.showToast("Answers autosaved.");
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const progress = persist();
+      if (progress < 90) {
+        UIFlow.showStatus("error-recoverable", "Please answer required questions before submission.");
+        return;
+      }
+      const s = UIFlow.readState();
+      const match = UIFlow.getCandidateMatch();
+      const updatedMatches = s.candidate.matching.matches.map((m) =>
+        m.id === match.id ? { ...m, screeningStatus: "submitted", outcomeStatus: "submitted" } : m
+      );
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          matching: { ...s.candidate.matching, matches: updatedMatches },
+          screening: { ...s.candidate.screening, qaSubmitted: true, qaProgress: 100 },
+          outcomes: { ...s.candidate.outcomes, timelineStatus: "submitted" }
+        }
+      });
+      UIFlow.showStatus("success", "Q and A submitted successfully.");
+      UIFlow.showToast("Submission complete.");
+      setTimeout(() => location.href = "candidate-submission-confirmation.html", 520);
+    });
+
+    const s = UIFlow.readState();
+    const answers = s.candidate.screening.qaAnswers || {};
+    document.getElementById("answer1").value = answers.answer1 || "";
+    document.getElementById("answer2").value = answers.answer2 || "";
+    document.getElementById("answer3").value = answers.answer3 || "";
+    persist();
+    UIFlow.showStatus("loading", "Session loaded with autosave enabled.");
+  </script>
+</body>
+</html>

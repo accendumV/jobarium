@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Sign Up or Log In</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="consent.html">Consent</a>
+        <a href="verification.html">Verification</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1 id="authTitle">Sign up</h1>
+        <p class="muted" id="authSubtitle">Create account with minimal friction.</p>
+        <div class="actions">
+          <button id="signupTab" class="btn">Sign up</button>
+          <button id="loginTab" class="btn secondary">Log in</button>
+        </div>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <form id="authForm" style="margin-top:14px;">
+          <label for="email">Email</label>
+          <input id="email" class="input" type="email" autocomplete="email" required>
+
+          <label for="password">Password</label>
+          <input id="password" class="input" type="password" autocomplete="current-password" required>
+
+          <div class="actions">
+            <button class="btn" type="submit" id="primaryAction">Create account</button>
+            <a class="btn secondary" href="role-intent.html">Back</a>
+          </div>
+        </form>
+
+        <hr style="border-color:#2f3b6f; margin:16px 0;">
+
+        <p class="small muted">OAuth quick path</p>
+        <div class="actions">
+          <button class="btn ghost" id="googleBtn" type="button">Continue with Google</button>
+          <button class="btn ghost" id="linkedinBtn" type="button">Continue with LinkedIn</button>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("auth");
+    const state = UIFlow.readState();
+    const params = new URLSearchParams(location.search);
+    let mode = params.get("mode") === "login" ? "login" : "signup";
+    const signupTab = document.getElementById("signupTab");
+    const loginTab = document.getElementById("loginTab");
+    const action = document.getElementById("primaryAction");
+    const form = document.getElementById("authForm");
+    const title = document.getElementById("authTitle");
+    const subtitle = document.getElementById("authSubtitle");
+
+    function getRoleLabel() {
+      return state.userType === "employer" ? "Employer" : "Candidate";
+    }
+
+    function renderMode() {
+      const isSignup = mode === "signup";
+      signupTab.className = isSignup ? "btn" : "btn secondary";
+      loginTab.className = isSignup ? "btn secondary" : "btn";
+      action.textContent = isSignup ? "Create account" : "Log in";
+      title.textContent = `${getRoleLabel()} ${isSignup ? "sign up" : "log in"}`;
+      subtitle.textContent = state.userType === "employer"
+        ? "Access your workspace setup and job automation flow."
+        : "Access your matched opportunity and profile onboarding flow.";
+    }
+
+    signupTab.addEventListener("click", () => { mode = "signup"; renderMode(); });
+    loginTab.addEventListener("click", () => { mode = "login"; renderMode(); });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      UIFlow.showStatus("loading", "Validating credentials...");
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      setTimeout(() => {
+        if (!email || !password) {
+          UIFlow.showStatus("error-recoverable", "Please enter email and password.");
+          return;
+        }
+        if (mode === "signup" && email.endsWith("@duplicate.com")) {
+          UIFlow.showStatus("error-recoverable", "This email already exists. Try log in.");
+          return;
+        }
+
+        UIFlow.updateState({
+          authEmail: email,
+          consentAccepted: false,
+          emailVerified: false,
+          consentSet: []
+        });
+        UIFlow.showStatus("success", mode === "signup" ? "Account created. Continue to consent." : "Login successful. Continue to consent check.");
+        UIFlow.showToast("Auth step complete.");
+        setTimeout(() => location.href = "consent.html", 650);
+      }, 750);
+    });
+
+    document.getElementById("googleBtn").addEventListener("click", () => {
+      UIFlow.updateState({ authEmail: "oauth.google@jobarium.demo", consentAccepted: false, emailVerified: false, consentSet: [] });
+      UIFlow.showToast("Google account linked. Continue to consent.");
+      setTimeout(() => location.href = "consent.html", 450);
+    });
+
+    document.getElementById("linkedinBtn").addEventListener("click", () => {
+      UIFlow.updateState({ authEmail: "oauth.linkedin@jobarium.demo", consentAccepted: false, emailVerified: false, consentSet: [] });
+      UIFlow.showToast("LinkedIn account linked. Continue to consent.");
+      setTimeout(() => location.href = "consent.html", 450);
+    });
+
+    renderMode();
+    UIFlow.showStatus("loading", "Loading auth config...");
+    setTimeout(() => UIFlow.showStatus("success", "Auth config loaded. Choose sign up or log in."), 420);
+  </script>
+</body>
+</html>

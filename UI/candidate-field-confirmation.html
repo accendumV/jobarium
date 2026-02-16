@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Field Confirmation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-cv-upload.html">CV Upload</a>
+        <a href="candidate-profile-completeness.html">Profile Completeness</a>
+        <a href="candidate-match-home.html">Match Home</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 980px;">
+        <h1>CAND-004: High Impact Field Confirmation</h1>
+        <p class="muted">Complete required fields to become matchable with high confidence.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="match-card" style="margin-top:10px;">
+          <h3>Preferred positions (up to 5)</h3>
+          <p class="small muted">Select from suggestions or type a custom role and add it.</p>
+          <div class="range-row">
+            <input id="roleInput" class="input" placeholder="Type a role and press Add">
+            <button class="btn secondary" id="addRoleBtn" type="button">Add role</button>
+          </div>
+          <div class="chip-wrap" id="roleChips"></div>
+          <div class="small muted" id="roleCount" style="margin-top:6px;"></div>
+          <div class="suggestion-grid" id="roleSuggestions"></div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;">
+          <h3>Location preference</h3>
+          <p class="small muted">Use one unified model across onsite, hybrid, remote, regional, and worldwide.</p>
+          <div class="grid-2">
+            <div>
+              <label for="workMode">Work mode</label>
+              <select id="workMode">
+                <option value="onsite">On-site</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="remote">Remote</option>
+              </select>
+            </div>
+            <div>
+              <label for="locationScope">Location scope</label>
+              <select id="locationScope">
+                <option value="radius">Radius from anchor location</option>
+                <option value="region">Region or country selection</option>
+                <option value="worldwide">Worldwide</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="radiusSection" class="map-box" style="margin-top:10px;">
+            <label for="anchorLocation">Anchor location</label>
+            <input id="anchorLocation" class="input" placeholder="Chicago, IL">
+            <div class="map-stage" style="margin-top:10px;"></div>
+            <label for="radiusKm">Radius (km): <span id="radiusLabel">25</span></label>
+            <input id="radiusKm" type="range" min="5" max="300" step="5" value="25">
+          </div>
+
+          <div id="regionSection" class="map-box" style="display:none; margin-top:10px;">
+            <label>Allowed regions or countries</label>
+            <div class="suggestion-grid" id="regionChecklist"></div>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;">
+          <h3>Compensation preference</h3>
+          <div class="grid-2">
+            <div>
+              <label for="currency">Currency</label>
+              <select id="currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+            <div>
+              <label for="period">Period</label>
+              <select id="period">
+                <option value="year">Per year</option>
+                <option value="month">Per month</option>
+                <option value="hour">Per hour</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="range-row" style="margin-top:10px;">
+            <div>
+              <label for="minComp">Minimum desired</label>
+              <input id="minComp" class="input" type="number" min="0" step="1000">
+            </div>
+            <div>
+              <label for="maxComp">Maximum desired</label>
+              <input id="maxComp" class="input" type="number" min="0" step="1000">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn secondary" id="benchmarkBtn" type="button">Apply market median hint</button>
+            <span class="small muted" id="compSummary"></span>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;">
+          <h3>Earliest start (required)</h3>
+          <div class="grid-2">
+            <div>
+              <label for="earliestStart">When can you start?</label>
+              <select id="earliestStart">
+                <option value="">Select...</option>
+                <option value="immediate">Immediate</option>
+                <option value="1_week">Within 1 week</option>
+                <option value="2_weeks">Within 2 weeks</option>
+                <option value="1_month">Within 1 month</option>
+                <option value="custom_date">Choose date</option>
+              </select>
+            </div>
+            <div id="customStartWrap" style="display:none;">
+              <label for="customStartDate">Custom start date</label>
+              <input id="customStartDate" class="input" type="date">
+            </div>
+          </div>
+          <p class="small muted" style="margin-top:10px;">
+            Schedule preference (full-time, part-time, shift preference) should be captured in profile enrichment,
+            not as a required gate at this step.
+          </p>
+        </div>
+
+        <div class="actions">
+          <button class="btn success" id="saveBtn" type="button">Save and continue</button>
+          <a class="btn secondary" href="candidate-cv-upload.html">Back</a>
+          <a class="btn" href="candidate-profile-completeness.html">Next screen</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    const ROLE_SUGGESTIONS = [
+      "Warehouse Operations Lead",
+      "Maintenance Supervisor",
+      "Inventory Control Manager",
+      "Facilities Technician",
+      "Logistics Coordinator",
+      "Operations Manager",
+      "Quality Assurance Lead",
+      "Production Supervisor"
+    ];
+    const REGION_OPTIONS = ["USA", "Canada", "UK", "EU", "Worldwide"];
+
+    const s0 = UIFlow.readState();
+    const onboarding = s0.candidate.onboarding;
+    let selectedRoles = Array.isArray(onboarding.preferredRoles) && onboarding.preferredRoles.length
+      ? [...onboarding.preferredRoles]
+      : (onboarding.rolePreference ? onboarding.rolePreference.split(",").map((v) => v.trim()).filter(Boolean) : []);
+    selectedRoles = selectedRoles.slice(0, 5);
+
+    let locationPref = onboarding.locationPref || {
+      workMode: "onsite",
+      scope: "radius",
+      anchor: "",
+      radiusKm: 25,
+      regions: []
+    };
+    let compensation = onboarding.compensation || { min: 70000, max: 85000, currency: "USD", period: "year" };
+    let earliestStart = onboarding.earliestStart || "2_weeks";
+
+    const roleInput = document.getElementById("roleInput");
+    const roleChips = document.getElementById("roleChips");
+    const roleCount = document.getElementById("roleCount");
+    const roleSuggestions = document.getElementById("roleSuggestions");
+    const workMode = document.getElementById("workMode");
+    const locationScope = document.getElementById("locationScope");
+    const radiusSection = document.getElementById("radiusSection");
+    const regionSection = document.getElementById("regionSection");
+    const anchorLocation = document.getElementById("anchorLocation");
+    const radiusKm = document.getElementById("radiusKm");
+    const radiusLabel = document.getElementById("radiusLabel");
+    const regionChecklist = document.getElementById("regionChecklist");
+    const currency = document.getElementById("currency");
+    const period = document.getElementById("period");
+    const minComp = document.getElementById("minComp");
+    const maxComp = document.getElementById("maxComp");
+    const compSummary = document.getElementById("compSummary");
+    const earliestStartSelect = document.getElementById("earliestStart");
+    const customStartWrap = document.getElementById("customStartWrap");
+    const customStartDate = document.getElementById("customStartDate");
+
+    function formatMoney(v) {
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Number(v) || 0);
+    }
+
+    function renderRoleSuggestions() {
+      roleSuggestions.innerHTML = ROLE_SUGGESTIONS.map((role) => `
+        <label class="checkbox-row">
+          <input type="checkbox" value="${role}" ${selectedRoles.includes(role) ? "checked" : ""} ${selectedRoles.length >= 5 && !selectedRoles.includes(role) ? "disabled" : ""}>
+          <span>${role}</span>
+        </label>
+      `).join("");
+      roleSuggestions.querySelectorAll("input[type='checkbox']").forEach((el) => {
+        el.addEventListener("change", () => {
+          const value = el.value;
+          if (el.checked) {
+            addRole(value);
+          } else {
+            selectedRoles = selectedRoles.filter((r) => r !== value);
+            renderRoles();
+          }
+        });
+      });
+    }
+
+    function renderRoles() {
+      roleChips.innerHTML = selectedRoles.map((role) => `
+        <span class="chip">${role}<button type="button" data-role="${role}" aria-label="Remove ${role}">x</button></span>
+      `).join("");
+      roleCount.textContent = `${selectedRoles.length}/5 selected`;
+      roleChips.querySelectorAll("button[data-role]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const role = btn.getAttribute("data-role");
+          selectedRoles = selectedRoles.filter((r) => r !== role);
+          renderRoles();
+        });
+      });
+      renderRoleSuggestions();
+    }
+
+    function addRole(role) {
+      const normalized = role.trim();
+      if (!normalized) return;
+      if (selectedRoles.includes(normalized)) {
+        UIFlow.showStatus("error-recoverable", "This role is already selected.");
+        return;
+      }
+      if (selectedRoles.length >= 5) {
+        UIFlow.showStatus("error-recoverable", "You can select up to 5 roles.");
+        return;
+      }
+      selectedRoles.push(normalized);
+      roleInput.value = "";
+      renderRoles();
+      UIFlow.showStatus("success", "Role added.");
+    }
+
+    function renderRegionChecklist() {
+      const regions = Array.isArray(locationPref.regions) ? locationPref.regions : [];
+      const worldwideSelected = regions.includes("Worldwide");
+      regionChecklist.innerHTML = REGION_OPTIONS.map((region) => `
+        <label class="checkbox-row">
+          <input type="checkbox" value="${region}" ${regions.includes(region) ? "checked" : ""} ${worldwideSelected && region !== "Worldwide" ? "disabled" : ""}>
+          <span>${region}</span>
+        </label>
+      `).join("");
+      regionChecklist.querySelectorAll("input[type='checkbox']").forEach((el) => {
+        el.addEventListener("change", () => {
+          const value = el.value;
+          let next = new Set(locationPref.regions || []);
+          if (el.checked) {
+            if (value === "Worldwide") {
+              next = new Set(["Worldwide"]);
+            } else {
+              next.delete("Worldwide");
+              next.add(value);
+            }
+          } else {
+            next.delete(value);
+          }
+          locationPref.regions = Array.from(next);
+          renderRegionChecklist();
+        });
+      });
+    }
+
+    function renderLocationSections() {
+      radiusSection.style.display = locationPref.scope === "radius" ? "block" : "none";
+      regionSection.style.display = locationPref.scope === "region" ? "block" : "none";
+      if (locationPref.scope === "worldwide") {
+        UIFlow.showStatus("success", "Worldwide scope selected.");
+      }
+    }
+
+    function syncCompFromInputs() {
+      compensation.min = Number(minComp.value || 0);
+      compensation.max = Number(maxComp.value || 0);
+      if (compensation.min > compensation.max) {
+        const t = compensation.min;
+        compensation.min = compensation.max;
+        compensation.max = t;
+      }
+      minComp.value = compensation.min;
+      maxComp.value = compensation.max;
+      const median = Math.round((compensation.min + compensation.max) / 2);
+      compSummary.textContent = `Median target: ${formatMoney(median)} ${compensation.currency}/${compensation.period}`;
+    }
+
+    roleInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addRole(roleInput.value);
+      } else if (e.key === "Backspace" && !roleInput.value && selectedRoles.length) {
+        selectedRoles.pop();
+        renderRoles();
+      }
+    });
+    document.getElementById("addRoleBtn").addEventListener("click", () => addRole(roleInput.value));
+
+    workMode.value = locationPref.workMode || "onsite";
+    locationScope.value = locationPref.scope || "radius";
+    anchorLocation.value = locationPref.anchor || "";
+    radiusKm.value = locationPref.radiusKm || 25;
+    radiusLabel.textContent = radiusKm.value;
+    workMode.addEventListener("change", () => { locationPref.workMode = workMode.value; });
+    locationScope.addEventListener("change", () => {
+      locationPref.scope = locationScope.value;
+      renderLocationSections();
+    });
+    anchorLocation.addEventListener("input", () => { locationPref.anchor = anchorLocation.value.trim(); });
+    radiusKm.addEventListener("input", () => {
+      locationPref.radiusKm = Number(radiusKm.value);
+      radiusLabel.textContent = radiusKm.value;
+    });
+
+    currency.value = compensation.currency || "USD";
+    period.value = compensation.period || "year";
+    minComp.value = compensation.min || 70000;
+    maxComp.value = compensation.max || 85000;
+
+    [minComp, maxComp].forEach((el) => el.addEventListener("input", syncCompFromInputs));
+    currency.addEventListener("change", () => { compensation.currency = currency.value; syncCompFromInputs(); });
+    period.addEventListener("change", () => { compensation.period = period.value; syncCompFromInputs(); });
+
+    document.getElementById("benchmarkBtn").addEventListener("click", () => {
+      const anchorRole = selectedRoles[0] || "default";
+      const benchmarkByRole = {
+        "Warehouse Operations Lead": [78000, 92000],
+        "Maintenance Supervisor": [72000, 86000],
+        "Inventory Control Manager": [70000, 84000],
+        default: [70000, 85000]
+      };
+      const band = benchmarkByRole[anchorRole] || benchmarkByRole.default;
+      compensation.min = band[0];
+      compensation.max = band[1];
+      minComp.value = compensation.min;
+      maxComp.value = compensation.max;
+      syncCompFromInputs();
+      UIFlow.showStatus("success", "Market median hint applied.");
+    });
+
+    earliestStartSelect.value = earliestStart;
+    earliestStartSelect.addEventListener("change", () => {
+      earliestStart = earliestStartSelect.value;
+      customStartWrap.style.display = earliestStart === "custom_date" ? "block" : "none";
+    });
+    customStartWrap.style.display = earliestStart === "custom_date" ? "block" : "none";
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      if (!selectedRoles.length) {
+        UIFlow.showStatus("error-recoverable", "Select at least one preferred role.");
+        return;
+      }
+      if (selectedRoles.length > 5) {
+        UIFlow.showStatus("error-recoverable", "You can select up to five roles only.");
+        return;
+      }
+      if (locationPref.scope === "radius" && !anchorLocation.value.trim()) {
+        UIFlow.showStatus("error-recoverable", "Set an anchor location for radius-based matching.");
+        return;
+      }
+      if (locationPref.scope === "region" && (!locationPref.regions || !locationPref.regions.length)) {
+        UIFlow.showStatus("error-recoverable", "Select at least one region/country, or use Worldwide scope.");
+        return;
+      }
+      if (!(compensation.min > 0 && compensation.max > 0 && compensation.min < compensation.max)) {
+        UIFlow.showStatus("error-recoverable", "Compensation range must have valid min and max values.");
+        return;
+      }
+      if (!earliestStartSelect.value) {
+        UIFlow.showStatus("error-recoverable", "Choose your earliest start window.");
+        return;
+      }
+      if (earliestStartSelect.value === "custom_date" && !customStartDate.value) {
+        UIFlow.showStatus("error-recoverable", "Choose a custom start date.");
+        return;
+      }
+
+      const rolePreference = selectedRoles.join(", ");
+      const location = locationPref.scope === "radius"
+        ? `${locationPref.workMode} near ${locationPref.anchor} (${locationPref.radiusKm} km)`
+        : locationPref.scope === "region"
+          ? `${locationPref.workMode} in ${locationPref.regions.join(", ")}`
+          : `${locationPref.workMode} worldwide`;
+      const payRange = `${compensation.currency} ${formatMoney(compensation.min)} - ${formatMoney(compensation.max)} per ${compensation.period}`;
+      const availability = earliestStartSelect.value === "custom_date"
+        ? `custom_date:${customStartDate.value}`
+        : earliestStartSelect.value;
+
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          onboarding: {
+            ...s.candidate.onboarding,
+            requiredCompleted: true,
+            preferredRoles: selectedRoles,
+            locationPref: {
+              workMode: locationPref.workMode,
+              scope: locationPref.scope,
+              anchor: locationPref.anchor,
+              radiusKm: Number(locationPref.radiusKm),
+              regions: [...(locationPref.regions || [])]
+            },
+            compensation: {
+              min: Number(compensation.min),
+              max: Number(compensation.max),
+              currency: compensation.currency,
+              period: compensation.period
+            },
+            earliestStart: availability,
+            rolePreference,
+            location,
+            payRange,
+            availability,
+            profileCompleteness: Math.max(68, s.candidate.onboarding.profileCompleteness)
+          }
+        }
+      });
+      UIFlow.showStatus("success", "Required profile fields saved.");
+      UIFlow.showToast("Profile essentials completed.");
+    });
+
+    renderRoles();
+    renderRegionChecklist();
+    renderLocationSections();
+    syncCompFromInputs();
+    UIFlow.showStatus("loading", "Loading parsed profile fields...");
+    setTimeout(() => UIFlow.showStatus("success", "Confirm required fields and continue."), 400);
+  </script>
+</body>
+</html>

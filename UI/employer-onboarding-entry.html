@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Employer Workspace Onboarding</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>Employer Workspace Onboarding Entry</h1>
+        <p class="muted">
+          First-login destination for employer users. This follows role-first auth and consent.
+        </p>
+        <div class="badge success">Portal: Employer</div>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <h3 style="margin-top:16px;">What starts next</h3>
+        <ul>
+          <li>Organization profile setup</li>
+          <li>Timezone and communication defaults</li>
+          <li>Optional teammate invites</li>
+        </ul>
+
+        <div class="actions">
+          <a class="btn" href="employer-team-roles.html">Start onboarding</a>
+          <a class="btn secondary" href="role-intent.html">Back to role selection</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    const s = UIFlow.readState();
+    if (s.userType !== "employer") {
+      location.href = "role-intent.html";
+    }
+    UIFlow.showStatus("success", "Employer onboarding entry is ready.");
+  </script>
+</body>
+</html>

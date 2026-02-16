@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Performance Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+        <a href="employer-job-setup.html">Job Setup</a>
+        <a href="employer-automation-settings.html">Automation</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>EMP-006: Job Performance Dashboard</h1>
+        <p class="muted">Monitor quality and conversion and tune job configuration quickly.</p>
+
+        <div class="grid-3" style="margin-top:12px;">
+          <div class="kpi">
+            <strong>Time to first packet</strong>
+            <span>42 min</span>
+          </div>
+          <div class="kpi">
+            <strong>Invite to completion</strong>
+            <span>38%</span>
+          </div>
+          <div class="kpi">
+            <strong>Packet to interview</strong>
+            <span id="packetInterviewRate">46%</span>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:14px;">
+          <strong>Recommendation engine</strong>
+          <div class="small muted">Use these shortcuts to improve funnel outcomes.</div>
+          <div class="actions">
+            <a class="btn secondary" href="employer-job-setup.html">Tune requirements</a>
+            <a class="btn secondary" href="employer-automation-settings.html">Tune invite policy</a>
+            <button class="btn secondary" id="simulateImproveBtn" type="button">Simulate conversion improvement</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+    let rate = 46;
+    document.getElementById("simulateImproveBtn").addEventListener("click", () => {
+      rate = Math.min(72, rate + 4);
+      document.getElementById("packetInterviewRate").textContent = `${rate}%`;
+    });
+  </script>
+</body>
+</html>

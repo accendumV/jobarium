@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Automation Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-job-setup.html">Job Setup</a>
+        <a href="employer-job-lifecycle.html">Job Lifecycle</a>
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 980px;">
+        <h1>EMP-003: Automation Settings</h1>
+        <p class="muted">Configure invite automation within safe guardrails.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="grid-3">
+          <div>
+            <label for="triggerMode">Trigger mode</label>
+            <select id="triggerMode">
+              <option value="top_n">Top N shortlist</option>
+              <option value="threshold">Fit threshold</option>
+            </select>
+          </div>
+          <div id="topNWrap">
+            <label for="topN">Top N</label>
+            <input id="topN" class="input" type="number" min="10" max="50" step="1">
+          </div>
+          <div id="fitThresholdWrap" style="display:none;">
+            <label for="fitThreshold">Fit threshold (%)</label>
+            <input id="fitThreshold" class="input" type="number" min="0" max="100" step="1">
+          </div>
+          <div>
+            <label for="dailyCap">Daily cap</label>
+            <input id="dailyCap" class="input" type="number" min="1" step="1">
+          </div>
+          <div>
+            <label for="weeklyCap">Weekly cap</label>
+            <input id="weeklyCap" class="input" type="number" min="1" step="1">
+          </div>
+          <div>
+            <label for="maxActiveInvites">Max active invites</label>
+            <input id="maxActiveInvites" class="input" type="number" min="1" step="1">
+          </div>
+          <div>
+            <label for="expiryHours">Invite expiry (hours)</label>
+            <input id="expiryHours" class="input" type="number" min="24" max="168" step="1">
+          </div>
+          <div>
+            <label for="cooldownDays">Re-invite cooldown (days)</label>
+            <input id="cooldownDays" class="input" type="number" min="1" max="30" step="1">
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;" id="policyPreview"></div>
+
+        <div class="actions">
+          <button class="btn success" id="savePolicyBtn" type="button">Save policy</button>
+          <a class="btn secondary" href="employer-job-setup.html">Back</a>
+          <a class="btn" href="employer-job-lifecycle.html">Continue to lifecycle</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+    const s = UIFlow.readState();
+    const policy = {
+      ...s.employer.automation,
+      fitThreshold: s.employer.automation.fitThreshold ?? 75
+    };
+    const fields = ["triggerMode", "topN", "fitThreshold", "dailyCap", "weeklyCap", "maxActiveInvites", "expiryHours", "cooldownDays"];
+    fields.forEach((id) => {
+      document.getElementById(id).value = policy[id];
+    });
+
+    const triggerModeEl = document.getElementById("triggerMode");
+    const topNWrap = document.getElementById("topNWrap");
+    const fitThresholdWrap = document.getElementById("fitThresholdWrap");
+
+    function renderModeFields() {
+      const mode = triggerModeEl.value;
+      topNWrap.style.display = mode === "top_n" ? "block" : "none";
+      fitThresholdWrap.style.display = mode === "threshold" ? "block" : "none";
+    }
+
+    function currentPolicy() {
+      return {
+        triggerMode: document.getElementById("triggerMode").value,
+        topN: Number(document.getElementById("topN").value || 0),
+        fitThreshold: Number(document.getElementById("fitThreshold").value || 0),
+        dailyCap: Number(document.getElementById("dailyCap").value || 0),
+        weeklyCap: Number(document.getElementById("weeklyCap").value || 0),
+        maxActiveInvites: Number(document.getElementById("maxActiveInvites").value || 0),
+        expiryHours: Number(document.getElementById("expiryHours").value || 0),
+        cooldownDays: Number(document.getElementById("cooldownDays").value || 0)
+      };
+    }
+
+    function validate(p) {
+      if (p.triggerMode === "top_n" && (p.topN < 10 || p.topN > 50)) {
+        return "Top N must be between 10 and 50.";
+      }
+      if (p.triggerMode === "threshold" && (p.fitThreshold < 0 || p.fitThreshold > 100)) {
+        return "Fit threshold must be between 0 and 100.";
+      }
+      if (p.dailyCap > p.weeklyCap) return "Daily cap cannot exceed weekly cap.";
+      if (p.expiryHours < 24 || p.expiryHours > 168) return "Expiry must be between 24 and 168 hours.";
+      return "";
+    }
+
+    function renderPreview() {
+      const p = currentPolicy();
+      const err = validate(p);
+      document.getElementById("policyPreview").innerHTML = `
+        <strong>Policy preview</strong>
+        <div class="small muted">Trigger: ${p.triggerMode === "top_n" ? `Top ${p.topN}` : `Fit >= ${p.fitThreshold}%`}</div>
+        <div class="small muted">Caps: ${p.dailyCap}/day, ${p.weeklyCap}/week, ${p.maxActiveInvites} active</div>
+        <div class="small muted">Expiry: ${p.expiryHours}h | Cooldown: ${p.cooldownDays}d</div>
+        <div class="small ${err ? "muted" : ""}" style="margin-top:8px;">${err ? `Validation: ${err}` : "Validation: policy is safe."}</div>
+      `;
+      return err;
+    }
+
+    fields.forEach((id) => document.getElementById(id).addEventListener("input", () => {
+      renderModeFields();
+      renderPreview();
+    }));
+
+    document.getElementById("savePolicyBtn").addEventListener("click", () => {
+      const p = currentPolicy();
+      const err = validate(p);
+      if (err) {
+        UIFlow.showStatus("error-recoverable", err);
+        return;
+      }
+      const state = UIFlow.readState();
+      UIFlow.updateState({
+        employer: {
+          ...state.employer,
+          automation: { ...p, policyValid: true }
+        }
+      });
+      UIFlow.showStatus("success", "Automation policy saved.");
+      UIFlow.showToast("Invite policy updated.");
+    });
+
+    renderModeFields();
+    renderPreview();
+    UIFlow.showStatus("success", "Automation settings loaded.");
+  </script>
+</body>
+</html>

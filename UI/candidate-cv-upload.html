@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - CV Upload</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="candidate-onboarding-entry.html">Onboarding Entry</a>
+        <a href="candidate-match-home.html">Match Home</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 900px;">
+        <h1>CAND-003: CV Upload or Import</h1>
+        <p class="muted">Upload your CV to bootstrap profile parsing and matching readiness.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <label for="cvFile">Choose CV file</label>
+        <input id="cvFile" class="input" type="file" accept=".pdf,.doc,.docx">
+
+        <div class="actions">
+          <button class="btn" id="uploadBtn" type="button">Upload and parse</button>
+          <button class="btn secondary" id="linkedinBtn" type="button">Import from LinkedIn</button>
+        </div>
+
+        <div class="status-box info" style="margin-top:14px;">
+          Accepted formats: PDF, DOC, DOCX. Parse runs asynchronously.
+        </div>
+
+        <div class="actions" style="margin-top:18px;">
+          <a class="btn secondary" href="candidate-onboarding-entry.html">Back</a>
+          <a class="btn" href="candidate-field-confirmation.html">Continue</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    const fileInput = document.getElementById("cvFile");
+
+    document.getElementById("uploadBtn").addEventListener("click", () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) {
+        UIFlow.showStatus("error-recoverable", "Please select a file before upload.");
+        return;
+      }
+      UIFlow.showStatus("loading", "Uploading CV and starting parser...");
+      setTimeout(() => {
+        const s = UIFlow.readState();
+        UIFlow.updateState({
+          candidate: {
+            ...s.candidate,
+            onboarding: {
+              ...s.candidate.onboarding,
+              cvUploaded: true,
+              parseStatus: "completed"
+            }
+          }
+        });
+        UIFlow.showStatus("success", "CV parsed successfully. Review extracted fields next.");
+        UIFlow.showToast("CV uploaded.");
+      }, 900);
+    });
+
+    document.getElementById("linkedinBtn").addEventListener("click", () => {
+      UIFlow.showStatus("loading", "Importing LinkedIn profile...");
+      setTimeout(() => {
+        const s = UIFlow.readState();
+        UIFlow.updateState({
+          candidate: {
+            ...s.candidate,
+            onboarding: {
+              ...s.candidate.onboarding,
+              cvUploaded: true,
+              parseStatus: "completed",
+              profileCompleteness: Math.max(42, s.candidate.onboarding.profileCompleteness)
+            }
+          }
+        });
+        UIFlow.showStatus("success", "Profile import complete. Confirm required fields.");
+        UIFlow.showToast("LinkedIn import complete.");
+      }, 780);
+    });
+
+    const s = UIFlow.readState();
+    if (s.candidate.onboarding.parseStatus === "completed") {
+      UIFlow.showStatus("success", "You already have parsed profile data. Continue.");
+    } else {
+      UIFlow.showStatus("loading", "Waiting for upload action.");
+    }
+  </script>
+</body>
+</html>

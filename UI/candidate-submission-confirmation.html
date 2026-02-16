@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Submission Confirmation</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="candidate-match-home.html">Match Home</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>CAND-008: Submission Confirmation</h1>
+        <p class="muted">Your Q and A session is complete and packet building has started.</p>
+        <div class="status-box success">
+          Submission received. Employers typically review within 24 to 72 hours.
+        </div>
+        <div class="grid-2" style="margin-top:14px;">
+          <div class="kpi">
+            <strong>Current state</strong>
+            <span class="small muted">Q and A submitted</span>
+            <span class="small muted">Packet building in background</span>
+          </div>
+          <div class="kpi">
+            <strong>Next expected event</strong>
+            <span class="small muted">Status update in opportunity timeline</span>
+            <span class="small muted">Notification when review outcome changes</span>
+          </div>
+        </div>
+        <div class="actions" style="margin-top:18px;">
+          <a class="btn" href="candidate-opportunity-timeline.html">Track status timeline</a>
+          <a class="btn secondary" href="candidate-match-home.html">Back to matches</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+  </script>
+</body>
+</html>

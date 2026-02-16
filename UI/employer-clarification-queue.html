@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Clarification Queue</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-packet-detail.html">Packet Detail</a>
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>Clarification Queue</h1>
+        <p class="muted">Track clarification requests and resolve them after candidate response.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div id="queueList" class="stack" style="margin-top:12px;"></div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function renderQueue() {
+      const s = UIFlow.readState();
+      const q = s.employer.clarifications.queue;
+      const root = document.getElementById("queueList");
+      if (!q.length) {
+        root.innerHTML = `<div class="match-card"><strong>No clarification items</strong><div class="small muted">Requests you trigger from packet detail will appear here.</div></div>`;
+        UIFlow.showStatus("empty", "No open clarification requests.");
+        return;
+      }
+      root.innerHTML = q.map((item) => `
+        <div class="match-card">
+          <div class="grid-2">
+            <div>
+              <strong>${item.candidateName}</strong>
+              <div class="small muted">${item.role}</div>
+            </div>
+            <div class="small">
+              <div><strong>Status:</strong> ${item.status}</div>
+              <div><strong>Packet:</strong> ${item.packetId}</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" data-resolve-id="${item.id}">Mark resolved</button>
+          </div>
+        </div>
+      `).join("");
+
+      root.querySelectorAll("button[data-resolve-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-resolve-id");
+          const state = UIFlow.readState();
+          UIFlow.updateState({
+            employer: {
+              ...state.employer,
+              clarifications: {
+                ...state.employer.clarifications,
+                queue: state.employer.clarifications.queue.map((item) =>
+                  item.id === id ? { ...item, status: "resolved" } : item
+                )
+              }
+            }
+          });
+          renderQueue();
+          UIFlow.showStatus("success", "Clarification item marked as resolved.");
+        });
+      });
+      UIFlow.showStatus("success", `${q.length} clarification request(s) in queue.`);
+    }
+
+    renderQueue();
+  </script>
+</body>
+</html>

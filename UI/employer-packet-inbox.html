@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Packet Inbox</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-job-lifecycle.html">Job Lifecycle</a>
+        <a href="employer-packet-detail.html">Packet Detail</a>
+        <a href="employer-performance-dashboard.html">Performance Dashboard</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>EMP-004: Packet Inbox</h1>
+        <p class="muted">Review completed packets with fit and authenticity context.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="grid-3">
+          <div>
+            <label for="roleFilter">Role filter</label>
+            <select id="roleFilter">
+              <option value="all">All roles</option>
+              <option value="Warehouse Operations Lead">Warehouse Operations Lead</option>
+              <option value="Maintenance Supervisor">Maintenance Supervisor</option>
+            </select>
+          </div>
+          <div>
+            <label for="authFilter">Authenticity filter</label>
+            <select id="authFilter">
+              <option value="all">All</option>
+              <option value="low_risk">Low risk</option>
+              <option value="review">Needs review</option>
+            </select>
+          </div>
+          <div>
+            <label for="statusFilter">Status filter</label>
+            <select id="statusFilter">
+              <option value="all">All statuses</option>
+              <option value="ready">Ready</option>
+              <option value="actioned">Actioned</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="packetList" class="stack" style="margin-top:14px;"></div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function renderPackets() {
+      const s = UIFlow.readState();
+      const roleFilter = document.getElementById("roleFilter").value;
+      const authFilter = document.getElementById("authFilter").value;
+      const statusFilter = document.getElementById("statusFilter").value;
+
+      const visible = s.employer.packets.items.filter((p) => {
+        if (roleFilter !== "all" && p.role !== roleFilter) return false;
+        if (authFilter !== "all" && p.authenticity !== authFilter) return false;
+        if (statusFilter !== "all" && p.status !== statusFilter) return false;
+        return true;
+      });
+
+      const root = document.getElementById("packetList");
+      if (!visible.length) {
+        root.innerHTML = `<div class="match-card"><strong>No packets found</strong><div class="small muted">Adjust filters or wait for new submissions.</div></div>`;
+        UIFlow.showStatus("empty", "No packets match current filters.");
+        return;
+      }
+
+      root.innerHTML = visible.map((p) => `
+        <div class="match-card">
+          <div class="grid-2">
+            <div>
+              <strong>${p.candidateName}</strong>
+              <div class="small muted">${p.role}</div>
+              <div class="small muted">${p.summary || "Summary unavailable. Transcript fallback will be shown."}</div>
+            </div>
+            <div class="small">
+              <div><strong>Fit:</strong> ${p.fitScore}%</div>
+              <div><strong>Authenticity:</strong> ${p.authenticity}</div>
+              <div><strong>Status:</strong> ${p.status}</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-packet-id="${p.id}">Open packet</button>
+          </div>
+        </div>
+      `).join("");
+
+      root.querySelectorAll("button[data-packet-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-packet-id");
+          const state = UIFlow.readState();
+          UIFlow.updateState({
+            employer: {
+              ...state.employer,
+              packets: {
+                ...state.employer.packets,
+                selectedPacketId: id
+              }
+            }
+          });
+          window.location.href = "employer-packet-detail.html";
+        });
+      });
+      UIFlow.showStatus("success", `${visible.length} packet(s) shown.`);
+    }
+
+    ["roleFilter", "authFilter", "statusFilter"].forEach((id) =>
+      document.getElementById(id).addEventListener("change", renderPackets)
+    );
+
+    renderPackets();
+  </script>
+</body>
+</html>

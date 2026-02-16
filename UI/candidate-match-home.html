@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Match Home</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-profile-completeness.html">Profile Completeness</a>
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="candidate-offers-center.html">Offers</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>CAND-006: Matching Status and Curated Match List</h1>
+        <p class="muted">Top matches only, with invite and screening status per opportunity.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="actions">
+          <span class="pill">Default view: top 3</span>
+          <button class="btn secondary" id="expandBtn" type="button">Expand to top 10</button>
+        </div>
+
+        <div class="match-card" id="preferenceSummary" style="margin-top:12px;"></div>
+        <div id="matches" class="stack" style="margin-top:14px;"></div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    let expanded = false;
+
+    function renderMatches() {
+      const s = UIFlow.readState();
+      const roles = (s.candidate.onboarding.preferredRoles && s.candidate.onboarding.preferredRoles.length)
+        ? s.candidate.onboarding.preferredRoles.join(", ")
+        : (s.candidate.onboarding.rolePreference || "Not set");
+      const locationText = s.candidate.onboarding.location || "Not set";
+      const pay = s.candidate.onboarding.payRange || "Not set";
+      document.getElementById("preferenceSummary").innerHTML = `
+        <strong>Matching inputs from CAND-004</strong>
+        <div class="small muted">Roles: ${roles}</div>
+        <div class="small muted">Location: ${locationText}</div>
+        <div class="small muted">Compensation: ${pay}</div>
+      `;
+      const matches = s.candidate.matching.matches;
+      const visible = expanded ? matches : matches.slice(0, 3);
+      const root = document.getElementById("matches");
+      root.innerHTML = visible.map((m) => `
+        <div class="match-card">
+          <div class="grid-2">
+            <div>
+              <strong>${m.title}</strong>
+              <div class="small muted">${m.employer}</div>
+              <div class="small muted">${m.why}</div>
+            </div>
+            <div class="small">
+              <div><strong>Fit:</strong> ${m.fitScore}%</div>
+              <div><strong>Invite:</strong> ${m.inviteStatus}</div>
+              <div><strong>Screening:</strong> ${m.screeningStatus}</div>
+              <div><strong>Outcome:</strong> ${m.outcomeStatus}</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn" data-match-id="${m.id}">Open match</button>
+          </div>
+        </div>
+      `).join("");
+
+      root.querySelectorAll("button[data-match-id]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-match-id");
+          const state = UIFlow.readState();
+          UIFlow.updateState({
+            candidate: {
+              ...state.candidate,
+              matching: {
+                ...state.candidate.matching,
+                selectedMatchId: id
+              }
+            }
+          });
+          window.location.href = "candidate-match-detail.html";
+        });
+      });
+    }
+
+    document.getElementById("expandBtn").addEventListener("click", () => {
+      expanded = !expanded;
+      document.getElementById("expandBtn").textContent = expanded ? "Show top 3" : "Expand to top 10";
+      renderMatches();
+      UIFlow.showStatus("success", expanded ? "Expanded shortlist view." : "Compact shortlist view.");
+    });
+
+    renderMatches();
+    UIFlow.showStatus("loading", "Refreshing latest matching run...");
+    setTimeout(() => UIFlow.showStatus("success", "3 shortlisted opportunities available."), 500);
+  </script>
+</body>
+</html>

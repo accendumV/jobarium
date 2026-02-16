@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Interview Scheduling Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="candidate-offers-center.html">Offers Center</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 900px;">
+        <h1>CAND-010: Interview Scheduling Center</h1>
+        <p class="muted">Select an interview slot and confirm in your timezone.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <label for="slotSelect">Available slots</label>
+        <select id="slotSelect">
+          <option value="">Choose a slot</option>
+          <option value="Tue 10:00">Tue 10:00 AM</option>
+          <option value="Tue 14:30">Tue 2:30 PM</option>
+          <option value="Wed 09:00">Wed 9:00 AM</option>
+        </select>
+
+        <div class="actions">
+          <button class="btn success" id="confirmBtn" type="button">Confirm slot</button>
+          <button class="btn secondary" id="altBtn" type="button">Request alternate time</button>
+          <a class="btn secondary" href="candidate-opportunity-timeline.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    document.getElementById("confirmBtn").addEventListener("click", () => {
+      const slot = document.getElementById("slotSelect").value;
+      if (!slot) {
+        UIFlow.showStatus("error-recoverable", "Choose a slot first.");
+        return;
+      }
+      UIFlow.showStatus("success", `Interview slot confirmed: ${slot}`);
+      UIFlow.showToast("Interview confirmed.");
+    });
+    document.getElementById("altBtn").addEventListener("click", () => {
+      UIFlow.showStatus("success", "Alternate slot request sent to employer.");
+      UIFlow.showToast("Alternate time requested.");
+    });
+    UIFlow.showStatus("loading", "Loading interview requests...");
+    setTimeout(() => UIFlow.showStatus("success", "Interview requests loaded."), 400);
+  </script>
+</body>
+</html>

@@ -73,6 +73,7 @@ Use it to:
 | D-032 | `04_delivery_and_execution/32_pilot_execution_ready_checklist.md` | 04 Delivery | Draft v1 | CEO/CTO | use as weekly pilot execution gate |
 | D-033 | `../Wiki/index.html` | 00 Navigation | Draft v1 | CEO/CTO | keep wiki links in sync with registry |
 | D-034 | `00_master_entry_point.md` | 00 Navigation | Draft v1 | CEO/CTO | use as single high-level starting point |
+| D-035 | `03_user_experience_flows/41_full_scale_ui_readiness_checklist.md` | 03 UX Flows | Draft v1 | CEO/CTO | track per-screen readiness gates and close P0 gaps |
 
 ## Mandatory Rules for New Documents
 1. Add every new planning document to this registry.

@@ -37,14 +37,14 @@ Primary planning assets already defined:
 ---
 
 ## 3) How the System Works (one-page view)
-1. Candidate signs up, uploads CV, confirms key fields.
-2. Employer sets role requirements, question kit, and invite automation.
-3. Matching pipeline filters and ranks candidates.
-4. Auto-invites are sent with safeguards (caps/cooldowns/expiry).
-5. Candidate completes async Q&A.
-6. Packet builder generates employer-ready packet.
-7. Employer takes action (interview/clarify/reject).
-8. Outcome signals feed continuous improvement.
+1. Candidate/employer create accounts first (auth + consent).
+2. Each user then completes separate in-app onboarding.
+3. Candidate profile parse and enrichment produce matchable readiness.
+4. Matching pipeline runs and exposes only shortlisted opportunities to candidates.
+5. Invitations, screening, and outcomes are tracked in match context.
+6. Interviews run as a dedicated scheduling flow.
+7. Employer packet workflows drive decisions and hiring outcomes.
+8. Offers and downstream signals feed continuous improvement loops.
 
 Trust and safety layers:
 - authenticity risk signals for Q&A,

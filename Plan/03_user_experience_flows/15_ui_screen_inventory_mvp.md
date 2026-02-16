@@ -29,6 +29,19 @@ This document closes the gap between journey flows and implementation by specify
 
 ## Candidate Portal Screens
 
+### SHARED-000: Role Intent Selection (`P0`)
+- Goal: identify user intent early so downstream signup, consent, and onboarding are role-specific.
+- Components:
+  - candidate/employer role cards
+  - role value proposition copy
+  - continue action
+- Data:
+  - selected role intent (`candidate` or `employer`)
+- States:
+  - selection missing, save failed
+- Analytics:
+  - `role_intent_selected`
+
 ### CAND-001: Entry and Sign-Up (`P0`)
 - Goal: create account with minimal friction.
 - Components:
@@ -42,9 +55,22 @@ This document closes the gap between journey flows and implementation by specify
   - loading auth config, invalid credentials, duplicate email
 - Analytics:
   - `candidate_signup_started`, `candidate_signup_completed`
+- Notes:
+  - this screen is entered after `SHARED-000` role intent selection
 
-### CAND-002: Consent Capture (`P0`)
-- Goal: collect terms/privacy/GDPR consent.
+### CAND-001B: Account Verification and First Login Gate (`P0`)
+- Goal: finish account creation and route user into onboarding.
+- Components:
+  - email verification confirmation
+  - first-login redirect notice
+  - onboarding lock gate message
+- States:
+  - verification pending, verification failed, verified
+- Analytics:
+  - `candidate_email_verified`, `candidate_first_login`
+
+### CAND-002: Consent Capture at Account Creation (`P0`)
+- Goal: collect terms/privacy/GDPR consent during sign-up (not inside onboarding wizard).
 - Components:
   - consent items checklist
   - version label
@@ -55,6 +81,8 @@ This document closes the gap between journey flows and implementation by specify
   - consent fetch failed, consent submit failed
 - Analytics:
   - `candidate_consent_accepted`, `candidate_consent_declined`
+- Notes:
+  - consent checklist may differ by role (candidate vs employer)
 
 ### CAND-003: CV Upload/Import (`P0`)
 - Goal: bootstrap profile quickly.
@@ -62,6 +90,7 @@ This document closes the gap between journey flows and implementation by specify
   - file dropzone (PDF/DOC/DOCX)
   - LinkedIn/import actions (if enabled)
   - parse status card
+  - additional document upload (certificates/portfolio)
 - Data:
   - file upload token, parser status
 - States:
@@ -86,6 +115,7 @@ This document closes the gap between journey flows and implementation by specify
 - Goal: guide optional enrichment.
 - Components:
   - progress meter
+  - parsed vs missing fields summary
   - missing fields recommendation list
   - profile section cards (skills/certs/history)
 - Data:
@@ -95,8 +125,25 @@ This document closes the gap between journey flows and implementation by specify
 - Analytics:
   - `candidate_profile_updated`, `candidate_profile_completeness_changed`
 
-### CAND-006: Invite Detail (`P0`)
-- Goal: informed start/decline decision.
+### CAND-006: Matching Status and Curated Match List (`P0`)
+- Goal: show asynchronous match progress and prevent candidate overwhelm.
+- Components:
+  - matching state card (in progress/match found/no fit yet)
+  - compact shortlist-only match list (role, fit, status, why matched, action)
+  - list visibility controls (default top 3, expand to top 10)
+  - no-fit guidance and profile improvement prompt
+  - nested invitation status per match
+  - nested screening status per match
+  - nested outcome status per match
+- Data:
+  - latest match run metadata, shortlisted matches, invite/screening/outcome state per match
+- States:
+  - no shortlisted matches, shortlisted with invite-ready item, shortlisted with queued invitation
+- Analytics:
+  - `candidate_matching_viewed`, `candidate_matchlist_expanded`, `candidate_match_clicked`
+
+### CAND-006B: Invite Detail (Nested Under Matching) (`P0`)
+- Goal: informed start/decline decision after invite is created.
 - Components:
   - role summary card
   - employer summary card
@@ -118,7 +165,7 @@ This document closes the gap between journey flows and implementation by specify
   - authenticity policy notice
   - submit action
 - Data:
-  - question kit, prior autosaved answers
+  - question kit, prior autosaved answers, match_id, invite_id
 - States:
   - autosave failed (retry), validation errors, session expired
 - Analytics:
@@ -149,6 +196,25 @@ This document closes the gap between journey flows and implementation by specify
   - no active opportunities
 - Analytics:
   - `candidate_timeline_viewed`
+
+### CAND-010: Interview Scheduling Center (`P0`)
+- Goal: handle interview scheduling as a dedicated flow.
+- Components:
+  - interview requests list
+  - slot picker
+  - calendar integration actions
+  - confirmation details
+- Analytics:
+  - `candidate_interview_slot_selected`, `candidate_calendar_connected`
+
+### CAND-011: Job Offers Center (`P0`)
+- Goal: centralize final offers after successful interview process.
+- Components:
+  - offer list
+  - offer detail and response actions
+  - email notification confirmation
+- Analytics:
+  - `candidate_offer_viewed`, `candidate_offer_accepted`, `candidate_offer_declined`
 
 ## Employer Portal Screens
 
@@ -244,6 +310,8 @@ This document closes the gap between journey flows and implementation by specify
   - digest/realtime settings
 - Analytics:
   - `notification_preferences_updated`
+- Placement:
+  - exposed from main account/dashboard settings after onboarding (not part of pre-onboarding entry flow)
 
 ### SHARED-002: Error and Retry Surface (`P0`)
 - Goal: recover from transient failures.
@@ -303,3 +371,53 @@ This document closes the gap between journey flows and implementation by specify
 - Advanced personalization/theme settings.
 - Dynamic drag-and-drop workflow builders.
 - Deep multi-panel admin workflows.
+
+## Full-Scale Product Expansion (Beyond MVP)
+
+### Candidate Flow Expansion
+- Add identity and account security screens:
+  - multi-factor enrollment
+  - account recovery and device/session controls
+- Add profile governance screens:
+  - profile version history
+  - data export, delete, and anonymization controls
+  - visibility mode controls (active, passive, private)
+- Expand matching surfaces:
+  - ranked opportunities center with reason transparency
+  - no-fit diagnostic state with guided profile actions
+  - invite history and reactivation queue
+- Expand post-submission surfaces:
+  - outcome explanation categories
+  - appeal and dispute tracking
+  - preference center with channel history
+
+### Employer Flow Expansion
+- Add organization foundation screens:
+  - company verification
+  - legal/compliance acknowledgment
+  - RBAC management and teammate role assignment
+- Add advanced job program screens:
+  - multi-role management dashboard
+  - template governance and versioning
+  - question kit library with reusable blocks
+- Add operations and governance screens:
+  - policy validation and activation diagnostics
+  - audit log explorer and retention controls
+  - integration health center (ATS, calendar, communication providers)
+- Add collaborative decision screens:
+  - reviewer assignment and handoff
+  - structured rejection reason taxonomy
+  - SLA and escalation monitoring
+
+### Shared Platform Expansion
+- unified notification center with delivery status
+- incident banner and degraded-mode UX framework
+- admin moderation and integrity operations console
+
+### Full-Scale Design Readiness Additions
+For each expanded screen set, define:
+1. role-level permission matrix
+2. analytics and audit events
+3. fallback/degraded behavior
+4. localization and accessibility requirements
+5. data retention and privacy constraints

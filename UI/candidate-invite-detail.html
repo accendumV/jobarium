@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Invite Detail</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-match-detail.html">Match Detail</a>
+        <a href="candidate-qa-session.html">Q and A Session</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 920px;">
+        <h1>CAND-006B: Invite Detail</h1>
+        <p class="muted">Review role summary and decide to start or decline.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div id="inviteMeta"></div>
+        <div class="actions">
+          <button class="btn success" id="startBtn" type="button">Start Q and A</button>
+          <button class="btn danger" id="declineBtn" type="button">Decline invite</button>
+          <a class="btn secondary" href="candidate-match-detail.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    const match = UIFlow.getCandidateMatch();
+    const meta = document.getElementById("inviteMeta");
+    meta.innerHTML = `
+      <div class="grid-2">
+        <div class="match-card">
+          <strong>${match.title}</strong>
+          <p class="small muted">${match.employer}</p>
+          <p class="small muted">Estimated completion time: 12 to 15 minutes.</p>
+        </div>
+        <div class="match-card">
+          <strong>Invite details</strong>
+          <p class="small muted">Invite status: ${match.inviteStatus}</p>
+          <p class="small muted">Expiry: 72 hours after send</p>
+          <p class="small muted">Pay range and schedule are shown after submission review.</p>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      if (match.inviteStatus === "expired") {
+        UIFlow.showStatus("error-blocking", "This invite has expired. Request a new invite if available.");
+        return;
+      }
+      const s = UIFlow.readState();
+      const updatedMatches = s.candidate.matching.matches.map((m) =>
+        m.id === match.id ? { ...m, inviteStatus: "started", screeningStatus: "in_progress" } : m
+      );
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          matching: { ...s.candidate.matching, matches: updatedMatches },
+          screening: { ...s.candidate.screening, inviteAccepted: true, qaProgress: 0 }
+        }
+      });
+      UIFlow.showToast("Invite started.");
+      setTimeout(() => location.href = "candidate-qa-session.html", 380);
+    });
+
+    document.getElementById("declineBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      const updatedMatches = s.candidate.matching.matches.map((m) =>
+        m.id === match.id ? { ...m, inviteStatus: "cancelled", outcomeStatus: "closed" } : m
+      );
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          matching: { ...s.candidate.matching, matches: updatedMatches }
+        }
+      });
+      UIFlow.showStatus("success", "Invite declined. Opportunity moved to closed state.");
+      UIFlow.showToast("Invite declined.");
+      setTimeout(() => location.href = "candidate-match-home.html", 520);
+    });
+
+    UIFlow.showStatus("success", "Invite ready for action.");
+  </script>
+</body>
+</html>

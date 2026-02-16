@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Opportunity Timeline</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .timeline-flash {
+      min-height: 22px;
+      margin-top: 10px;
+      color: #9fb1e8;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .timeline-flash.show {
+      opacity: 1;
+    }
+
+    .timeline-flash.success {
+      color: #8ff0c7;
+    }
+
+    .timeline-step.active {
+      border-color: rgba(45, 212, 191, 0.7);
+      background: linear-gradient(180deg, rgba(16, 52, 49, 0.72), rgba(12, 36, 34, 0.9));
+    }
+
+    .timeline-step.active .small {
+      color: #a7f3d0;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-match-home.html">Match Home</a>
+        <a href="candidate-interview-scheduling.html">Interview Center</a>
+        <a href="candidate-offers-center.html">Offers Center</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>CAND-009: Opportunity Status Timeline</h1>
+        <p class="muted">Track submission, review, interview, clarify, and final outcome states.</p>
+
+        <div id="flashMessage" class="timeline-flash" role="status" aria-live="polite"></div>
+
+        <div id="timelineList" class="stack" style="margin-top:14px;"></div>
+
+        <div class="actions" style="margin-top:16px;">
+          <button class="btn secondary" id="clarifyBtn" type="button">Simulate clarify request</button>
+          <button class="btn secondary" id="interviewBtn" type="button">Simulate interview request</button>
+          <button class="btn secondary" id="offerBtn" type="button">Simulate offer received</button>
+          <button class="btn secondary" id="resetSimBtn" type="button">Reset simulation</button>
+          <button class="btn secondary" id="flagBtn" type="button">Simulate authenticity flag</button>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="candidate-interview-scheduling.html">Open interview center</a>
+          <a class="btn" href="candidate-offers-center.html">Open offers center</a>
+          <a class="btn secondary" href="candidate-qa-session.html">Back to Q and A session</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    let flashTimer = null;
+
+    function flash(message, tone = "success") {
+      const el = document.getElementById("flashMessage");
+      el.textContent = message;
+      el.className = `timeline-flash ${tone} show`;
+      window.clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => {
+        el.className = `timeline-flash ${tone}`;
+      }, 2500);
+    }
+
+    function renderTimeline() {
+      const s = UIFlow.readState();
+      const timeline = [
+        { key: "submitted", label: "Submitted", active: true },
+        { key: "under_review", label: "Under review", active: true },
+        { key: "interview_requested", label: "Interview requested", active: s.candidate.outcomes.interviewRequested },
+        { key: "clarify_requested", label: "Clarify requested", active: s.candidate.screening.clarificationRequested },
+        { key: "offer_received", label: "Offer received", active: s.candidate.outcomes.offerReceived }
+      ];
+      document.getElementById("timelineList").innerHTML = timeline.map((t) => `
+        <div class="match-card timeline-step ${t.active ? "active" : ""}">
+          <strong>${t.label}</strong>
+          <div class="small muted">${t.active ? "Active in this opportunity" : "Not active yet"}</div>
+        </div>
+      `).join("");
+    }
+
+    document.getElementById("clarifyBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          screening: { ...s.candidate.screening, clarificationRequested: true },
+          outcomes: { ...s.candidate.outcomes, interviewRequested: false, offerReceived: false }
+        }
+      });
+      renderTimeline();
+      flash("Clarification requested. Candidate can return to Q and A.");
+    });
+
+    document.getElementById("interviewBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          screening: { ...s.candidate.screening, clarificationRequested: false },
+          outcomes: { ...s.candidate.outcomes, interviewRequested: true, offerReceived: false }
+        }
+      });
+      renderTimeline();
+      flash("Interview requested state applied.");
+    });
+
+    document.getElementById("offerBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          screening: { ...s.candidate.screening, clarificationRequested: false },
+          outcomes: { ...s.candidate.outcomes, interviewRequested: true, offerReceived: true }
+        }
+      });
+      renderTimeline();
+      flash("Offer received state applied.");
+    });
+
+    document.getElementById("resetSimBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          screening: { ...s.candidate.screening, clarificationRequested: false },
+          outcomes: { ...s.candidate.outcomes, interviewRequested: false, offerReceived: false }
+        }
+      });
+      renderTimeline();
+      flash("Simulation reset to baseline timeline.");
+    });
+
+    document.getElementById("flagBtn").addEventListener("click", () => {
+      UIFlow.showToast("Authenticity flag simulated.");
+      window.location.href = "candidate-appeal-submission.html";
+    });
+
+    renderTimeline();
+    flash("Timeline loaded.");
+  </script>
+</body>
+</html>

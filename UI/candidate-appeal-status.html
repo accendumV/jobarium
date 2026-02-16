@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Appeal Status</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>Appeal Case Status</h1>
+        <p class="muted">Track your appeal status and final review outcome.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div id="statusPane" class="stack"></div>
+        <div class="actions" style="margin-top:16px;">
+          <button class="btn secondary" id="resolveBtn" type="button">Simulate resolved</button>
+          <a class="btn secondary" href="candidate-opportunity-timeline.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+
+    function render() {
+      const s = UIFlow.readState();
+      const pane = document.getElementById("statusPane");
+      if (!s.candidate.appeal.submitted) {
+        pane.innerHTML = `<div class="match-card"><strong>No appeals submitted</strong><p class="small muted">You can submit an appeal from the opportunity timeline if needed.</p></div>`;
+        UIFlow.showStatus("empty", "No active appeal cases.");
+        return;
+      }
+      pane.innerHTML = `
+        <div class="match-card"><strong>Submitted</strong><p class="small muted">Appeal has been received.</p></div>
+        <div class="match-card"><strong>In review</strong><p class="small muted">Status: ${s.candidate.appeal.status}</p></div>
+        <div class="match-card"><strong>Resolved</strong><p class="small muted">${s.candidate.appeal.status === "resolved" ? "Final decision has been posted." : "Pending review completion."}</p></div>
+      `;
+      UIFlow.showStatus("success", `Appeal status: ${s.candidate.appeal.status}`);
+    }
+
+    document.getElementById("resolveBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          appeal: { ...s.candidate.appeal, submitted: true, status: "resolved" }
+        }
+      });
+      render();
+      UIFlow.showToast("Appeal marked as resolved.");
+    });
+
+    render();
+  </script>
+</body>
+</html>

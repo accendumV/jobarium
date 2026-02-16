@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Profile Completeness</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-field-confirmation.html">Required Fields</a>
+        <a href="candidate-match-home.html">Match Home</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 920px;">
+        <h1>CAND-005: Profile Completeness Dashboard</h1>
+        <p class="muted">Increase profile quality to improve matching confidence.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="kpi">
+          <strong>Profile completeness</strong>
+          <div class="progress-track"><div class="progress-value" id="completenessBar" style="width: 0%;"></div></div>
+          <span id="completenessLabel" class="small muted">0%</span>
+        </div>
+
+        <div class="grid-3" style="margin-top:14px;">
+          <div class="match-card">
+            <strong>Skills</strong>
+            <p class="small muted">Add 3 to 5 role-relevant skills.</p>
+            <button class="btn secondary small" id="skillsBtn" type="button">Add skills</button>
+          </div>
+          <div class="match-card">
+            <strong>Certifications</strong>
+            <p class="small muted">Add licenses and certifications.</p>
+            <button class="btn secondary small" id="certBtn" type="button">Add certs</button>
+          </div>
+          <div class="match-card">
+            <strong>Experience highlights</strong>
+            <p class="small muted">Add measurable outcomes from prior roles.</p>
+            <button class="btn secondary small" id="expBtn" type="button">Add highlights</button>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:18px;">
+          <a class="btn secondary" href="candidate-field-confirmation.html">Back</a>
+          <a class="btn" href="candidate-match-home.html">Go to match home</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+
+    function renderCompleteness() {
+      const s = UIFlow.readState();
+      const v = s.candidate.onboarding.profileCompleteness;
+      document.getElementById("completenessBar").style.width = `${v}%`;
+      document.getElementById("completenessLabel").textContent = `${v}% complete`;
+    }
+
+    function bump(value) {
+      const s = UIFlow.readState();
+      const next = Math.min(96, s.candidate.onboarding.profileCompleteness + value);
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          onboarding: {
+            ...s.candidate.onboarding,
+            profileCompleteness: next
+          }
+        }
+      });
+      renderCompleteness();
+      UIFlow.showStatus("success", "Profile section updated.");
+      UIFlow.showToast("Profile completeness improved.");
+    }
+
+    document.getElementById("skillsBtn").addEventListener("click", () => bump(8));
+    document.getElementById("certBtn").addEventListener("click", () => bump(7));
+    document.getElementById("expBtn").addEventListener("click", () => bump(6));
+
+    renderCompleteness();
+    UIFlow.showStatus("success", "Profile is matchable. You can continue any time.");
+  </script>
+</body>
+</html>

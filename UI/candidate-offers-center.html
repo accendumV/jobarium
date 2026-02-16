@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Offers Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="candidate-match-home.html">Match Home</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 940px;">
+        <h1>CAND-011: Job Offers Center</h1>
+        <p class="muted">Review active offers and submit your response.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="match-card">
+          <strong>Operations Lead - Northline Logistics</strong>
+          <p class="small muted">Compensation: $82k + benefits</p>
+          <p class="small muted">Start date: In 3 weeks</p>
+          <p class="small muted">Response deadline: 72 hours</p>
+          <div class="actions">
+            <button class="btn success" id="acceptBtn" type="button">Accept offer</button>
+            <button class="btn danger" id="declineBtn" type="button">Decline offer</button>
+            <button class="btn secondary" id="negotiateBtn" type="button">Request negotiation</button>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:16px;">
+          <a class="btn secondary" href="candidate-opportunity-timeline.html">Back to timeline</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+
+    function setOfferState(active) {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          outcomes: { ...s.candidate.outcomes, offerReceived: active }
+        }
+      });
+    }
+
+    document.getElementById("acceptBtn").addEventListener("click", () => {
+      setOfferState(true);
+      UIFlow.showStatus("success", "Offer accepted. Employer has been notified.");
+      UIFlow.showToast("Offer accepted.");
+    });
+    document.getElementById("declineBtn").addEventListener("click", () => {
+      setOfferState(false);
+      UIFlow.showStatus("success", "Offer declined.");
+      UIFlow.showToast("Offer declined.");
+    });
+    document.getElementById("negotiateBtn").addEventListener("click", () => {
+      setOfferState(true);
+      UIFlow.showStatus("success", "Negotiation request sent.");
+      UIFlow.showToast("Negotiation requested.");
+    });
+
+    const s = UIFlow.readState();
+    UIFlow.showStatus(
+      s.candidate.outcomes.offerReceived ? "success" : "empty",
+      s.candidate.outcomes.offerReceived ? "You have an active offer." : "No active offers right now."
+    );
+  </script>
+</body>
+</html>

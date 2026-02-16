@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Email Verification</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="auth.html">Auth</a>
+        <a href="consent.html">Consent</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1 id="verifyTitle">Verification and First Login Gate</h1>
+        <p class="muted">Verify email first, then route to role specific onboarding entry.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <p class="small">Verification target: <strong id="emailTarget">unknown</strong></p>
+
+        <label for="code">Verification code</label>
+        <input id="code" class="input" placeholder="Use 123456 in this prototype">
+
+        <div class="actions">
+          <button id="verifyBtn" class="btn success" type="button">Verify email</button>
+          <button id="resendBtn" class="btn secondary" type="button">Resend code</button>
+          <button id="failBtn" class="btn danger" type="button">Simulate verification failure</button>
+        </div>
+
+        <div class="status-box info" style="margin-top:16px;">
+          Gate rule: onboarding entry is blocked until verification status is <strong>verified</strong>.
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("verification");
+    const s = UIFlow.readState();
+    const role = s.userType === "employer" ? "employer" : "candidate";
+    document.getElementById("verifyTitle").textContent = `${role === "employer" ? "Employer" : "Candidate"} verification and first login gate`;
+    document.getElementById("emailTarget").textContent = s.authEmail || "no-email@example.com";
+
+    function verifiedFlow() {
+      UIFlow.updateState({ emailVerified: true });
+      UIFlow.showStatus("success", "Email verified. Redirecting to onboarding entry.");
+      UIFlow.showToast("Verification complete.");
+      setTimeout(() => {
+        location.href = role === "employer" ? "employer-onboarding-entry.html" : "candidate-onboarding-entry.html";
+      }, 600);
+    }
+
+    document.getElementById("verifyBtn").addEventListener("click", () => {
+      const code = document.getElementById("code").value.trim();
+      UIFlow.showStatus("loading", "Validating code...");
+      setTimeout(() => {
+        if (code !== "123456") {
+          UIFlow.showStatus("error-recoverable", "Code is invalid. Use 123456 in this prototype.");
+          return;
+        }
+        verifiedFlow();
+      }, 650);
+    });
+
+    document.getElementById("resendBtn").addEventListener("click", () => {
+      UIFlow.showStatus("loading", "Sending new verification code...");
+      setTimeout(() => {
+        UIFlow.showStatus("success", "Code resent. Check your inbox.");
+      }, 450);
+    });
+
+    document.getElementById("failBtn").addEventListener("click", () => {
+      UIFlow.updateState({ emailVerified: false });
+      UIFlow.showStatus("error-blocking", "Verification service timeout. Ref: VERIFY-408.");
+    });
+
+    UIFlow.showStatus(s.emailVerified ? "success" : "loading", s.emailVerified ? "Already verified. Continue." : "Verification pending.");
+    if (s.emailVerified) {
+      setTimeout(() => {
+        location.href = role === "employer" ? "employer-onboarding-entry.html" : "candidate-onboarding-entry.html";
+      }, 500);
+    }
+  </script>
+</body>
+</html>

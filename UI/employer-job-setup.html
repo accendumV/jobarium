@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Job Setup Wizard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-team-roles.html">Team and Roles</a>
+        <a href="employer-automation-settings.html">Automation Settings</a>
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>EMP-002: Job Setup Wizard</h1>
+        <p class="muted">Define role requirements and question-kit readiness in one structured form.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="grid-2">
+          <div>
+            <label for="template">Template</label>
+            <select id="template">
+              <option>Warehouse Operations Lead</option>
+              <option>Maintenance Supervisor</option>
+              <option>Inventory Control Manager</option>
+              <option>Custom</option>
+            </select>
+          </div>
+          <div>
+            <label for="title">Job title</label>
+            <input id="title" class="input" placeholder="Warehouse Operations Lead">
+          </div>
+          <div>
+            <label for="location">Location</label>
+            <input id="location" class="input" placeholder="Chicago, IL">
+          </div>
+          <div>
+            <label for="schedule">Schedule</label>
+            <input id="schedule" class="input" placeholder="Day shift">
+          </div>
+          <div>
+            <label for="compMin">Compensation min</label>
+            <input id="compMin" class="input" type="number" min="0" step="1000">
+          </div>
+          <div>
+            <label for="compMax">Compensation max</label>
+            <input id="compMax" class="input" type="number" min="0" step="1000">
+          </div>
+        </div>
+
+        <label for="mustHaves">Must-haves (one per line)</label>
+        <textarea id="mustHaves" class="input"></textarea>
+
+        <label for="dealbreakers">Dealbreakers (one per line)</label>
+        <textarea id="dealbreakers" class="input"></textarea>
+
+        <div class="checkbox-row">
+          <input id="questionKitReady" type="checkbox">
+          <label for="questionKitReady">Question kit is configured and ready.</label>
+        </div>
+
+        <div class="actions">
+          <button class="btn success" id="saveBtn" type="button">Save job setup</button>
+          <a class="btn secondary" href="employer-team-roles.html">Back</a>
+          <a class="btn" href="employer-automation-settings.html">Continue to automation</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+    const s = UIFlow.readState();
+    const setup = s.employer.jobSetup;
+    document.getElementById("template").value = setup.template;
+    document.getElementById("title").value = setup.title;
+    document.getElementById("location").value = setup.location;
+    document.getElementById("schedule").value = setup.schedule;
+    document.getElementById("compMin").value = setup.compensationMin;
+    document.getElementById("compMax").value = setup.compensationMax;
+    document.getElementById("mustHaves").value = setup.mustHaves.join("\n");
+    document.getElementById("dealbreakers").value = setup.dealbreakers.join("\n");
+    document.getElementById("questionKitReady").checked = setup.questionKitReady;
+
+    function lines(text) {
+      return text.split("\n").map((v) => v.trim()).filter(Boolean);
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const payload = {
+        template: document.getElementById("template").value,
+        title: document.getElementById("title").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        schedule: document.getElementById("schedule").value.trim(),
+        compensationMin: Number(document.getElementById("compMin").value || 0),
+        compensationMax: Number(document.getElementById("compMax").value || 0),
+        mustHaves: lines(document.getElementById("mustHaves").value),
+        dealbreakers: lines(document.getElementById("dealbreakers").value),
+        questionKitReady: document.getElementById("questionKitReady").checked
+      };
+      if (!payload.title || !payload.location || payload.compensationMin <= 0 || payload.compensationMax <= 0) {
+        UIFlow.showStatus("error-recoverable", "Complete required fields with valid compensation values.");
+        return;
+      }
+      if (payload.compensationMin > payload.compensationMax) {
+        UIFlow.showStatus("error-recoverable", "Compensation min cannot exceed max.");
+        return;
+      }
+      if (!payload.questionKitReady) {
+        UIFlow.showStatus("error-recoverable", "Question kit must be ready before activation.");
+        return;
+      }
+      const state = UIFlow.readState();
+      UIFlow.updateState({
+        employer: {
+          ...state.employer,
+          jobSetup: payload
+        }
+      });
+      UIFlow.showStatus("success", "Job setup saved.");
+      UIFlow.showToast("Job configuration updated.");
+    });
+
+    UIFlow.showStatus("success", "Job setup loaded.");
+  </script>
+</body>
+</html>

@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Full-Scale UI Readiness Checklist</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --accent: #60a5fa;
+      --ok: #34d399;
+      --warn: #fbbf24;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .wrap {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 16px 18px;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 28px; }
+    .sub { color: var(--muted); margin-bottom: 16px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.2fr 180px 180px 180px;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+    }
+    button {
+      width: auto;
+      cursor: pointer;
+    }
+    .meta {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .badge {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .action {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+    .action:hover {
+      border-color: var(--accent);
+      color: #dbeafe;
+    }
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .panel-hd {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-2);
+      font-weight: 600;
+    }
+    .gates {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 16px;
+    }
+    .gate {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+    .gate input { width: auto; margin-top: 2px; }
+    .table-wrap { overflow: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1500px;
+      font-size: 13px;
+    }
+    th, td {
+      border-bottom: 1px solid #1f2937;
+      padding: 8px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #0f223a;
+      z-index: 1;
+      white-space: nowrap;
+    }
+    .area-row td {
+      background: #0f223a;
+      font-weight: 700;
+      color: #dbeafe;
+      border-top: 1px solid #1e3a8a;
+    }
+    .id { color: var(--muted); font-weight: 600; white-space: nowrap; }
+    .p0, .p1 {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .p0 { color: var(--warn); }
+    .p1 { color: #93c5fd; }
+    .checkbox-cell {
+      text-align: center;
+      min-width: 64px;
+    }
+    .checkbox-cell input {
+      width: auto;
+      transform: scale(1.1);
+      cursor: pointer;
+    }
+    .na {
+      color: var(--muted);
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 1px 7px;
+      display: inline-block;
+    }
+    .legend {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .empty { padding: 16px; color: var(--muted); }
+    @media (max-width: 960px) {
+      .toolbar { grid-template-columns: 1fr; }
+      .gates { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Full-Scale UI Readiness Checklist</h1>
+    <div class="sub">Interactive checklist with local persistence and DB export.</div>
+
+    <div class="toolbar">
+      <input id="q" type="text" placeholder="Search by id, screen, or required elements">
+      <select id="area"></select>
+      <select id="priority"></select>
+      <select id="status"></select>
+    </div>
+
+    <div class="meta">
+      <div class="badge" id="count"></div>
+      <div class="badge" id="progress"></div>
+      <div class="badge" id="changed">Changed: 0</div>
+      <button class="action" id="exportBtn" type="button">Export Updated DB</button>
+      <button class="action" id="resetBtn" type="button">Reset Local Changes</button>
+    </div>
+
+    <section class="panel">
+      <div class="panel-hd">Global Readiness Gates</div>
+      <div id="globalGates" class="gates"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-hd">Screen Readiness Matrix</div>
+      <div class="legend">Columns: IA/Flow, States, Data/API, Analytics, RBAC, Copy, A11y, QA.</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Screen</th>
+              <th>Priority</th>
+              <th>Required Elements</th>
+              <th>IA/Flow</th>
+              <th>States</th>
+              <th>Data/API</th>
+              <th>Analytics</th>
+              <th>RBAC</th>
+              <th>Copy</th>
+              <th>A11y</th>
+              <th>QA</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="../db/ui_readiness_checklist.js"></script>
+  <script>
+    const q = document.getElementById("q");
+    const area = document.getElementById("area");
+    const priority = document.getElementById("priority");
+    const status = document.getElementById("status");
+    const rowsEl = document.getElementById("rows");
+    const count = document.getElementById("count");
+    const progress = document.getElementById("progress");
+    const changed = document.getElementById("changed");
+    const exportBtn = document.getElementById("exportBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const globalGatesEl = document.getElementById("globalGates");
+
+    const OVERRIDES_KEY = "jobarium_ui_readiness_overrides_v1";
+    let db = null;
+    let baseDb = null;
+
+    const CHECK_KEYS = ["ia_flow", "states", "data_api", "analytics", "rbac", "copy", "a11y", "qa"];
+
+    function unique(items, key) {
+      return [...new Set(items.map(x => x[key]).filter(Boolean))].sort((a, b) => String(a).localeCompare(String(b)));
+    }
+
+    function fillSelect(el, values, label) {
+      el.innerHTML = "";
+      const all = document.createElement("option");
+      all.value = "";
+      all.textContent = "All " + label;
+      el.appendChild(all);
+      values.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        el.appendChild(opt);
+      });
+    }
+
+    function loadOverrides() {
+      try {
+        const raw = localStorage.getItem(OVERRIDES_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveOverrides(payload) {
+      localStorage.setItem(OVERRIDES_KEY, JSON.stringify(payload));
+    }
+
+    function applyOverrides() {
+      const overrides = loadOverrides();
+      if (!db) return;
+
+      if (overrides.items && typeof overrides.items === "object") {
+        db.checklist = db.checklist.map(item => {
+          const itemOverride = overrides.items[item.id];
+          if (!itemOverride || typeof itemOverride !== "object") return item;
+          return {
+            ...item,
+            checks: { ...item.checks, ...itemOverride }
+          };
+        });
+      }
+
+      if (overrides.gates && typeof overrides.gates === "object") {
+        db.global_gates = db.global_gates.map(g => ({
+          ...g,
+          checked: Object.prototype.hasOwnProperty.call(overrides.gates, g.id) ? !!overrides.gates[g.id] : g.checked
+        }));
+      }
+    }
+
+    function changedCount() {
+      const overrides = loadOverrides();
+      const itemCount = overrides.items ? Object.keys(overrides.items).length : 0;
+      const gateCount = overrides.gates ? Object.keys(overrides.gates).length : 0;
+      return itemCount + gateCount;
+    }
+
+    function rowStatus(item) {
+      const vals = CHECK_KEYS.map(k => item.checks[k]).filter(v => v !== null);
+      if (!vals.length) return "N/A";
+      const done = vals.filter(Boolean).length;
+      if (done === 0) return "Not started";
+      if (done === vals.length) return "Done";
+      return "In progress";
+    }
+
+    function renderGlobalGates() {
+      globalGatesEl.innerHTML = "";
+      db.global_gates.forEach(gate => {
+        const label = document.createElement("label");
+        label.className = "gate";
+        label.innerHTML = `
+          <input type="checkbox" data-gate-id="${gate.id}" ${gate.checked ? "checked" : ""}>
+          <span><strong>${gate.id}</strong> - ${gate.label}</span>
+        `;
+        globalGatesEl.appendChild(label);
+      });
+    }
+
+    function renderRows() {
+      const term = q.value.trim().toLowerCase();
+      const areaV = area.value;
+      const pV = priority.value;
+      const statusV = status.value;
+
+      const filtered = db.checklist.filter(item => {
+        const matchesText = !term || [item.id, item.screen, item.elements, item.area].join(" ").toLowerCase().includes(term);
+        const matchesArea = !areaV || item.area === areaV;
+        const matchesPriority = !pV || item.priority === pV;
+        const matchesStatus = !statusV || rowStatus(item) === statusV;
+        return matchesText && matchesArea && matchesPriority && matchesStatus;
+      });
+
+      count.textContent = `Showing ${filtered.length} of ${db.checklist.length} screens`;
+
+      rowsEl.innerHTML = "";
+      if (!filtered.length) {
+        rowsEl.innerHTML = '<tr><td class="empty" colspan="12">No screens match current filters.</td></tr>';
+        return;
+      }
+
+      const grouped = {};
+      filtered.forEach(item => {
+        if (!grouped[item.area]) grouped[item.area] = [];
+        grouped[item.area].push(item);
+      });
+
+      Object.keys(grouped).sort().forEach(areaName => {
+        const areaRow = document.createElement("tr");
+        areaRow.className = "area-row";
+        areaRow.innerHTML = `<td colspan="12">${areaName} (${grouped[areaName].length})</td>`;
+        rowsEl.appendChild(areaRow);
+
+        grouped[areaName].sort((a, b) => a.id.localeCompare(b.id)).forEach(item => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="id">${item.id}</td>
+            <td>${item.screen}</td>
+            <td><span class="${item.priority === "P0" ? "p0" : "p1"}">${item.priority}</span></td>
+            <td>${item.elements}</td>
+            ${CHECK_KEYS.map(k => {
+              const v = item.checks[k];
+              if (v === null) return '<td class="checkbox-cell"><span class="na">N/A</span></td>';
+              return `<td class="checkbox-cell"><input type="checkbox" data-id="${item.id}" data-key="${k}" ${v ? "checked" : ""}></td>`;
+            }).join("")}
+          `;
+          rowsEl.appendChild(tr);
+        });
+      });
+    }
+
+    function renderProgress() {
+      const rows = db.checklist.flatMap(item => CHECK_KEYS.map(k => item.checks[k]).filter(v => v !== null));
+      const done = rows.filter(Boolean).length;
+      progress.textContent = `Checklist progress: ${done}/${rows.length}`;
+      changed.textContent = `Changed: ${changedCount()}`;
+    }
+
+    function render() {
+      renderGlobalGates();
+      renderRows();
+      renderProgress();
+    }
+
+    function updateOverrideForItem(id, key, value) {
+      const overrides = loadOverrides();
+      overrides.items = overrides.items || {};
+      overrides.items[id] = overrides.items[id] || {};
+      overrides.items[id][key] = value;
+      saveOverrides(overrides);
+    }
+
+    function updateOverrideForGate(id, value) {
+      const overrides = loadOverrides();
+      overrides.gates = overrides.gates || {};
+      overrides.gates[id] = value;
+      saveOverrides(overrides);
+    }
+
+    function bindEvents() {
+      [q, area, priority, status].forEach(el => {
+        el.addEventListener("input", renderRows);
+        el.addEventListener("change", renderRows);
+      });
+
+      rowsEl.addEventListener("change", (event) => {
+        const box = event.target.closest("input[type='checkbox'][data-id][data-key]");
+        if (!box) return;
+        const id = box.getAttribute("data-id");
+        const key = box.getAttribute("data-key");
+        const item = db.checklist.find(x => x.id === id);
+        if (!item) return;
+        item.checks[key] = box.checked;
+        updateOverrideForItem(id, key, box.checked);
+        renderProgress();
+      });
+
+      globalGatesEl.addEventListener("change", (event) => {
+        const box = event.target.closest("input[type='checkbox'][data-gate-id]");
+        if (!box) return;
+        const id = box.getAttribute("data-gate-id");
+        const gate = db.global_gates.find(g => g.id === id);
+        if (!gate) return;
+        gate.checked = box.checked;
+        updateOverrideForGate(id, box.checked);
+        renderProgress();
+      });
+
+      exportBtn.addEventListener("click", () => {
+        const outPayload = {
+          ...db,
+          updated_at: new Date().toISOString()
+        };
+        const blob = new Blob([JSON.stringify(outPayload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "ui_readiness_checklist.updated.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+
+      resetBtn.addEventListener("click", () => {
+        localStorage.removeItem(OVERRIDES_KEY);
+        db = JSON.parse(JSON.stringify(baseDb));
+        render();
+      });
+    }
+
+    async function init() {
+      try {
+        const res = await fetch("../db/ui_readiness_checklist.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        db = await res.json();
+      } catch (error) {
+        if (window.__UI_READINESS_DB__) {
+          db = JSON.parse(JSON.stringify(window.__UI_READINESS_DB__));
+        } else {
+          rowsEl.innerHTML = '<tr><td class="empty" colspan="12">Failed to load DB (<code>../db/ui_readiness_checklist.json</code>).</td></tr>';
+          return;
+        }
+      }
+
+      baseDb = JSON.parse(JSON.stringify(db));
+      applyOverrides();
+
+      fillSelect(area, unique(db.checklist, "area"), "areas");
+      fillSelect(priority, unique(db.checklist, "priority"), "priorities");
+      fillSelect(status, ["Not started", "In progress", "Done", "N/A"], "statuses");
+
+      bindEvents();
+      render();
+    }
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Integration Status Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-compliance-billing.html">Compliance and Billing</a>
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 960px;">
+        <h1>Integration Status Center</h1>
+        <p class="muted">Monitor provider health and fallback posture.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div id="integrationList" class="stack" style="margin-top:12px;"></div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function render() {
+      const s = UIFlow.readState();
+      const entries = Object.entries(s.employer.integrations);
+      document.getElementById("integrationList").innerHTML = entries.map(([k, v]) => `
+        <div class="match-card">
+          <div class="grid-2">
+            <div><strong>${k.toUpperCase()}</strong></div>
+            <div class="small"><strong>Status:</strong> ${v}</div>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" data-int="${k}" data-action="healthy">Mark healthy</button>
+            <button class="btn secondary" data-int="${k}" data-action="degraded">Mark degraded</button>
+            <button class="btn secondary" data-int="${k}" data-action="not_connected">Disconnect</button>
+          </div>
+        </div>
+      `).join("");
+
+      document.querySelectorAll("button[data-int][data-action]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const key = btn.getAttribute("data-int");
+          const value = btn.getAttribute("data-action");
+          const state = UIFlow.readState();
+          UIFlow.updateState({
+            employer: {
+              ...state.employer,
+              integrations: {
+                ...state.employer.integrations,
+                [key]: value
+              }
+            }
+          });
+          render();
+          UIFlow.showStatus("success", `${key.toUpperCase()} updated to ${value}.`);
+        });
+      });
+    }
+
+    render();
+    UIFlow.showStatus("success", "Integration statuses loaded.");
+  </script>
+</body>
+</html>

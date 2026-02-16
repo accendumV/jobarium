@@ -443,6 +443,19 @@
       "updated_at": null,
       "updated_by": null,
       "notes": ""
+    },
+    {
+      "id": "D-035",
+      "title": "Jobarium Full-Scale UI Screen Readiness Checklist",
+      "path_md": "03_user_experience_flows/41_full_scale_ui_readiness_checklist.md",
+      "path_html": "03_user_experience_flows/41_full_scale_ui_readiness_checklist.html",
+      "area": "03 UX Flows",
+      "status": "Draft v1",
+      "owner": "CEO/CTO",
+      "next_action": "track per-screen readiness gates and close P0 gaps",
+      "updated_at": null,
+      "updated_by": null,
+      "notes": ""
     }
   ],
   "history": [

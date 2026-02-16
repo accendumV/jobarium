@@ -129,3 +129,22 @@ Capture high-impact decisions with rationale to prevent repeated debates and doc
   - `02_architecture/18_invite_and_provider_defaults_mvp.md`
   - `06_operations/16_pilot_support_runbook.md`
 - Review date: end of pilot month 1
+
+### DEC-0007: Role intent before signup in global entry flow
+- Date: 2026-02-16
+- Status: Accepted
+- Owner: CEO/Product
+- Context: Candidate and employer flows have different onboarding paths and consent sets.
+- Decision: Ask user role intent first (`Candidate` or `Employer`), then continue with role-specific auth copy and role-based consent capture before verification.
+- Alternatives considered:
+  - signup first, role selection after verification
+  - single generic consent package for all users
+- Why this option: improves UX clarity, supports compliance correctness for role-specific consent, and reduces misrouting.
+- Consequences:
+  - global entry map updates to include role-intent gate
+  - consent screen logic must support role-dependent checklist/versioning
+  - verification routes directly to role-specific onboarding entry
+- Affected docs:
+  - `03_user_experience_flows/screen_connectivity_maps.md`
+  - `03_user_experience_flows/15_ui_screen_inventory_mvp.md`
+- Review date: after pilot week 2 funnel review

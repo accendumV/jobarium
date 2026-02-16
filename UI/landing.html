@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Landing</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>Match first hiring, not queue first hiring.</h1>
+        <p class="muted">
+          This prototype implements the first screen map with role-first intent:
+          Landing -> Role intent -> Auth -> Role based consent -> Verification ->
+          Candidate or Employer onboarding entry.
+        </p>
+        <div class="actions">
+          <a class="btn" href="role-intent.html">Get started</a>
+          <a class="btn secondary" href="role-intent.html">I already have an account</a>
+        </div>
+        <div class="status-box info" style="margin-top:18px; max-width: 700px;">
+          We ask role first so consent and onboarding logic can be tailored correctly for candidates and employers.
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

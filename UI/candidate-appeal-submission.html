@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Appeal Submission</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+        <a href="candidate-appeal-status.html">Appeal Status</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 920px;">
+        <h1>Authenticity Appeal Submission</h1>
+        <p class="muted">Submit context if you want manual review of an authenticity flag.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <label for="reason">Why should this submission be reviewed?</label>
+        <textarea id="reason" class="input" placeholder="Provide useful context for reviewer..."></textarea>
+
+        <label for="evidence">Optional evidence link</label>
+        <input id="evidence" class="input" placeholder="https://">
+
+        <div class="actions">
+          <button class="btn success" id="submitBtn" type="button">Submit appeal</button>
+          <a class="btn secondary" href="candidate-opportunity-timeline.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      const reason = document.getElementById("reason").value.trim();
+      if (!reason) {
+        UIFlow.showStatus("error-recoverable", "Please provide a short reason before submitting.");
+        return;
+      }
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...s.candidate,
+          appeal: { submitted: true, status: "in_review" }
+        }
+      });
+      UIFlow.showStatus("success", "Appeal submitted successfully.");
+      UIFlow.showToast("Appeal created.");
+      setTimeout(() => location.href = "candidate-appeal-status.html", 480);
+    });
+    UIFlow.showStatus("success", "Appeal form loaded.");
+  </script>
+</body>
+</html>

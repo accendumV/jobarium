@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Notification Preferences</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="candidate-onboarding-entry.html">Candidate Entry</a>
+        <a href="employer-onboarding-entry.html">Employer Entry</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1>SHARED-001: Notification Preferences</h1>
+        <p class="muted">Channel controls for email, SMS and in-app updates.</p>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <form id="prefForm">
+          <div class="checkbox-row">
+            <input type="checkbox" id="email">
+            <label for="email">Email notifications</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sms">
+            <label for="sms">SMS notifications</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="inApp">
+            <label for="inApp">In-app notifications</label>
+          </div>
+
+          <label for="digestMode">Delivery mode</label>
+          <select id="digestMode">
+            <option value="realtime">Realtime</option>
+            <option value="daily">Daily digest</option>
+            <option value="weekly">Weekly digest</option>
+          </select>
+
+          <div class="actions">
+            <button class="btn success" type="submit">Save preferences</button>
+            <a class="btn secondary" href="landing.html">Done</a>
+          </div>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    const s = UIFlow.readState();
+    document.getElementById("email").checked = s.notificationPreferences.email;
+    document.getElementById("sms").checked = s.notificationPreferences.sms;
+    document.getElementById("inApp").checked = s.notificationPreferences.inApp;
+    document.getElementById("digestMode").value = s.notificationPreferences.digest;
+
+    document.getElementById("prefForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      UIFlow.showStatus("loading", "Saving preferences...");
+      setTimeout(() => {
+        UIFlow.updateState({
+          notificationPreferences: {
+            email: document.getElementById("email").checked,
+            sms: document.getElementById("sms").checked,
+            inApp: document.getElementById("inApp").checked,
+            digest: document.getElementById("digestMode").value
+          }
+        });
+        UIFlow.showStatus("success", "Preferences saved.");
+        UIFlow.showToast("Notification preferences updated.");
+      }, 520);
+    });
+
+    UIFlow.showStatus("success", "Preferences loaded.");
+  </script>
+</body>
+</html>

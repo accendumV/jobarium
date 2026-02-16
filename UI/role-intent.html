@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Choose your role</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="auth.html">Sign Up or Log In</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card">
+        <h1>Choose your role first</h1>
+        <p class="muted">
+          This helps us show the correct sign-up path, legal consents, and onboarding flow from the start.
+        </p>
+        <div class="grid-2" style="margin-top:10px;">
+          <div class="card" style="background:#121b37;">
+            <h3>Candidate</h3>
+            <p class="small muted">Find matched roles and complete role specific async Q and A invites.</p>
+            <button class="btn" id="candidateBtn">I am a Candidate</button>
+          </div>
+          <div class="card" style="background:#121b37;">
+            <h3>Employer</h3>
+            <p class="small muted">Set up jobs, automation policy, and review completed candidate packets.</p>
+            <button class="btn" id="employerBtn">I am an Employer</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    document.getElementById("candidateBtn").addEventListener("click", () => {
+      UIFlow.updateState({
+        userType: "candidate",
+        authEmail: "",
+        consentAccepted: false,
+        emailVerified: false,
+        consentSet: []
+      });
+      UIFlow.showToast("Candidate flow selected.");
+      setTimeout(() => location.href = "auth.html", 420);
+    });
+
+    document.getElementById("employerBtn").addEventListener("click", () => {
+      UIFlow.updateState({
+        userType: "employer",
+        authEmail: "",
+        consentAccepted: false,
+        emailVerified: false,
+        consentSet: []
+      });
+      UIFlow.showToast("Employer flow selected.");
+      setTimeout(() => location.href = "auth.html", 420);
+    });
+  </script>
+</body>
+</html>

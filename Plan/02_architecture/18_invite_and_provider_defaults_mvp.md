@@ -35,6 +35,27 @@ Lock two decision areas for MVP:
 - Preserve enough throughput for early hiring outcomes.
 - Keep behavior predictable for small teams.
 
+## A2) Candidate-Side Match Exposure Defaults (MVP)
+
+### Default Values (per candidate)
+- time to first match target (TTFM): `5-30 min` after onboarding completion
+- TTFM fallback SLA: `24h` (show first match or no-fit status update)
+- default in-app visible matches: `top 3`
+- max in-app match list: `top 10`
+- max active outstanding invites per candidate: `3`
+- max new invites per candidate per day: `2`
+- max new invites per candidate per week: `5`
+
+### Candidate Guardrails
+- do not show low-confidence matches below fit threshold.
+- prefer "best next action" ordering (invite-ready first).
+- if no viable match in `24-72h`, show profile improvement guidance instead of empty spam-like feeds.
+
+### Why these defaults
+- Reduce candidate overwhelm and choice paralysis.
+- Keep trust high with curated relevance.
+- Improve invite response/completion rates vs bulk exposure.
+
 ## B) Provider Strategy (MVP)
 
 ### Decision

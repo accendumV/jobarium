@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jobarium UI - Consent Capture</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Flow Prototype</div>
+      <nav class="nav-links small">
+        <a href="landing.html">Landing</a>
+        <a href="role-intent.html">Choose Role</a>
+        <a href="auth.html">Auth</a>
+        <a href="verification.html">Verification</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 860px;">
+        <h1 id="consentTitle">Consent Capture</h1>
+        <p class="muted" id="consentSubtitle">Collect Terms, Privacy and GDPR consent at account creation.</p>
+        <div class="badge info">Policy version <span id="consentVersion" style="margin-left:6px;">-</span></div>
+
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <form id="consentForm" style="margin-top:12px;">
+          <div id="consentChecklist"></div>
+
+          <div class="actions">
+            <button class="btn success" type="submit">Accept and continue</button>
+            <button class="btn danger" type="button" id="declineBtn">Decline</button>
+          </div>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("consent");
+    const state = UIFlow.readState();
+    const role = state.userType === "employer" ? "employer" : "candidate";
+    const roleLabel = role === "employer" ? "Employer" : "Candidate";
+    const consentChecklist = document.getElementById("consentChecklist");
+    document.getElementById("consentVersion").textContent = state.consentVersion;
+    document.getElementById("consentTitle").textContent = `${roleLabel} consent capture`;
+    document.getElementById("consentSubtitle").textContent = role === "employer"
+      ? "Collect legal, privacy, GDPR and employer data processing commitments."
+      : "Collect terms, privacy and GDPR consent for candidate participation.";
+
+    const items = role === "employer"
+      ? [
+          { id: "terms", label: "I agree to the Terms of Service and acceptable use policy." },
+          { id: "privacy", label: "I accept the Privacy Notice and data processing details." },
+          { id: "gdpr", label: "I consent to GDPR-compliant processing and can request export or deletion later." },
+          { id: "dpa", label: "I confirm employer data processing responsibility for candidate review activity." }
+        ]
+      : [
+          { id: "terms", label: "I agree to the Terms of Service and acceptable use policy." },
+          { id: "privacy", label: "I accept the Privacy Notice and data processing details." },
+          { id: "gdpr", label: "I consent to GDPR-compliant processing and can request export or deletion later." }
+        ];
+
+    consentChecklist.innerHTML = items.map((item) => `
+      <div class="checkbox-row">
+        <input id="${item.id}" type="checkbox" required>
+        <label for="${item.id}">${item.label}</label>
+      </div>
+    `).join("");
+
+    UIFlow.showStatus("loading", "Fetching latest consent policy...");
+    setTimeout(() => UIFlow.showStatus("success", "Policy loaded. Review and submit."), 480);
+
+    document.getElementById("consentForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      UIFlow.updateState({ consentAccepted: true, consentSet: items.map((item) => item.id) });
+      UIFlow.showStatus("success", "Consent accepted and recorded.");
+      UIFlow.showToast("Consent saved.");
+      setTimeout(() => location.href = "verification.html", 650);
+    });
+
+    document.getElementById("declineBtn").addEventListener("click", () => {
+      UIFlow.updateState({ consentAccepted: false, consentSet: [] });
+      UIFlow.showStatus("error-blocking", "Consent declined. You cannot continue without acceptance.");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Match Detail</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-match-home.html">Match Home</a>
+        <a href="candidate-opportunity-timeline.html">Timeline</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" id="detailCard">
+        <h1>Match Detail</h1>
+        <p class="muted">Detailed view of selected opportunity and next action.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div id="matchMeta"></div>
+        <div class="actions">
+          <a class="btn secondary" href="candidate-match-home.html">Back to matches</a>
+          <a class="btn" id="inviteLink" href="candidate-invite-detail.html">Open invite</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    const match = UIFlow.getCandidateMatch();
+    const meta = document.getElementById("matchMeta");
+    meta.innerHTML = `
+      <div class="kpi">
+        <strong>${match.title}</strong>
+        <span class="small muted">${match.employer}</span>
+      </div>
+      <div class="grid-2" style="margin-top:12px;">
+        <div class="match-card">
+          <strong>Fit summary</strong>
+          <p class="small muted">Fit score ${match.fitScore}% based on constraints and profile relevance.</p>
+          <p class="small muted">${match.why}</p>
+        </div>
+        <div class="match-card">
+          <strong>Status</strong>
+          <p class="small muted">Invite: ${match.inviteStatus}</p>
+          <p class="small muted">Screening: ${match.screeningStatus}</p>
+          <p class="small muted">Outcome: ${match.outcomeStatus}</p>
+        </div>
+      </div>
+    `;
+
+    if (match.inviteStatus === "none") {
+      document.getElementById("inviteLink").className = "btn secondary";
+      document.getElementById("inviteLink").textContent = "No active invite";
+      document.getElementById("inviteLink").href = "candidate-match-home.html";
+      UIFlow.showStatus("empty", "No invite is available for this match yet.");
+    } else {
+      UIFlow.showStatus("success", "Invite is available for this match.");
+    }
+  </script>
+</body>
+</html>

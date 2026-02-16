@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Compliance and Billing Settings</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-team-roles.html">Team and Roles</a>
+        <a href="employer-integration-status.html">Integration Status</a>
+        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 980px;">
+        <h1>Compliance and Billing Settings</h1>
+        <p class="muted">Review plan usage limits and core compliance acknowledgments.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="grid-3">
+          <div class="kpi">
+            <strong>Plan</strong>
+            <span id="planName"></span>
+          </div>
+          <div class="kpi">
+            <strong>Active jobs</strong>
+            <span id="activeJobsUsage"></span>
+          </div>
+          <div class="kpi">
+            <strong>Packets used</strong>
+            <span id="packetUsage"></span>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:14px;">
+          <strong>Compliance controls</strong>
+          <div class="checkbox-row">
+            <input id="consentA" type="checkbox">
+            <label for="consentA">I acknowledge data processing responsibilities for employer workflows.</label>
+          </div>
+          <div class="checkbox-row">
+            <input id="consentB" type="checkbox">
+            <label for="consentB">I acknowledge retention and audit policies for candidate review actions.</label>
+          </div>
+          <div class="actions">
+            <button class="btn success" id="saveComplianceBtn" type="button">Save acknowledgments</button>
+            <button class="btn secondary" id="simulateUsageBtn" type="button">Simulate usage increment</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function renderUsage() {
+      const s = UIFlow.readState();
+      document.getElementById("planName").textContent = s.employer.billing.plan;
+      document.getElementById("activeJobsUsage").textContent = `${s.employer.billing.activeJobsUsed}/${s.employer.billing.activeJobsLimit}`;
+      document.getElementById("packetUsage").textContent = `${s.employer.billing.packetUsed}/${s.employer.billing.packetLimit}`;
+    }
+
+    document.getElementById("saveComplianceBtn").addEventListener("click", () => {
+      const ok = document.getElementById("consentA").checked && document.getElementById("consentB").checked;
+      if (!ok) {
+        UIFlow.showStatus("error-recoverable", "Please accept both acknowledgments.");
+        return;
+      }
+      UIFlow.showStatus("success", "Compliance acknowledgments saved.");
+    });
+
+    document.getElementById("simulateUsageBtn").addEventListener("click", () => {
+      const s = UIFlow.readState();
+      UIFlow.updateState({
+        employer: {
+          ...s.employer,
+          billing: {
+            ...s.employer.billing,
+            packetUsed: Math.min(s.employer.billing.packetLimit, s.employer.billing.packetUsed + 8)
+          }
+        }
+      });
+      renderUsage();
+      UIFlow.showStatus("success", "Usage counters updated.");
+    });
+
+    renderUsage();
+    UIFlow.showStatus("success", "Billing and compliance settings loaded.");
+  </script>
+</body>
+</html>

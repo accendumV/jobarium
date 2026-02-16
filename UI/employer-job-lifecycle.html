@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Employer - Job Lifecycle Management</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Employer Flow</div>
+      <nav class="nav-links small">
+        <a href="employer-automation-settings.html">Automation Settings</a>
+        <a href="employer-packet-inbox.html">Packet Inbox</a>
+      </nav>
+    </div>
+  </header>
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 920px;">
+        <h1>Job Lifecycle Management</h1>
+        <p class="muted">Control draft, active, paused, closed, and archived states safely.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="kpi">
+          <strong>Current status</strong>
+          <span id="statusBadge" class="pill">active</span>
+          <span class="small muted" id="statusNote">Automation is running and invites can be sent.</span>
+        </div>
+
+        <div class="actions" style="margin-top:14px;">
+          <button class="btn secondary" id="activateBtn" type="button">Activate</button>
+          <button class="btn secondary" id="pauseBtn" type="button">Pause</button>
+          <button class="btn secondary" id="closeBtn" type="button">Close</button>
+          <button class="btn secondary" id="archiveBtn" type="button">Archive</button>
+          <button class="btn secondary" id="restoreBtn" type="button">Restore to draft</button>
+        </div>
+
+        <div class="actions">
+          <a class="btn" href="employer-packet-inbox.html">Open packet inbox</a>
+          <a class="btn secondary" href="employer-automation-settings.html">Back</a>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("employer");
+
+    function render() {
+      const s = UIFlow.readState();
+      const status = s.employer.lifecycle.status;
+      document.getElementById("statusBadge").textContent = status;
+      const notes = {
+        draft: "Job is in draft and cannot send invites.",
+        active: "Automation is running and invites can be sent.",
+        paused: "New invites are paused; existing activity remains visible.",
+        closed: "Job is closed; packet intake is stopped.",
+        archived: "Job is archived. Use Restore to draft to edit and reactivate."
+      };
+      document.getElementById("statusNote").textContent = notes[status] || "";
+
+      const inArchived = status === "archived";
+      document.getElementById("activateBtn").disabled = inArchived;
+      document.getElementById("pauseBtn").disabled = inArchived;
+      document.getElementById("closeBtn").disabled = inArchived;
+      document.getElementById("archiveBtn").disabled = inArchived;
+      document.getElementById("restoreBtn").disabled = !inArchived;
+    }
+
+    function setStatus(next) {
+      const s = UIFlow.readState();
+      const current = s.employer.lifecycle.status;
+      if (current === "archived" && next !== "draft") {
+        UIFlow.showStatus("error-blocking", "Archived jobs can only be restored to draft first.");
+        return;
+      }
+      UIFlow.updateState({
+        employer: {
+          ...s.employer,
+          lifecycle: { status: next }
+        }
+      });
+      render();
+      UIFlow.showStatus("success", `Job status changed to ${next}.`);
+    }
+
+    document.getElementById("activateBtn").addEventListener("click", () => setStatus("active"));
+    document.getElementById("pauseBtn").addEventListener("click", () => setStatus("paused"));
+    document.getElementById("closeBtn").addEventListener("click", () => setStatus("closed"));
+    document.getElementById("archiveBtn").addEventListener("click", () => setStatus("archived"));
+    document.getElementById("restoreBtn").addEventListener("click", () => setStatus("draft"));
+
+    render();
+    UIFlow.showStatus("success", "Lifecycle controls loaded.");
+  </script>
+</body>
+</html>
