@@ -1,0 +1,302 @@
+{
+    "resume_id": "res_2026_0042",
+    "user_id": "user_991",
+    "version": 7,
+    "schema_version": "1.1",
+    "taxonomy_version": "tax_2026_02",
+    "normalization_version": "norm_1.4.1",
+    "headline": "Field Operations Supervisor (HVAC + Facilities + Warehouse Ops)",
+    "primary_location": "Houston, TX",
+    "domain_profiles_applied": ["hvac", "facilities", "warehouse_ops"],
+  
+    "contact": {
+      "name": "Morgan Reyes",
+      "email": "morgan.reyes@example.com",
+      "phone": "+1-713-555-0178"
+    },
+  
+    "summary": "Cross-domain operations leader with hands-on HVAC service history, facilities maintenance ownership, and warehouse process leadership.",
+  
+    "sections": [
+      {
+        "id": "sec_experience",
+        "type": "experience",
+        "title": "Experience",
+        "order": 1,
+        "items": [
+          {
+            "id": "exp_1",
+            "title": "Field Service Supervisor",
+            "company": "Gulf Mechanical Services",
+            "location": "Houston, TX",
+            "start_date": "2021-04-01",
+            "end_date": null,
+            "highlights": [
+              "Led 14 technicians across commercial service territory.",
+              "Improved first-time-fix rate from 73% to 85%."
+            ],
+            "skills": ["HVAC Diagnostics", "Dispatch Operations", "Team Leadership"],
+            "domain_tags": ["hvac", "field_service"],
+            "extra_fields": {
+              "domain": {
+                "hvac": {
+                  "normalized_role_id": "role_hvac_field_service_supervisor",
+                  "equipment_families": ["rooftop_unit", "split_system", "heat_pump"],
+                  "refrigerants": ["r410a", "r22"],
+                  "service_scope": ["diagnostics", "repair", "preventive_maintenance"]
+                }
+              }
+            }
+          },
+          {
+            "id": "exp_2",
+            "title": "Facilities Maintenance Lead",
+            "company": "HarborPoint Campus",
+            "location": "Houston, TX",
+            "start_date": "2018-02-01",
+            "end_date": "2021-03-31",
+            "highlights": [
+              "Owned preventive maintenance program for 6 buildings.",
+              "Reduced unplanned downtime by 21%."
+            ],
+            "skills": ["CMMS", "Preventive Maintenance", "Vendor Coordination"],
+            "domain_tags": ["facilities"],
+            "extra_fields": {
+              "domain": {
+                "facilities": {
+                  "normalized_role_id": "role_facilities_maintenance_lead",
+                  "asset_classes": ["hvac", "electrical", "plumbing", "fire_safety"],
+                  "cmms_platforms": ["maximo"],
+                  "compliance_scope": ["osha", "life_safety"]
+                }
+              }
+            }
+          },
+          {
+            "id": "exp_3",
+            "title": "Warehouse Operations Supervisor",
+            "company": "BluePort Logistics",
+            "location": "Houston, TX",
+            "start_date": "2015-01-01",
+            "end_date": "2018-01-31",
+            "highlights": [
+              "Supervised inbound/outbound workflow for 45 associates.",
+              "Improved inventory accuracy from 96.8% to 99.1%."
+            ],
+            "skills": ["WMS", "Cycle Counting", "Shift Planning"],
+            "domain_tags": ["warehouse_ops"],
+            "extra_fields": {
+              "domain": {
+                "warehouse_ops": {
+                  "normalized_role_id": "role_warehouse_operations_supervisor",
+                  "wms_systems": ["sap_ewm"],
+                  "kpis": ["inventory_accuracy", "dock_to_stock_time", "pick_rate"]
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "sec_certifications",
+        "type": "certifications",
+        "title": "Certifications",
+        "order": 2,
+        "items": [
+          {
+            "id": "cert_epa608",
+            "name": "EPA 608 Universal",
+            "issuer": "US EPA",
+            "issued_on": "2019-06-15",
+            "expires_on": null,
+            "extra_fields": {
+              "domain": {
+                "hvac": {
+                  "cert_class": "refrigerant_handling",
+                  "jurisdiction": "US"
+                }
+              }
+            }
+          },
+          {
+            "id": "cert_osha30",
+            "name": "OSHA 30",
+            "issuer": "OSHA",
+            "issued_on": "2022-09-01",
+            "expires_on": null,
+            "extra_fields": {
+              "domain": {
+                "facilities": {
+                  "cert_class": "safety_compliance"
+                },
+                "warehouse_ops": {
+                  "cert_class": "safety_compliance"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+  
+    "skills_flat": [
+      "HVAC Diagnostics",
+      "Preventive Maintenance",
+      "CMMS",
+      "WMS",
+      "Cycle Counting",
+      "Team Leadership"
+    ],
+  
+    "skills_normalized": [
+      {
+        "skill_id": "sk_hvac_diagnostics",
+        "label": "HVAC Diagnostics",
+        "domain_ids": ["hvac"],
+        "evidence_item_ids": ["exp_1"],
+        "confidence": 0.94
+      },
+      {
+        "skill_id": "sk_preventive_maintenance",
+        "label": "Preventive Maintenance",
+        "domain_ids": ["hvac", "facilities"],
+        "evidence_item_ids": ["exp_1", "exp_2"],
+        "confidence": 0.96
+      },
+      {
+        "skill_id": "sk_wms_operations",
+        "label": "WMS Operations",
+        "domain_ids": ["warehouse_ops"],
+        "evidence_item_ids": ["exp_3"],
+        "confidence": 0.92
+      }
+    ],
+  
+    "certifications_normalized": [
+      {
+        "cert_id": "cert_epa_608_universal",
+        "label": "EPA 608 Universal",
+        "status": "active",
+        "jurisdiction": "US",
+        "eligible_role_ids": ["role_hvac_service_technician", "role_hvac_field_service_supervisor"],
+        "evidence_item_ids": ["cert_epa608"]
+      },
+      {
+        "cert_id": "cert_osha_30",
+        "label": "OSHA 30",
+        "status": "active",
+        "jurisdiction": "US",
+        "eligible_role_ids": [
+          "role_facilities_maintenance_lead",
+          "role_warehouse_operations_supervisor",
+          "role_field_service_supervisor"
+        ],
+        "evidence_item_ids": ["cert_osha30"]
+      }
+    ],
+  
+    "preferences": {
+      "work": {
+        "mode": {
+          "target": ["onsite", "hybrid"],
+          "strictness": "strong"
+        },
+        "scope": {
+          "type": "radius",
+          "anchor_location": "Houston, TX",
+          "radius_km": 80,
+          "strictness": "strong"
+        }
+      },
+      "compensation": [
+        {
+          "role_id": "role_hvac_field_service_supervisor",
+          "currency": "USD",
+          "period": "year",
+          "operator": "between",
+          "target_min": 90000,
+          "target_max": 115000,
+          "strictness": "strong"
+        },
+        {
+          "role_id": "role_warehouse_operations_supervisor",
+          "currency": "USD",
+          "period": "year",
+          "operator": "between",
+          "target_min": 80000,
+          "target_max": 100000,
+          "strictness": "flexible"
+        }
+      ],
+      "benefits": [
+        {
+          "benefit_id": "health_insurance",
+          "operator": "eq",
+          "target": true,
+          "strictness": "required"
+        },
+        {
+          "benefit_id": "retirement_401k_match",
+          "operator": "gte",
+          "target": 5,
+          "unit": "percent",
+          "strictness": "strong"
+        }
+      ],
+      "trade_specific": {
+        "hvac": {
+          "equipment_preferences": [
+            { "equipment_family_id": "rooftop_unit", "strictness": "strong" },
+            { "equipment_family_id": "split_system", "strictness": "flexible" }
+          ]
+        },
+        "warehouse_ops": {
+          "shift_preferences": [
+            { "shift_id": "day_shift", "strictness": "strong" },
+            { "shift_id": "weekend_rotation", "strictness": "flexible" }
+          ]
+        }
+      },
+      "earliest_start": {
+        "operator": "lte",
+        "target": "P21D",
+        "strictness": "strong"
+      }
+    },
+  
+    "matching_bindings": {
+      "role_domain_coverage": [
+        { "role_id": "role_hvac_field_service_supervisor", "domain_id": "hvac", "evidence_item_ids": ["exp_1"] },
+        { "role_id": "role_facilities_maintenance_lead", "domain_id": "facilities", "evidence_item_ids": ["exp_2"] },
+        { "role_id": "role_warehouse_operations_supervisor", "domain_id": "warehouse_ops", "evidence_item_ids": ["exp_3"] }
+      ],
+      "skill_to_evidence": [
+        { "skill_id": "sk_hvac_diagnostics", "evidence_item_ids": ["exp_1"] },
+        { "skill_id": "sk_preventive_maintenance", "evidence_item_ids": ["exp_1", "exp_2"] },
+        { "skill_id": "sk_wms_operations", "evidence_item_ids": ["exp_3"] }
+      ]
+    },
+  
+    "_provenance": {
+      "document": {
+        "source_type": "pdf_upload",
+        "parse_run_id": "parse_110233",
+        "parser_version": "resume-parser@1.5.3",
+        "parsed_at": "2026-02-18T14:00:00Z"
+      },
+      "fields": {
+        "/preferences/benefits/0/target": {
+          "source": "user",
+          "locked_by_user": true,
+          "updated_at": "2026-02-18T14:20:00Z"
+        }
+      }
+    },
+  
+    "conflicts": [],
+    "meta": {
+      "language": "en",
+      "created_at": "2026-02-18T14:00:00Z",
+      "updated_at": "2026-02-18T14:20:00Z"
+    }
+  }

@@ -1,0 +1,262 @@
+{
+    "resume_id": "res_2026_0001",
+    "user_id": "user_789",
+    "version": 5,
+    "schema_version": "1.1",
+    "taxonomy_version": "tax_2026_02",
+    "normalization_version": "norm_1.4.0",
+    "headline": "Senior Operations and Field Service Professional",
+    "primary_location": "Dallas, TX",
+    "contact": {
+      "name": "Alex Carter",
+      "email": "alex.carter@example.com",
+      "phone": "+1-214-555-0199",
+      "links": {
+        "linkedin": "https://linkedin.com/in/alexcarter",
+        "portfolio": "https://alexcarter.dev"
+      }
+    },
+    "summary": "Operations and field service professional with 9+ years across maintenance, team leadership, and process optimization.",
+    "sections": [
+      {
+        "id": "sec_experience",
+        "type": "experience",
+        "title": "Experience",
+        "order": 1,
+        "items": [
+          {
+            "id": "exp_northstar_2021",
+            "title": "Field Service Supervisor",
+            "company": "NorthStar Services",
+            "location": "Dallas, TX",
+            "employment_type": "full_time",
+            "start_date": "2021-03-01",
+            "end_date": null,
+            "highlights": [
+              "Led 12 technicians across preventive and corrective maintenance routes.",
+              "Reduced repeat service visits by 18% through revised diagnostic checklist.",
+              "Improved first-time-fix rate from 71% to 84% in 9 months."
+            ],
+            "skills": [
+              "Team Leadership",
+              "Root Cause Analysis",
+              "Preventive Maintenance"
+            ],
+            "extra_fields": {}
+          },
+          {
+            "id": "exp_bluegrid_2017",
+            "title": "Service Technician",
+            "company": "BlueGrid Mechanical",
+            "location": "Fort Worth, TX",
+            "employment_type": "full_time",
+            "start_date": "2017-01-15",
+            "end_date": "2021-02-28",
+            "highlights": [
+              "Performed diagnostics and repair across commercial sites.",
+              "Maintained 96% SLA compliance for emergency response tickets."
+            ],
+            "skills": [
+              "Troubleshooting",
+              "Customer Communication",
+              "Work Order Systems"
+            ],
+            "extra_fields": {}
+          }
+        ]
+      },
+      {
+        "id": "sec_projects",
+        "type": "projects",
+        "title": "Projects",
+        "order": 2,
+        "items": [
+          {
+            "id": "proj_ticketing_rework",
+            "title": "Ticket Routing Optimization",
+            "start_date": "2023-01-01",
+            "end_date": "2023-07-01",
+            "highlights": [
+              "Mapped dispatch bottlenecks and introduced priority queue rules.",
+              "Reduced average ticket aging by 22%."
+            ],
+            "skills": [
+              "Process Improvement",
+              "Dispatch Operations",
+              "Reporting"
+            ],
+            "extra_fields": {}
+          }
+        ]
+      },
+      {
+        "id": "sec_education",
+        "type": "education",
+        "title": "Education",
+        "order": 3,
+        "items": [
+          {
+            "id": "edu_ntc",
+            "school": "North Texas College",
+            "degree": "A.A.S. Applied Technology",
+            "start_date": "2014-08-01",
+            "end_date": "2016-05-15",
+            "highlights": [],
+            "extra_fields": {}
+          }
+        ]
+      },
+      {
+        "id": "sec_certifications",
+        "type": "certifications",
+        "title": "Certifications",
+        "order": 4,
+        "items": [
+          {
+            "id": "cert_osha30",
+            "name": "OSHA 30",
+            "issuer": "OSHA",
+            "issued_on": "2022-04-10",
+            "expires_on": null,
+            "credential_id": "OSHA30-AC-9921",
+            "extra_fields": {}
+          }
+        ]
+      }
+    ],
+    "skills_flat": [
+      "Team Leadership",
+      "Troubleshooting",
+      "Preventive Maintenance",
+      "Root Cause Analysis",
+      "Process Improvement",
+      "Dispatch Operations"
+    ],
+    "skills_normalized": [
+      {
+        "skill_id": "sk_team_leadership",
+        "label": "Team Leadership",
+        "label_raw_variants": ["Team Lead", "Led technicians"],
+        "domain_ids": ["operations", "field_service"],
+        "evidence_item_ids": ["exp_northstar_2021"],
+        "proficiency": "advanced",
+        "last_used_at": "2026-01-15",
+        "confidence": 0.95,
+        "source": "parser_plus_normalizer"
+      },
+      {
+        "skill_id": "sk_troubleshooting",
+        "label": "Troubleshooting",
+        "label_raw_variants": ["Diagnostics", "Issue triage"],
+        "domain_ids": ["field_service"],
+        "evidence_item_ids": ["exp_bluegrid_2017"],
+        "proficiency": "advanced",
+        "last_used_at": "2025-12-20",
+        "confidence": 0.91,
+        "source": "parser_plus_normalizer"
+      }
+    ],
+    "certifications_normalized": [
+      {
+        "cert_id": "cert_osha_30",
+        "label": "OSHA 30",
+        "status": "active",
+        "jurisdiction": "US",
+        "eligible_role_ids": [
+          "role_field_service_supervisor",
+          "role_maintenance_supervisor"
+        ],
+        "evidence_item_ids": ["cert_osha30"],
+        "confidence": 0.98
+      }
+    ],
+    "preferences": {
+      "work": {
+        "mode": {
+          "target": ["onsite", "hybrid"],
+          "strictness": "strong"
+        },
+        "scope": {
+          "type": "radius",
+          "anchor_location": "Dallas, TX",
+          "radius_km": 60,
+          "strictness": "strong"
+        }
+      },
+      "compensation": [
+        {
+          "role_id": "role_field_service_supervisor",
+          "location_scope": "Dallas-TX-60km",
+          "currency": "USD",
+          "period": "year",
+          "operator": "between",
+          "target_min": 78000,
+          "target_max": 98000,
+          "strictness": "strong"
+        }
+      ],
+      "benefits": [
+        {
+          "benefit_id": "health_insurance",
+          "label": "Health insurance",
+          "operator": "eq",
+          "target": true,
+          "strictness": "required"
+        },
+        {
+          "benefit_id": "retirement_401k_match",
+          "label": "401(k) match",
+          "operator": "gte",
+          "target": 5,
+          "unit": "percent",
+          "strictness": "strong"
+        },
+        {
+          "benefit_id": "pto_days",
+          "label": "Paid time off",
+          "operator": "gte",
+          "target": 15,
+          "unit": "days_per_year",
+          "strictness": "flexible"
+        }
+      ],
+      "earliest_start": {
+        "operator": "lte",
+        "target": "P14D",
+        "strictness": "strong"
+      }
+    },
+    "_provenance": {
+      "document": {
+        "source_type": "pdf_upload",
+        "source_file_url": "s3://resumes/user_789/res_2026_0001/v5.pdf",
+        "parse_run_id": "parse_99321",
+        "parser_version": "resume-parser@1.5.2",
+        "parsed_at": "2026-02-18T09:15:00Z"
+      },
+      "fields": {
+        "/contact/email": {
+          "source": "user",
+          "updated_at": "2026-02-18T09:30:00Z",
+          "locked_by_user": true
+        },
+        "/sections/sec_experience/items/exp_northstar_2021/title": {
+          "source": "parser",
+          "confidence": 0.94,
+          "updated_at": "2026-02-18T09:15:00Z",
+          "locked_by_user": false
+        },
+        "/preferences/benefits/0/target": {
+          "source": "user",
+          "updated_at": "2026-02-18T10:02:00Z",
+          "locked_by_user": true
+        }
+      }
+    },
+    "conflicts": [],
+    "meta": {
+      "language": "en",
+      "created_at": "2026-02-18T09:15:00Z",
+      "updated_at": "2026-02-18T10:02:00Z"
+    }
+  }

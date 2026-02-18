@@ -1,0 +1,306 @@
+{
+    "resume_id": "res_2026_0001",
+    "user_id": "user_789",
+    "version": 6,
+    "schema_version": "1.1",
+    "taxonomy_version": "tax_2026_02",
+    "normalization_version": "norm_1.4.1",
+    "headline": "HVAC Field Service Supervisor",
+    "primary_location": "Dallas, TX",
+    "domain_profiles_applied": ["hvac"],
+    "sections": [
+      {
+        "id": "sec_experience",
+        "type": "experience",
+        "title": "Experience",
+        "order": 1,
+        "items": [
+          {
+            "id": "exp_northstar_2021",
+            "title": "HVAC Field Service Supervisor",
+            "company": "NorthStar Services",
+            "location": "Dallas, TX",
+            "start_date": "2021-03-01",
+            "end_date": null,
+            "highlights": [
+              "Led diagnostics/repair team for commercial RTU and split systems.",
+              "Reduced repeat service visits by 18%.",
+              "Maintained first-time-fix >84%."
+            ],
+            "skills": [
+              "HVAC Diagnostics",
+              "RTU Service",
+              "Preventive Maintenance",
+              "Team Leadership"
+            ],
+            "extra_fields": {
+              "domain": {
+                "hvac": {
+                  "normalized_role_id": "role_hvac_field_service_supervisor",
+                  "work_context": ["commercial"],
+                  "equipment_families": [
+                    "rooftop_unit",
+                    "split_system",
+                    "heat_pump",
+                    "air_handler"
+                  ],
+                  "refrigerants": ["r410a", "r22"],
+                  "service_scope": [
+                    "diagnostics",
+                    "repair",
+                    "preventive_maintenance",
+                    "commissioning_support"
+                  ],
+                  "capacity_range_tons": {
+                    "min": 2,
+                    "max": 50
+                  },
+                  "on_call_experience": true,
+                  "ai_annotations": {
+                    "domain_confidence": 0.96,
+                    "normalizer_version": "hvac-pack@1.2.0"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "id": "sec_certifications",
+        "type": "certifications",
+        "title": "Certifications",
+        "order": 2,
+        "items": [
+          {
+            "id": "cert_epa608",
+            "name": "EPA 608 Universal",
+            "issuer": "US EPA",
+            "issued_on": "2020-06-11",
+            "expires_on": null,
+            "credential_id": "EPA608-AX17",
+            "extra_fields": {
+              "domain": {
+                "hvac": {
+                  "cert_class": "refrigerant_handling",
+                  "jurisdiction": "US",
+                  "role_relevance": [
+                    "role_hvac_service_technician",
+                    "role_hvac_field_service_supervisor"
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": "cert_nate",
+            "name": "NATE Core",
+            "issuer": "NATE",
+            "issued_on": "2021-09-20",
+            "expires_on": "2027-09-20",
+            "credential_id": "NATE-884421",
+            "extra_fields": {
+              "domain": {
+                "hvac": {
+                  "cert_class": "technical_competency",
+                  "jurisdiction": "US"
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "skills_flat": [
+      "HVAC Diagnostics",
+      "RTU Service",
+      "Preventive Maintenance",
+      "Refrigerant Handling",
+      "Team Leadership"
+    ],
+    "skills_normalized": [
+      {
+        "skill_id": "sk_hvac_diagnostics",
+        "label": "HVAC Diagnostics",
+        "domain_ids": ["hvac"],
+        "evidence_item_ids": ["exp_northstar_2021"],
+        "proficiency": "advanced",
+        "confidence": 0.94
+      },
+      {
+        "skill_id": "sk_rtu_service",
+        "label": "RTU Service",
+        "domain_ids": ["hvac"],
+        "evidence_item_ids": ["exp_northstar_2021"],
+        "proficiency": "advanced",
+        "confidence": 0.92
+      },
+      {
+        "skill_id": "sk_refrigerant_handling",
+        "label": "Refrigerant Handling",
+        "domain_ids": ["hvac"],
+        "evidence_item_ids": ["exp_northstar_2021", "cert_epa608"],
+        "proficiency": "advanced",
+        "confidence": 0.93
+      }
+    ],
+    "certifications_normalized": [
+      {
+        "cert_id": "cert_epa_608_universal",
+        "label": "EPA 608 Universal",
+        "status": "active",
+        "jurisdiction": "US",
+        "eligible_role_ids": [
+          "role_hvac_service_technician",
+          "role_hvac_field_service_supervisor"
+        ],
+        "evidence_item_ids": ["cert_epa608"],
+        "confidence": 0.99
+      },
+      {
+        "cert_id": "cert_nate_core",
+        "label": "NATE Core",
+        "status": "active",
+        "jurisdiction": "US",
+        "eligible_role_ids": [
+          "role_hvac_service_technician",
+          "role_hvac_field_service_supervisor"
+        ],
+        "evidence_item_ids": ["cert_nate"],
+        "confidence": 0.97
+      }
+    ],
+    "preferences": {
+      "work": {
+        "mode": {
+          "target": ["onsite"],
+          "strictness": "required"
+        },
+        "scope": {
+          "type": "radius",
+          "anchor_location": "Dallas, TX",
+          "radius_km": 70,
+          "strictness": "strong"
+        },
+        "on_call": {
+          "operator": "eq",
+          "target": true,
+          "strictness": "flexible"
+        }
+      },
+      "compensation": [
+        {
+          "role_id": "role_hvac_field_service_supervisor",
+          "location_scope": "Dallas-TX-70km",
+          "currency": "USD",
+          "period": "year",
+          "operator": "between",
+          "target_min": 85000,
+          "target_max": 105000,
+          "strictness": "strong"
+        }
+      ],
+      "benefits": [
+        {
+          "benefit_id": "health_insurance",
+          "operator": "eq",
+          "target": true,
+          "strictness": "required"
+        },
+        {
+          "benefit_id": "retirement_401k_match",
+          "operator": "gte",
+          "target": 6,
+          "unit": "percent",
+          "strictness": "strong"
+        },
+        {
+          "benefit_id": "vehicle_allowance",
+          "operator": "eq",
+          "target": true,
+          "strictness": "strong"
+        }
+      ],
+      "trade_specific": {
+        "hvac": {
+          "equipment_preferences": [
+            {
+              "equipment_family_id": "rooftop_unit",
+              "strictness": "strong"
+            },
+            {
+              "equipment_family_id": "split_system",
+              "strictness": "flexible"
+            }
+          ],
+          "refrigerant_preferences": [
+            {
+              "refrigerant_id": "r410a",
+              "strictness": "strong"
+            }
+          ],
+          "service_scope_preferences": [
+            {
+              "scope_id": "diagnostics",
+              "strictness": "required"
+            },
+            {
+              "scope_id": "preventive_maintenance",
+              "strictness": "strong"
+            }
+          ]
+        }
+      },
+      "earliest_start": {
+        "operator": "lte",
+        "target": "P14D",
+        "strictness": "strong"
+      }
+    },
+    "matching_bindings": {
+      "skill_to_evidence": [
+        {
+          "skill_id": "sk_hvac_diagnostics",
+          "evidence_item_ids": ["exp_northstar_2021"]
+        },
+        {
+          "skill_id": "sk_refrigerant_handling",
+          "evidence_item_ids": ["exp_northstar_2021", "cert_epa608"]
+        }
+      ],
+      "cert_to_role_eligibility": [
+        {
+          "cert_id": "cert_epa_608_universal",
+          "eligible_role_ids": ["role_hvac_service_technician", "role_hvac_field_service_supervisor"]
+        }
+      ]
+    },
+    "_provenance": {
+      "document": {
+        "source_type": "pdf_upload",
+        "source_file_url": "s3://resumes/user_789/res_2026_0001/v6.pdf",
+        "parse_run_id": "parse_99502",
+        "parser_version": "resume-parser@1.5.3",
+        "parsed_at": "2026-02-18T12:14:00Z"
+      },
+      "fields": {
+        "/preferences/benefits/1/target": {
+          "source": "user",
+          "updated_at": "2026-02-18T12:26:00Z",
+          "locked_by_user": true
+        },
+        "/sections/sec_experience/items/exp_northstar_2021/extra_fields/domain/hvac/equipment_families/0": {
+          "source": "normalizer",
+          "confidence": 0.95,
+          "updated_at": "2026-02-18T12:14:30Z",
+          "locked_by_user": false
+        }
+      }
+    },
+    "conflicts": [],
+    "meta": {
+      "language": "en",
+      "created_at": "2026-02-18T09:15:00Z",
+      "updated_at": "2026-02-18T12:26:00Z"
+    }
+  }
