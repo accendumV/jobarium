@@ -1,4 +1,4 @@
-# Resume Data Model and Embedding Views (MVP)
+# Resume Data Model and Embedding Views (MVP, Merged Hardened)
 
 ## Purpose
 Define a scalable, flexible data model for storing resumes that supports:
@@ -222,6 +222,17 @@ Key idea: **canonical JSON is authoritative**; embeddings and projections are **
 - **Ordering**: `order` allows rendering and user-controlled rearrangement.
 - **Locking/provenance** (recommended): per-field metadata to prevent parser from overwriting user-confirmed edits.
 
+### Canonical extension references (JSON artifacts)
+The following files are official extension examples of this canonical model and should be treated as companion artifacts:
+- `Plan/CV.json`: baseline canonical sample.
+- `Plan/CV_ext.json`: canonical + extended structures for richer normalized fields.
+- `Plan/CV_ext_multi.json`: canonical + multi-domain extensions and preference/binding examples.
+
+Rules for all three:
+- They must conform to the same canonical root contract defined in this document.
+- Any additional fields are extensions, not replacements for canonical keys.
+- Parser/user merge, provenance, strictness, and idempotency rules from this document still apply.
+
 ---
 
 ## UI Rendering From Canonical Resume JSON (MVP)
@@ -392,4 +403,204 @@ Suggested approach:
 - Deterministic embedding templates (global + item-level)
 - Vector storage (pgvector first is fine)
 - Basic indexes (by user, updated_at, and a few scalar projections)
+
+---
+
+## Production Hardening Additions (Merged from Hardened Variant)
+
+### 1) Canonical JSON Additions for Production Safety
+
+#### 1.1 Stable IDs everywhere
+Every entity in the tree must have a stable ID:
+- section: `section_id`
+- item: `item_id`
+- field (optional for dynamic fields): `field_id`
+
+Use IDs for write targeting where possible; avoid brittle index-only patching.
+
+#### 1.2 Add model metadata
+Add explicit metadata fields at root:
+- `schema_version`
+- `normalization_version`
+- `parser_version`
+- `last_material_change_at`
+
+#### 1.3 Add field-level state envelope
+For user-facing fields, support:
+- `value`
+- `state` (`normal`, `parser_suggested`, `user_locked`, `conflict`)
+- `provenance_ref`
+
+This keeps UI state explicit and allows controlled merge logic.
+
+### 2) Parser vs User Merge Semantics (Required)
+Define deterministic precedence rules:
+1. `locked_by_user = true` -> parser cannot overwrite value.
+2. Unlocked user-edited fields:
+   - parser update only if confidence delta crosses threshold and no recent user edit window.
+3. On conflict:
+   - keep existing value
+   - store parser suggestion in side channel
+   - set field state to `conflict` for UI review.
+
+Recommended conflict object fields:
+- `field_path_or_id`
+- `current_value`
+- `suggested_value`
+- `parser_confidence`
+- `detected_at`
+- `resolution` (`keep_current`, `accept_suggested`, `manual_edit`)
+
+### 3) Provenance at Scale (Retention and Compaction)
+Per-field provenance is useful but can grow quickly.
+
+Retention policy:
+- keep full provenance for latest active version
+- keep compact provenance summaries for older versions
+- archive deep history to cheaper storage for audit replay
+
+Compaction strategy:
+- periodic job consolidates repetitive parser-only updates
+- preserve user-origin changes and lock transitions in full detail
+
+### 4) Domain Profile Packs (Trade Flexibility Without Schema Drift)
+Use domain packs (for example HVAC, Electrical, Plumbing, Warehouse/Ops).
+
+Each pack defines:
+- recommended sections/fields
+- validation and formatting rules
+- normalization dictionaries (titles/skills/certs)
+- UI hints (widgets, ordering, suggestions)
+
+Canonical schema stays stable; domain behavior is configuration-driven.
+
+#### 4.1 Multi-domain support in one canonical resume
+Support one comprehensive candidate profile across mixed backgrounds.
+
+Rules:
+- domain extensions are attached per item/section context (not only at root)
+- one resume can apply multiple domain packs simultaneously
+- matching can consume only role-relevant slices while UI renders one coherent document
+- do not force separate resumes per domain unless explicitly requested
+
+### 5) Normalization and Locale Contracts
+
+#### 5.1 Always store both raw and normalized
+For key fields:
+- raw text from source
+- normalized ID/value (taxonomy-backed)
+
+#### 5.2 Locale and multilingual support
+Store:
+- `document_language`
+- per-field language (optional)
+- localized formatting metadata (date/currency units)
+
+Do not force normalization that destroys source meaning.
+
+#### 5.3 Taxonomy strategy for trade diversity
+Use layered taxonomy:
+- global core taxonomy (roles, skills, certifications, locations, work modes)
+- trade extensions
+- synonym/alias graph (raw phrase -> canonical id)
+
+Store both raw extracted text and normalized canonical IDs with confidence and taxonomy version.
+
+### 6) Embedding and Recompute Pipeline Contracts
+Idempotency key for embedding jobs:
+- `(resume_id, resume_version, embedding_template_version, embedding_model_version, item_ref_id)`
+
+Retry and DLQ:
+- transient failures -> bounded retries with backoff
+- persistent failures -> DLQ with operator replay tooling
+
+Selective re-embedding:
+- recompute only changed items where possible, not full resume by default
+
+Freshness:
+- define explicit SLO for embedding freshness after edit/upload.
+
+### 7) Projection Consistency Model
+All projections are rebuildable derivatives.
+
+Required controls:
+- projection version tags
+- last-built watermark
+- consistency checks against canonical version
+- one-click rebuild process for drift recovery
+
+Do not let projections become hidden sources of truth.
+
+### 8) Multi-Source Resume Strategy (Dedup and Merge)
+Candidates may have PDF upload, LinkedIn import, and manual edits.
+
+Required policy:
+- define active resume per candidate
+- define merge behavior across sources
+- preserve source lineage per section/item
+
+Recommended:
+- one active canonical per candidate profile plus historical versions
+- user-controlled "adopt suggestion" rather than silent merge for high-impact fields
+
+#### 8.5 Preference Model Contract (Strictness + Typed Values)
+Each preference entry should carry:
+- `strictness`: `required | strong | flexible | none`
+- `operator`: `eq | gte | lte | between | in`
+- `target` or `target_min/target_max`
+- `unit` where relevant
+- provenance/lock metadata
+
+Matching implication:
+- `required` -> hard filter
+- `strong` -> heavy ranking penalty if unmet
+- `flexible` -> mild ranking penalty
+
+This applies to compensation, location/work mode, schedule, benefits, and earliest-start preferences.
+
+#### 8.6 Binding Map for Explainable Matching
+Implement binding map in canonical/derived views:
+- role <-> domain
+- skill <-> evidence item IDs
+- certification/license <-> role eligibility
+- location preference <-> work mode/scope
+- compensation preference <-> role/location context
+- provenance/confidence <-> lock state
+
+These bindings are MVP-critical for precision and explainability.
+
+### 9) UI Lock/Override UX Contract
+Per-field controls:
+- `Lock value`
+- `Unlock for auto-update`
+
+UI behavior:
+- show provenance inline (source, confidence, last update)
+- parser suggestions appear as reviewable diffs
+- allow accept suggestion / keep locked value / manual edit
+
+This is the trust mechanism for parser-driven systems.
+
+### 10) Security and Compliance Controls (Must-Have)
+Resume data is sensitive:
+- encrypt at rest and in transit
+- classify and mask PII in logs/events
+- strict RBAC and tenant scoping for reads
+- retention/deletion/export flows linked to canonical and derived artifacts
+- audit trail for lock/unlock and overwrite decisions
+
+### 11) Expanded Production Checklist
+- [ ] Canonical schema includes stable IDs and explicit schema/version metadata
+- [ ] Parser merge engine enforces lock and conflict rules
+- [ ] Provenance compaction job and retention policy defined
+- [ ] Domain profile packs implemented for target launch verticals
+- [ ] Normalization contracts (raw + normalized) implemented for roles/skills/certs/locations
+- [ ] Embedding jobs are idempotent and replayable; DLQ in place
+- [ ] Projection rebuild process and drift checks implemented
+- [ ] Resume dedup/merge policy documented and tested
+- [ ] UI lock/override interactions implemented and user-tested
+- [ ] PII controls and audit requirements verified
+- [ ] Preferences use strictness + typed value semantics (including benefits thresholds)
+- [ ] Multi-domain profiles validated in one canonical resume without schema branching
+- [ ] Binding map is available for "why matched" explanations
 

@@ -1,0 +1,903 @@
+openapi: 3.1.0
+info:
+  title: Jobarium API
+  version: 1.0.0
+  description: Machine-readable contract derived from `api_contracts.md`.
+servers:
+  - url: https://api.jobarium.com
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+  - name: candidate
+  - name: employer
+  - name: invite
+  - name: qa
+  - name: packet
+  - name: admin
+paths:
+  /auth/signup:
+    post:
+      tags: [auth]
+      summary: AUTH-001 Signup
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SignupResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: AUTH-002 Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+  /consents:
+    post:
+      tags: [auth]
+      summary: AUTH-003 Create consent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConsentRequest"
+      responses:
+        "201":
+          description: Consent created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConsentResponse"
+  /candidate/profile:
+    get:
+      tags: [candidate]
+      summary: CAND-001 Get candidate profile
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateProfileResponse"
+    put:
+      tags: [candidate]
+      summary: CAND-002 Update candidate profile
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateProfileUpdateRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateProfileResponse"
+  /candidate/documents:
+    post:
+      tags: [candidate]
+      summary: CAND-003 Create upload slot
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateDocumentCreateRequest"
+      responses:
+        "201":
+          description: Upload slot created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateDocumentCreateResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+  /candidate/matches:
+    get:
+      tags: [candidate]
+      summary: CAND-004 Get candidate matches
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateMatchesResponse"
+  /candidate/profile/matchability:
+    get:
+      tags: [candidate]
+      summary: CAND-005 Get matchability status
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MatchabilityResponse"
+  /candidate/profile/draft:
+    put:
+      tags: [candidate]
+      summary: CAND-006 Save profile draft
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileDraftRequest"
+      responses:
+        "200":
+          description: Draft saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileDraftResponse"
+  /candidate/profile/builder/start:
+    post:
+      tags: [candidate]
+      summary: CAND-007 Start builder mode
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileBuilderStartRequest"
+      responses:
+        "201":
+          description: Builder initialized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileBuilderStartResponse"
+  /candidate/documents/{id}/parse/retry:
+    post:
+      tags: [candidate]
+      summary: CAND-008 Retry parse
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/DocumentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ParseRetryRequest"
+      responses:
+        "202":
+          description: Retry queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptedResponse"
+  /organizations:
+    post:
+      tags: [employer]
+      summary: EMP-001 Create organization
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OrganizationCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrganizationCreateResponse"
+  /jobs:
+    post:
+      tags: [employer]
+      summary: EMP-002 Create job draft
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobCreateRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+  /jobs/{id}:
+    put:
+      tags: [employer]
+      summary: EMP-003 Update job draft
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/JobId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobUpdateRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+  /jobs/{id}/activate:
+    post:
+      tags: [employer]
+      summary: EMP-004 Activate job
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/JobId"
+      responses:
+        "200":
+          description: Activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobResponse"
+        "409":
+          $ref: "#/components/responses/ConflictError"
+  /jobs/{id}/automation-settings:
+    put:
+      tags: [employer]
+      summary: EMP-005 Set automation settings
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/JobId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutomationSettingsRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AutomationSettingsResponse"
+  /jobs/{id}/draft:
+    put:
+      tags: [employer]
+      summary: EMP-006 Save job draft
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/JobId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobDraftRequest"
+      responses:
+        "200":
+          description: Draft saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDraftResponse"
+  /invites/{id}:
+    get:
+      tags: [invite]
+      summary: INV-001 Get invite details
+      parameters:
+        - $ref: "#/components/parameters/InviteId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InviteResponse"
+  /qa/sessions/{id}/start:
+    post:
+      tags: [qa]
+      summary: QA-001 Start QA session
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "200":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QaSessionResponse"
+  /qa/sessions/{id}/autosave:
+    post:
+      tags: [qa]
+      summary: QA-002 Autosave QA session
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/SessionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QaAutosaveRequest"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QaSessionResponse"
+  /qa/sessions/{id}/submit:
+    post:
+      tags: [qa]
+      summary: QA-003 Submit QA session
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/SessionId"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptedResponse"
+  /employer/packets:
+    get:
+      tags: [packet]
+      summary: PKT-001 List packets
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PacketListResponse"
+  /employer/packets/{id}:
+    get:
+      tags: [packet]
+      summary: PKT-002 Get packet detail
+      parameters:
+        - $ref: "#/components/parameters/PacketId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PacketDetailResponse"
+  /employer/packets/{id}/actions:
+    post:
+      tags: [packet]
+      summary: PKT-003 Create packet action
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/PacketId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PacketActionRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PacketActionResponse"
+  /admin/failures:
+    get:
+      tags: [admin]
+      summary: ADM-001 List failures
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Cursor"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FailureListResponse"
+  /admin/failures/{id}/replay:
+    post:
+      tags: [admin]
+      summary: ADM-002 Replay failure
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+        - $ref: "#/components/parameters/FailureId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplayRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptedResponse"
+  /gdpr/export:
+    post:
+      tags: [admin]
+      summary: ADM-003 Request data export
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GdprRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptedResponse"
+  /gdpr/delete:
+    post:
+      tags: [admin]
+      summary: ADM-004 Request data deletion/anonymization
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GdprDeleteRequest"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AcceptedResponse"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IdempotencyKey:
+      in: header
+      name: Idempotency-Key
+      required: true
+      schema:
+        type: string
+    Limit:
+      in: query
+      name: limit
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    Cursor:
+      in: query
+      name: cursor
+      schema:
+        type: string
+    JobId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+    InviteId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+    SessionId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+    PacketId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+    FailureId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+    DocumentId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+  responses:
+    ValidationError:
+      description: Validation failed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    UnauthorizedError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+    ConflictError:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+  schemas:
+    Meta:
+      type: object
+      properties:
+        trace_id: { type: string }
+        request_id: { type: string }
+      required: [trace_id, request_id]
+    Error:
+      type: object
+      properties:
+        code: { type: string }
+        message: { type: string }
+        details:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required: [code, message]
+    ErrorEnvelope:
+      type: object
+      properties:
+        error: { $ref: "#/components/schemas/Error" }
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [error, meta]
+    AcceptedResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            status: { type: string, enum: [accepted] }
+          required: [status]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    SignupRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10 }
+        role_intent: { type: string }
+        phone: { type: string }
+      required: [email, password, role_intent]
+    SignupResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            user_id: { type: string }
+            role: { type: string }
+            email_verified: { type: boolean }
+          required: [user_id, role, email_verified]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    LoginRequest:
+      type: object
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+      required: [email, password]
+    LoginResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            access_token: { type: string }
+            refresh_token: { type: string }
+            expires_in_seconds: { type: integer }
+          required: [access_token, refresh_token, expires_in_seconds]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    ConsentRequest:
+      type: object
+      properties:
+        consent_type: { type: string }
+        consent_version: { type: string }
+        accepted: { type: boolean }
+      required: [consent_type, consent_version, accepted]
+    ConsentResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    CandidateProfileUpdateRequest:
+      type: object
+      additionalProperties: true
+    CandidateProfileResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    CandidateDocumentCreateRequest:
+      type: object
+      properties:
+        file_name: { type: string }
+        mime_type: { type: string }
+        sha256: { type: string }
+      required: [file_name, mime_type, sha256]
+    CandidateDocumentCreateResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            document_id: { type: string }
+            upload_url: { type: string }
+            expires_at: { type: string, format: date-time }
+          required: [document_id, upload_url, expires_at]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    CandidateMatchesResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    MatchabilityResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            status: { type: string }
+            required_fields:
+              type: array
+              items: { type: string }
+            missing_fields:
+              type: array
+              items: { type: string }
+            high_impact_missing_fields:
+              type: array
+              items: { type: string }
+          required: [status, required_fields, missing_fields, high_impact_missing_fields]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    ProfileDraftRequest:
+      type: object
+      additionalProperties: true
+    ProfileDraftResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            draft_version: { type: integer }
+            last_saved_at: { type: string, format: date-time }
+          required: [draft_version, last_saved_at]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    ProfileBuilderStartRequest:
+      type: object
+      properties:
+        mode: { type: string }
+        template: { type: string }
+      required: [mode]
+    ProfileBuilderStartResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    ParseRetryRequest:
+      type: object
+      properties:
+        reason: { type: string }
+      required: [reason]
+    OrganizationCreateRequest:
+      type: object
+      properties:
+        name: { type: string }
+        industry: { type: string }
+        timezone: { type: string }
+      required: [name]
+    OrganizationCreateResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            organization_id: { type: string }
+          required: [organization_id]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    JobCreateRequest:
+      type: object
+      additionalProperties: true
+    JobUpdateRequest:
+      type: object
+      additionalProperties: true
+    JobResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    AutomationSettingsRequest:
+      type: object
+      properties:
+        top_n: { type: integer }
+        score_threshold: { type: number }
+        daily_invite_cap: { type: integer }
+        cooldown_hours: { type: integer }
+        invite_expiry_hours: { type: integer }
+      required: [top_n, score_threshold, daily_invite_cap, cooldown_hours, invite_expiry_hours]
+    AutomationSettingsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    JobDraftRequest:
+      type: object
+      additionalProperties: true
+    JobDraftResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            job_id: { type: string }
+            draft_version: { type: integer }
+            last_saved_at: { type: string, format: date-time }
+          required: [job_id, draft_version, last_saved_at]
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    InviteResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    QaAutosaveRequest:
+      type: object
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required: [answers]
+    QaSessionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    PacketListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    PacketDetailResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    PacketActionRequest:
+      type: object
+      properties:
+        action: { type: string, enum: [interview, clarify, reject] }
+        note: { type: string }
+      required: [action]
+    PacketActionResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    FailureListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        meta: { $ref: "#/components/schemas/Meta" }
+      required: [data, meta]
+    ReplayRequest:
+      type: object
+      properties:
+        reason: { type: string }
+      required: [reason]
+    GdprRequest:
+      type: object
+      properties:
+        subject_user_id: { type: string }
+      required: [subject_user_id]
+    GdprDeleteRequest:
+      type: object
+      properties:
+        subject_user_id: { type: string }
+        mode: { type: string, enum: [anonymize, delete] }
+        reason: { type: string }
+      required: [subject_user_id, mode]

@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate - Resume Constructor</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container">
+      <div class="brand">Jobarium Candidate Flow</div>
+      <nav class="nav-links small">
+        <a href="candidate-cv-upload.html">CV Intake</a>
+        <a href="candidate-field-confirmation.html">Required Fields</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="container">
+      <article class="card" style="max-width: 960px;">
+        <h1>Guided Resume Constructor</h1>
+        <p class="muted">Step-by-step builder aligned to canonical CV structure.</p>
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+
+        <div class="actions">
+          <span class="pill">Step <span id="stepNo">1</span> of 4</span>
+        </div>
+
+        <div id="step1" class="match-card" style="margin-top:12px;">
+          <h3>Step 1: Core profile</h3>
+          <div class="grid-2">
+            <div>
+              <label for="headline">Headline</label>
+              <input id="headline" class="input" placeholder="Field Operations Supervisor">
+            </div>
+            <div>
+              <label for="primaryLocation">Primary location</label>
+              <input id="primaryLocation" class="input" placeholder="Houston, TX">
+            </div>
+          </div>
+          <label for="summary">Professional summary</label>
+          <textarea id="summary" class="input" placeholder="Write a concise summary of your background..."></textarea>
+        </div>
+
+        <div id="step2" class="match-card" style="display:none; margin-top:12px;">
+          <h3>Step 2: Experience</h3>
+          <div class="grid-3">
+            <div>
+              <label for="jobTitle">Recent role title</label>
+              <input id="jobTitle" class="input" placeholder="Field Service Supervisor">
+            </div>
+            <div>
+              <label for="company">Company</label>
+              <input id="company" class="input" placeholder="NorthStar Services">
+            </div>
+            <div>
+              <label for="jobLocation">Location</label>
+              <input id="jobLocation" class="input" placeholder="Houston, TX">
+            </div>
+          </div>
+          <label for="highlights">Key highlights (one per line)</label>
+          <textarea id="highlights" class="input" placeholder="Led 14 technicians...&#10;Improved first-time-fix rate..."></textarea>
+        </div>
+
+        <div id="step3" class="match-card" style="display:none; margin-top:12px;">
+          <h3>Step 3: Skills and certifications</h3>
+          <label for="skills">Skills (comma separated)</label>
+          <input id="skills" class="input" placeholder="HVAC Diagnostics, Team Leadership, PM">
+          <label for="certs">Certifications (comma separated)</label>
+          <input id="certs" class="input" placeholder="EPA 608 Universal, OSHA 30">
+        </div>
+
+        <div id="step4" class="match-card" style="display:none; margin-top:12px;">
+          <h3>Step 4: Preferences snapshot</h3>
+          <div class="grid-3">
+            <div>
+              <label for="prefWorkMode">Work mode</label>
+              <select id="prefWorkMode">
+                <option value="onsite">On-site</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="remote">Remote</option>
+              </select>
+            </div>
+            <div>
+              <label for="prefCompMin">Comp min</label>
+              <input id="prefCompMin" class="input" type="number" min="0" step="1000" value="70000">
+            </div>
+            <div>
+              <label for="prefCompMax">Comp max</label>
+              <input id="prefCompMax" class="input" type="number" min="0" step="1000" value="90000">
+            </div>
+          </div>
+          <p class="small muted">Detailed role/location strictness can be edited in the next required-fields step.</p>
+        </div>
+
+        <div class="actions">
+          <button class="btn secondary" id="prevBtn" type="button">Previous</button>
+          <button class="btn" id="nextBtn" type="button">Next</button>
+          <button class="btn success" id="finishBtn" type="button" style="display:none;">Finish constructor</button>
+          <a class="btn secondary" href="candidate-cv-upload.html">Back to intake</a>
+          <a class="btn" href="candidate-field-confirmation.html">Continue</a>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script>
+    UIFlow.guard("candidate");
+    let step = 1;
+
+    const stepEls = [1, 2, 3, 4].map((n) => document.getElementById(`step${n}`));
+    const stepNo = document.getElementById("stepNo");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const finishBtn = document.getElementById("finishBtn");
+
+    const s0 = UIFlow.readState();
+    const draft = s0.candidate.onboarding.canonicalDraft || {};
+    document.getElementById("headline").value = draft.headline || "";
+    document.getElementById("primaryLocation").value = draft.primary_location || "";
+    document.getElementById("summary").value = draft.summary || "";
+
+    function showStep() {
+      stepEls.forEach((el, idx) => {
+        el.style.display = idx + 1 === step ? "block" : "none";
+      });
+      stepNo.textContent = String(step);
+      prevBtn.disabled = step === 1;
+      nextBtn.style.display = step < 4 ? "inline-flex" : "none";
+      finishBtn.style.display = step === 4 ? "inline-flex" : "none";
+    }
+
+    prevBtn.addEventListener("click", () => {
+      step = Math.max(1, step - 1);
+      showStep();
+    });
+    nextBtn.addEventListener("click", () => {
+      step = Math.min(4, step + 1);
+      showStep();
+    });
+
+    finishBtn.addEventListener("click", () => {
+      const headline = document.getElementById("headline").value.trim();
+      const primaryLocation = document.getElementById("primaryLocation").value.trim();
+      const summary = document.getElementById("summary").value.trim();
+      const jobTitle = document.getElementById("jobTitle").value.trim();
+      const company = document.getElementById("company").value.trim();
+      const jobLocation = document.getElementById("jobLocation").value.trim();
+      const highlights = document.getElementById("highlights").value.split("\n").map((v) => v.trim()).filter(Boolean);
+      const skills = document.getElementById("skills").value.split(",").map((v) => v.trim()).filter(Boolean);
+      const certs = document.getElementById("certs").value.split(",").map((v) => v.trim()).filter(Boolean);
+      const prefWorkMode = document.getElementById("prefWorkMode").value;
+      const prefCompMin = Number(document.getElementById("prefCompMin").value || 0);
+      const prefCompMax = Number(document.getElementById("prefCompMax").value || 0);
+
+      if (!headline || !primaryLocation || !summary || !jobTitle || !company) {
+        UIFlow.showStatus("error-recoverable", "Please fill core fields in steps 1 and 2.");
+        return;
+      }
+      if (prefCompMin <= 0 || prefCompMax <= 0 || prefCompMin > prefCompMax) {
+        UIFlow.showStatus("error-recoverable", "Compensation range in step 4 is invalid.");
+        return;
+      }
+
+      const state = UIFlow.readState();
+      UIFlow.updateState({
+        candidate: {
+          ...state.candidate,
+          onboarding: {
+            ...state.candidate.onboarding,
+            intakeMethod: "constructor",
+            constructorCompleted: true,
+            cvUploaded: true,
+            parseStatus: "completed",
+            profileCompleteness: Math.max(48, state.candidate.onboarding.profileCompleteness),
+            preferredRoles: state.candidate.onboarding.preferredRoles.length ? state.candidate.onboarding.preferredRoles : [jobTitle],
+            compensation: {
+              ...state.candidate.onboarding.compensation,
+              min: prefCompMin,
+              max: prefCompMax
+            },
+            locationPref: {
+              ...state.candidate.onboarding.locationPref,
+              workMode: prefWorkMode,
+              anchor: primaryLocation
+            },
+            canonicalDraft: {
+              headline,
+              primary_location: primaryLocation,
+              summary,
+              experience: [
+                {
+                  title: jobTitle,
+                  company,
+                  location: jobLocation || primaryLocation,
+                  highlights
+                }
+              ],
+              skills_flat: skills,
+              certifications: certs
+            }
+          }
+        }
+      });
+      UIFlow.showStatus("success", "Constructor completed. Canonical draft created.");
+      UIFlow.showToast("Resume constructor saved.");
+    });
+
+    showStep();
+    UIFlow.showStatus("success", "Constructor ready.");
+  </script>
+</body>
+</html>

@@ -24,20 +24,40 @@
     <section class="container">
       <article class="card" style="max-width: 900px;">
         <h1>CAND-003: CV Upload or Import</h1>
-        <p class="muted">Upload your CV to bootstrap profile parsing and matching readiness.</p>
+        <p class="muted">Choose one intake path: upload CV, paste plain-text experience, or use guided constructor.</p>
 
         <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
 
-        <label for="cvFile">Choose CV file</label>
-        <input id="cvFile" class="input" type="file" accept=".pdf,.doc,.docx">
+        <div class="match-card">
+          <h3>Option A: Upload CV file</h3>
+          <label for="cvFile">Choose CV file</label>
+          <input id="cvFile" class="input" type="file" accept=".pdf,.doc,.docx">
 
-        <div class="actions">
-          <button class="btn" id="uploadBtn" type="button">Upload and parse</button>
-          <button class="btn secondary" id="linkedinBtn" type="button">Import from LinkedIn</button>
+          <div class="actions">
+            <button class="btn" id="uploadBtn" type="button">Upload and parse</button>
+            <button class="btn secondary" id="linkedinBtn" type="button">Import from LinkedIn</button>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;">
+          <h3>Option B: Paste plain text profile</h3>
+          <p class="small muted">Paste your role history/skills in plain text. We will parse into canonical structure.</p>
+          <textarea id="plainTextInput" class="input" placeholder="Example:&#10;Field Service Supervisor at NorthStar Services (2021-present)&#10;Led 12 technicians...&#10;Skills: HVAC diagnostics, PM, dispatch..."></textarea>
+          <div class="actions">
+            <button class="btn secondary" id="plainTextParseBtn" type="button">Parse plain text</button>
+          </div>
+        </div>
+
+        <div class="match-card" style="margin-top:12px;">
+          <h3>Option C: Guided constructor</h3>
+          <p class="small muted">No CV and no plain text ready? Build step-by-step.</p>
+          <div class="actions">
+            <a class="btn secondary" href="candidate-cv-constructor.html">Open resume constructor</a>
+          </div>
         </div>
 
         <div class="status-box info" style="margin-top:14px;">
-          Accepted formats: PDF, DOC, DOCX. Parse runs asynchronously.
+          Accepted formats: PDF, DOC, DOCX. All 3 options end in the same canonical CV model.
         </div>
 
         <div class="actions" style="margin-top:18px;">
@@ -53,6 +73,7 @@
   <script>
     UIFlow.guard("candidate");
     const fileInput = document.getElementById("cvFile");
+    const plainTextInput = document.getElementById("plainTextInput");
 
     document.getElementById("uploadBtn").addEventListener("click", () => {
       const file = fileInput.files && fileInput.files[0];
@@ -68,6 +89,7 @@
             ...s.candidate,
             onboarding: {
               ...s.candidate.onboarding,
+              intakeMethod: "cv_upload",
               cvUploaded: true,
               parseStatus: "completed"
             }
@@ -87,6 +109,7 @@
             ...s.candidate,
             onboarding: {
               ...s.candidate.onboarding,
+              intakeMethod: "linkedin_import",
               cvUploaded: true,
               parseStatus: "completed",
               profileCompleteness: Math.max(42, s.candidate.onboarding.profileCompleteness)
@@ -98,7 +121,39 @@
       }, 780);
     });
 
+    document.getElementById("plainTextParseBtn").addEventListener("click", () => {
+      const text = plainTextInput.value.trim();
+      if (!text || text.length < 40) {
+        UIFlow.showStatus("error-recoverable", "Please provide a more detailed plain-text description.");
+        return;
+      }
+      UIFlow.showStatus("loading", "Parsing plain-text profile...");
+      setTimeout(() => {
+        const s = UIFlow.readState();
+        UIFlow.updateState({
+          candidate: {
+            ...s.candidate,
+            onboarding: {
+              ...s.candidate.onboarding,
+              intakeMethod: "plain_text",
+              plainTextDescription: text,
+              cvUploaded: true,
+              parseStatus: "completed",
+              profileCompleteness: Math.max(40, s.candidate.onboarding.profileCompleteness),
+              canonicalDraft: {
+                ...s.candidate.onboarding.canonicalDraft,
+                summary: text.slice(0, 280)
+              }
+            }
+          }
+        });
+        UIFlow.showStatus("success", "Plain-text profile parsed. Continue to required fields.");
+        UIFlow.showToast("Plain-text intake complete.");
+      }, 900);
+    });
+
     const s = UIFlow.readState();
+    plainTextInput.value = s.candidate.onboarding.plainTextDescription || "";
     if (s.candidate.onboarding.parseStatus === "completed") {
       UIFlow.showStatus("success", "You already have parsed profile data. Continue.");
     } else {

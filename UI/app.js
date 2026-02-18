@@ -21,6 +21,9 @@ const initialState = {
     onboarding: {
       cvUploaded: false,
       parseStatus: "none",
+      intakeMethod: "none",
+      plainTextDescription: "",
+      constructorCompleted: false,
       requiredCompleted: false,
       profileCompleteness: 28,
       preferredRoles: [],
@@ -42,7 +45,15 @@ const initialState = {
       rolePreference: "",
       location: "",
       payRange: "",
-      availability: ""
+      availability: "",
+      canonicalDraft: {
+        headline: "",
+        primary_location: "",
+        summary: "",
+        experience: [],
+        skills_flat: [],
+        certifications: []
+      }
     },
     matching: {
       selectedMatchId: "m1",
