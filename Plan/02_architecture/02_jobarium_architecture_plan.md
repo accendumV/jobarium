@@ -39,7 +39,7 @@
 - **Document AI (OCR/Form Parser)**: robust extraction fallback for scanned PDFs/images.
 - **Vertex AI**:
   - Embeddings generation
-  - Vector index retrieval (or managed vector-capable store)
+  - **Vector Search** index storage + retrieval
   - Packet summary generation
 - **Cloud Logging + Monitoring + Error Reporting + Trace**: observability.
 - **Secret Manager + KMS**: secret and key handling.
@@ -336,15 +336,16 @@ Employers need confidence that submitted answers reflect candidate involvement, 
   - retention limits and role-restricted access.
 
 ## Proposed Tech Stack (Pragmatic)
-- Frontend: Next.js (TypeScript), server actions + API client.
-- Backend: TypeScript on Cloud Run (NestJS or Fastify modular architecture).
+- Frontend: **Angular (TypeScript) SPA (CSR)** hosted on **Cloud Storage + Cloud CDN/HTTPS LB**.
+- Backend: **NestJS (TypeScript)** on Cloud Run (modular monolith style).
 - Database: Cloud SQL PostgreSQL + Prisma/Drizzle ORM.
 - Queue/Event: Pub/Sub + Cloud Tasks.
 - Cache: Redis (Memorystore).
-- Auth: first-party auth + optional Google OAuth; JWT with short-lived access + rotating refresh.
+- AuthN: **Firebase Auth** (managed identity); NestJS verifies Firebase ID tokens (JWT).
+- AuthZ: business-layer authorization (org scoping + “self” access); detailed policy deferred.
 - Messaging: SendGrid (email), Twilio (SMS) or GCP partner equivalent.
 - Payments: Stripe (hybrid model support).
-- AI: Vertex AI embeddings + summarization.
+- AI: Vertex AI embeddings + summarization; **Vertex AI Vector Search** for vector storage/retrieval.
 - Authenticity scoring:
   - rule-based signal engine first,
   - optional lightweight classifier in phase 1.5 after enough labeled data.
@@ -373,9 +374,9 @@ Employers need confidence that submitted answers reflect candidate involvement, 
 
 ## Open Architecture Decisions (to Lock Next)
 1. Single backend service vs multiple Cloud Run services at launch.
-2. Vector storage choice: Vertex index vs Postgres+extension fallback.
+2. Vector storage choice: **Vertex AI Vector Search** (locked for MVP).
 3. Invite cadence policy defaults per job.
-4. Final auth strategy (passwordless vs password+OAuth mix).
+4. AuthN strategy: **Firebase Auth** (locked for MVP).
 5. Exact billing limits and trial thresholds for hybrid pricing.
 6. CV parser strategy for `.doc` legacy files (support now vs convert-only policy).
 7. Confidence threshold for "auto-apply parsed fields" vs "require user confirmation."
