@@ -1,36 +1,559 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" style="overflow: clip;">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Jobarium UI - Sign Up or Log In</title>
   <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <header class="topbar">
-    <div class="container">
-      <div class="brand">Jobarium Flow Prototype</div>
-      <nav class="nav-links small">
-        <a href="landing.html">Landing</a>
-        <a href="role-intent.html">Choose Role</a>
-        <a href="consent.html">Consent</a>
-        <a href="verification.html">Verification</a>
-        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
-      </nav>
-    </div>
-  </header>
+  <style>
+    :root {
+      --clr-bg-obsidian: #02030a;
+      --clr-bg-deep: #050816;
+      --clr-bg-night: #070b1f;
+      --clr-primary: #6f7cff;
+      --clr-secondary: #c8d2ff;
+      --clr-accent: #2fd5ff;
+      --clr-text: rgba(243, 246, 255, 0.96);
+      --clr-text-muted: rgba(206, 219, 255, 0.72);
+    }
 
+    body.auth-glass-page {
+      background:
+        radial-gradient(1480px 1160px at 10% 16%, rgba(35, 57, 148, 0.44), rgba(0, 0, 0, 0) 70%),
+        radial-gradient(1380px 1060px at 88% 22%, rgba(52, 42, 132, 0.36), rgba(0, 0, 0, 0) 68%),
+        radial-gradient(1620px 1240px at 52% 92%, rgba(13, 92, 136, 0.3), rgba(0, 0, 0, 0) 72%),
+        linear-gradient(160deg, var(--clr-bg-obsidian) 0%, var(--clr-bg-deep) 42%, var(--clr-bg-night) 100%);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body.auth-glass-page::before,
+    body.auth-glass-page::after {
+      content: "";
+      position: fixed;
+      border-radius: 999px;
+      pointer-events: none;
+      filter: blur(78px);
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    body.auth-glass-page::before {
+      width: 760px;
+      height: 760px;
+      background: radial-gradient(circle at 35% 35%, rgba(94, 124, 255, 0.34), rgba(38, 49, 122, 0.16) 58%, rgba(0, 0, 0, 0) 78%);
+      top: -12%;
+      left: -10%;
+      transform: translate3d(var(--orb-a-x, 0px), var(--orb-a-y, 0px), 0);
+    }
+
+    body.auth-glass-page::after {
+      width: 720px;
+      height: 720px;
+      background: radial-gradient(circle at 65% 40%, rgba(98, 68, 196, 0.28), rgba(34, 35, 108, 0.17) 57%, rgba(0, 0, 0, 0) 78%);
+      right: -8%;
+      bottom: -14%;
+      transform: translate3d(var(--orb-b-x, 0px), var(--orb-b-y, 0px), 0);
+    }
+
+    .bg-orb {
+      position: fixed;
+      pointer-events: none;
+      border-radius: 999px;
+      filter: blur(86px);
+      opacity: 0.42;
+      z-index: 0;
+    }
+
+    .bg-orb.orb-c {
+      width: 820px;
+      height: 820px;
+      left: 32%;
+      top: -26%;
+      background: radial-gradient(circle at 52% 48%, rgba(47, 213, 255, 0.22), rgba(20, 74, 130, 0.14) 55%, rgba(0, 0, 0, 0) 78%);
+      transform: translate3d(var(--orb-c-x, 0px), var(--orb-c-y, 0px), 0);
+    }
+
+    @keyframes orbDriftA {
+      0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      19% { transform: translate3d(44px, 26px, 0) scale(1.06) rotate(4deg); }
+      38% { transform: translate3d(-20px, 58px, 0) scale(0.98) rotate(-3deg); }
+      63% { transform: translate3d(62px, -14px, 0) scale(1.08) rotate(6deg); }
+      81% { transform: translate3d(-34px, 42px, 0) scale(1.01) rotate(-2deg); }
+      100% { transform: translate3d(28px, -36px, 0) scale(1.04) rotate(3deg); }
+    }
+
+    @keyframes orbDriftB {
+      0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      17% { transform: translate3d(-46px, -24px, 0) scale(1.05) rotate(-4deg); }
+      36% { transform: translate3d(18px, -62px, 0) scale(0.97) rotate(2deg); }
+      57% { transform: translate3d(-58px, 18px, 0) scale(1.09) rotate(-5deg); }
+      79% { transform: translate3d(26px, -46px, 0) scale(1.02) rotate(3deg); }
+      100% { transform: translate3d(-32px, 34px, 0) scale(1.06) rotate(-2deg); }
+    }
+
+    @keyframes orbDriftC {
+      0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+      22% { transform: translate3d(38px, 34px, 0) scale(1.07) rotate(3deg); }
+      41% { transform: translate3d(-30px, 62px, 0) scale(0.95) rotate(-4deg); }
+      66% { transform: translate3d(56px, -22px, 0) scale(1.08) rotate(5deg); }
+      84% { transform: translate3d(-24px, 28px, 0) scale(1.01) rotate(-2deg); }
+      100% { transform: translate3d(20px, -40px, 0) scale(1.05) rotate(2deg); }
+    }
+
+    @keyframes cardLightSweep {
+      0% { transform: translate3d(-80px, 0, 0) rotate(6deg); opacity: 0.34; }
+      100% { transform: translate3d(42px, 0, 0) rotate(6deg); opacity: 0.34; }
+    }
+
+    @keyframes cardTopEdgeSweep {
+      0% { transform: translate3d(-80px, 0, 0); opacity: 1; }
+      100% { transform: translate3d(42px, 0, 0); opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body.auth-glass-page::before,
+      body.auth-glass-page::after,
+      .bg-orb.orb-c,
+      .auth-glass-card::before,
+      .auth-glass-card::after {
+        animation: none;
+      }
+    }
+
+    .auth-glass-page .layout {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      position: relative;
+      z-index: 1;
+      padding: 24px 0;
+    }
+
+    .auth-glass-page .layout .container {
+      display: grid;
+      place-items: center;
+      width: min(1120px, 92vw);
+      gap: 30px;
+    }
+
+    .auth-brand {
+      margin: 0;
+      color: var(--clr-text);
+      font-size: 24px;
+      letter-spacing: 0.04em;
+      text-transform: lowercase;
+    }
+
+    .auth-brand-strong {
+      font-weight: 700;
+    }
+
+    .auth-brand-thin {
+      font-weight: 100;
+    }
+
+    .auth-brand-tm {
+      font-size: 0.34em;
+      vertical-align: super;
+      margin-left: 4px;
+      letter-spacing: 0;
+      opacity: 0.9;
+      font-weight: 700;
+    }
+
+    .auth-glass-card {
+      width: min(520px, 100%);
+      padding: 40px;
+      background: linear-gradient(
+        145deg,
+        rgba(20, 24, 40, 0.62),
+        rgba(9, 12, 24, 0.48)
+      );
+      backdrop-filter: blur(14px) saturate(150%);
+      -webkit-backdrop-filter: blur(14px) saturate(150%);
+      border-radius: 20px;
+      border: 0;
+      box-shadow:
+        0 24px 54px rgba(0, 0, 0, 0.56),
+        0 0 0 1px rgba(130, 156, 255, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 22px 8px rgba(255, 255, 255, 0.06);
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .auth-glass-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+      z-index: 1;
+      transform: translate3d(var(--card-reflect-x, 0px), 0, 0);
+      opacity: var(--card-reflect-o, 1);
+    }
+
+    .auth-glass-card::after {
+      content: "";
+      position: absolute;
+      top: -8%;
+      left: 27%;
+      width: 48%;
+      height: 120%;
+      background: linear-gradient(
+        102deg,
+        rgba(255, 255, 255, 0) 18%,
+        rgba(255, 255, 255, 0.14) 40%,
+        rgba(255, 255, 255, 0.1) 54%,
+        rgba(255, 255, 255, 0) 75%
+      );
+      filter: blur(10px);
+      opacity: var(--card-refract-o, 0.5);
+      transform: translate3d(var(--card-refract-x, 0px), var(--card-refract-y, 0px), 0) rotate(6deg);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .auth-glass-card > * {
+      position: relative;
+      z-index: 2;
+    }
+
+    .auth-glass-card h1 {
+      color: var(--clr-text);
+      margin: 0;
+    }
+
+    .auth-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .auth-title-meta {
+      min-width: 0;
+    }
+
+    .auth-title-meta .muted {
+      margin-top: 6px;
+    }
+
+    .auth-glass-card .muted,
+    .auth-glass-card .small {
+      color: var(--clr-text-muted);
+    }
+
+    .auth-glass-card label {
+      color: rgba(231, 239, 255, 0.9);
+      font-size: 0.9rem;
+    }
+
+    .auth-glass-card .input {
+      border: 1px solid rgba(151, 175, 255, 0.4);
+      background: rgba(15, 20, 39, 0.54);
+      color: var(--clr-text);
+      border-radius: 10px;
+    }
+
+    .auth-glass-card .input::placeholder {
+      color: rgba(200, 217, 255, 0.52);
+    }
+
+    .auth-glass-card .input:focus {
+      border-color: rgba(111, 124, 255, 0.94);
+      box-shadow: 0 0 0 3px rgba(111, 124, 255, 0.24);
+      outline: none;
+    }
+
+    .auth-glass-card .btn {
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(145deg, rgba(111, 124, 255, 0.34), rgba(56, 76, 173, 0.2));
+      backdrop-filter: inherit;
+      -webkit-backdrop-filter: inherit;
+      color: var(--clr-text);
+      box-shadow: none;
+    }
+
+    .auth-glass-card .btn.secondary {
+      background: linear-gradient(145deg, rgba(200, 210, 255, 0.18), rgba(130, 145, 215, 0.08));
+      color: rgba(233, 241, 255, 0.9);
+    }
+
+    .auth-glass-card .btn.ghost {
+      background: linear-gradient(145deg, rgba(47, 213, 255, 0.16), rgba(111, 124, 255, 0.08));
+      color: rgba(221, 241, 255, 0.88);
+    }
+
+    .auth-glass-card .btn:hover {
+      filter: none;
+      transform: translateY(-1px);
+      background: linear-gradient(145deg, rgba(131, 144, 255, 0.42), rgba(68, 92, 198, 0.24));
+      box-shadow: none;
+    }
+
+    .auth-glass-card .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .auth-glass-card .btn:focus-visible {
+      outline: none;
+      box-shadow: none;
+      filter: brightness(1.08);
+    }
+
+    .auth-mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 4px;
+      border-radius: 999px;
+      background: rgba(7, 13, 34, 0.86);
+      backdrop-filter: inherit;
+      -webkit-backdrop-filter: inherit;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      --blob-x: 0;
+      --blob-duration: 320ms;
+      isolation: isolate;
+    }
+
+    .auth-mode-blob {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      transform: translate3d(var(--blob-x), 0, 0);
+      transition: transform var(--blob-duration) cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+      will-change: transform;
+      z-index: 1;
+      display: block;
+    }
+
+    .auth-mode-blob-core {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(145deg, rgba(199, 211, 255, 0.52), rgba(118, 140, 224, 0.28));
+      transform-origin: center;
+      will-change: transform;
+    }
+
+    .auth-mode-switch.moving-right .auth-mode-blob-core {
+      animation: liquidStretchRight var(--blob-duration) cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .auth-mode-switch.moving-left .auth-mode-blob-core {
+      animation: liquidStretchLeft var(--blob-duration) cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes liquidStretchRight {
+      0% { transform: scaleX(1) scaleY(1); }
+      42% { transform: scaleX(1.22) scaleY(0.84); }
+      72% { transform: scaleX(0.92) scaleY(1.06); }
+      100% { transform: scaleX(1) scaleY(1); }
+    }
+
+    @keyframes liquidStretchLeft {
+      0% { transform: scaleX(1) scaleY(1); }
+      42% { transform: scaleX(1.22) scaleY(0.84); }
+      72% { transform: scaleX(0.92) scaleY(1.06); }
+      100% { transform: scaleX(1) scaleY(1); }
+    }
+
+    .auth-mode-switch .btn {
+      height: 30px;
+      min-width: 88px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      margin: 0;
+      transform: none;
+      background: transparent;
+      position: relative;
+      z-index: 2;
+    }
+
+    .auth-mode-switch .btn.secondary {
+      background: transparent;
+      color: rgba(207, 219, 255, 0.64);
+    }
+
+    .auth-mode-switch .btn:not(.secondary) {
+      background: transparent;
+      color: rgba(245, 248, 255, 0.96);
+    }
+
+    .auth-mode-switch .btn:hover {
+      transform: none;
+    }
+
+    .auth-mode-switch[data-mode="signup"] {
+      --blob-x: 0px;
+    }
+
+    .auth-mode-switch[data-mode="login"] {
+      --blob-x: calc(100% + 4px);
+    }
+
+    .auth-status-outside {
+      width: min(520px, 100%);
+      margin-top: 10px;
+      min-height: 56px;
+    }
+
+    .auth-status-outside .status-box {
+      border: 0;
+      background: rgba(9, 14, 26, 0.38);
+      transition: opacity 260ms ease;
+      opacity: 1;
+      margin: 0;
+      width: 100%;
+    }
+
+    .auth-status-outside .status-box.fade-out {
+      opacity: 0;
+    }
+
+    .auth-status-outside .status-box.hidden {
+      display: block;
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auth-primary-actions {
+      margin-bottom: 26px;
+    }
+
+    .oauth-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 0;
+    }
+
+    .auth-inline-divider {
+      margin: 0 0 26px;
+      border: 0;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0),
+        rgba(176, 194, 255, 0.34),
+        rgba(255, 255, 255, 0)
+      );
+      opacity: 0.85;
+    }
+
+    .auth-glass-card.status-flash {
+      animation: cardStatusFlash 1000ms ease-out;
+    }
+
+    @keyframes cardStatusFlash {
+      0% {
+        box-shadow:
+          0 24px 54px rgba(0, 0, 0, 0.56),
+          0 0 0 1px rgba(130, 156, 255, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+          inset 0 0 22px 8px rgba(255, 255, 255, 0.06);
+      }
+      20% {
+        box-shadow:
+          0 24px 54px rgba(0, 0, 0, 0.58),
+          0 0 0 1px var(--flash-color, rgba(130, 156, 255, 0.28)),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+          inset 0 0 36px 12px var(--flash-color, rgba(130, 156, 255, 0.28));
+      }
+      100% {
+        box-shadow:
+          0 24px 54px rgba(0, 0, 0, 0.56),
+          0 0 0 1px rgba(130, 156, 255, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+          inset 0 0 22px 8px rgba(255, 255, 255, 0.06);
+      }
+    }
+
+    .auth-status-outside .status-box.loading {
+      background: rgba(124, 153, 255, 0.12);
+    }
+
+    .auth-status-outside .status-box.empty {
+      background: rgba(180, 196, 255, 0.08);
+    }
+
+    .auth-status-outside .status-box.error-recoverable {
+      background: rgba(247, 184, 73, 0.12);
+    }
+
+    .auth-status-outside .status-box.error-blocking {
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .auth-status-outside .status-box.success {
+      background: rgba(45, 212, 191, 0.12);
+    }
+
+    .auth-glass-page .toast {
+      border: 0;
+    }
+
+    .oauth-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .oauth-icon {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
+    }
+
+    .oauth-btn.google .oauth-icon {
+      color: #ffffff;
+    }
+
+    .oauth-btn.linkedin .oauth-icon {
+      color: #0a66c2;
+    }
+  </style>
+</head>
+<body class="auth-glass-page">
+  <div class="bg-orb orb-c" aria-hidden="true"></div>
   <main class="layout">
     <section class="container">
-      <article class="card" style="max-width: 860px;">
-        <h1 id="authTitle">Sign up</h1>
-        <p class="muted" id="authSubtitle">Create account with minimal friction.</p>
-        <div class="actions">
-          <button id="signupTab" class="btn">Sign up</button>
-          <button id="loginTab" class="btn secondary">Log in</button>
+      <h1 class="auth-brand"><span class="auth-brand-strong">job</span><span class="auth-brand-thin">arium</span><span class="auth-brand-tm">TM</span></h1>
+      <article class="card auth-glass-card" style="max-width: 860px;">
+        <div class="auth-title-row">
+          <div class="auth-title-meta">
+            <h1 id="authTitle">Sign up</h1>
+            <p class="muted" id="authSubtitle">Create account with minimal friction.</p>
+          </div>
+          <div class="auth-mode-switch">
+            <span class="auth-mode-blob" aria-hidden="true"><span class="auth-mode-blob-core"></span></span>
+            <button id="signupTab" class="btn">Sign up</button>
+            <button id="loginTab" class="btn secondary">Log in</button>
+          </div>
         </div>
-
-        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
 
         <form id="authForm" style="margin-top:14px;">
           <label for="email">Email</label>
@@ -39,20 +562,31 @@
           <label for="password">Password</label>
           <input id="password" class="input" type="password" autocomplete="current-password" required>
 
-          <div class="actions">
+          <div class="actions auth-primary-actions">
             <button class="btn" type="submit" id="primaryAction">Create account</button>
-            <a class="btn secondary" href="role-intent.html">Back</a>
           </div>
         </form>
 
-        <hr style="border-color:#2f3b6f; margin:16px 0;">
+        <hr class="auth-inline-divider">
 
-        <p class="small muted">OAuth quick path</p>
-        <div class="actions">
-          <button class="btn ghost" id="googleBtn" type="button">Continue with Google</button>
-          <button class="btn ghost" id="linkedinBtn" type="button">Continue with LinkedIn</button>
+        <div class="actions oauth-actions">
+          <button class="btn ghost oauth-btn google" id="googleBtn" type="button">
+            <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M21.35 11.1h-9.18v2.92h5.27c-.24 1.5-1.8 4.4-5.27 4.4-3.17 0-5.75-2.63-5.75-5.87s2.58-5.87 5.75-5.87c1.8 0 3 .77 3.69 1.43l2.52-2.46C16.77 4.15 14.67 3.2 12.17 3.2 7.2 3.2 3.2 7.3 3.2 12.35s4 9.15 8.97 9.15c5.18 0 8.6-3.63 8.6-8.75 0-.59-.07-1.04-.15-1.65z"/>
+            </svg>
+            <span>Continue with Google</span>
+          </button>
+          <button class="btn ghost oauth-btn linkedin" id="linkedinBtn" type="button">
+            <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm-9.5 6.5H6.75V18h2.75V9.5zM8.13 6.3a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM18 12.6c0-2.67-1.43-3.9-3.34-3.9-1.54 0-2.23.84-2.61 1.43V9.5H9.31V18h2.74v-4.2c0-1.11.21-2.19 1.58-2.19 1.35 0 1.37 1.26 1.37 2.26V18H18v-5.4z"/>
+            </svg>
+            <span>Continue with LinkedIn</span>
+          </button>
         </div>
       </article>
+      <div class="auth-status-outside">
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+      </div>
     </section>
   </main>
 
@@ -69,38 +603,107 @@
     const form = document.getElementById("authForm");
     const title = document.getElementById("authTitle");
     const subtitle = document.getElementById("authSubtitle");
+    const modeSwitch = document.querySelector(".auth-mode-switch");
+    const authCard = document.querySelector(".auth-glass-card");
+    const statusEl = document.querySelector("[data-status]");
+    let statusFadeTimer = null;
+    let statusHideTimer = null;
+    let switchAnimTimer = null;
+
+    function clearStatusTimers() {
+      window.clearTimeout(statusFadeTimer);
+      window.clearTimeout(statusHideTimer);
+      statusFadeTimer = null;
+      statusHideTimer = null;
+    }
+
+    function showStatusPersistent(kind, message) {
+      clearStatusTimers();
+      if (statusEl) statusEl.classList.remove("fade-out");
+      UIFlow.showStatus(kind, message);
+      triggerCardFlash(kind);
+    }
+
+    function showStatusTransient(kind, message, duration = 3000) {
+      clearStatusTimers();
+      if (statusEl) statusEl.classList.remove("fade-out");
+      UIFlow.showStatus(kind, message);
+      triggerCardFlash(kind);
+      statusFadeTimer = window.setTimeout(() => {
+        if (statusEl) statusEl.classList.add("fade-out");
+      }, Math.max(0, duration - 260));
+      statusHideTimer = window.setTimeout(() => {
+        UIFlow.hideStatus();
+        if (statusEl) statusEl.classList.remove("fade-out");
+      }, duration);
+    }
+
+    function triggerCardFlash(kind) {
+      if (!authCard) return;
+      const flashPalette = {
+        loading: "rgba(124, 153, 255, 0.28)",
+        empty: "rgba(180, 196, 255, 0.24)",
+        "error-recoverable": "rgba(247, 184, 73, 0.28)",
+        "error-blocking": "rgba(248, 113, 113, 0.3)",
+        success: "rgba(45, 212, 191, 0.28)"
+      };
+      authCard.style.setProperty("--flash-color", flashPalette[kind] || "rgba(130, 156, 255, 0.28)");
+      authCard.classList.remove("status-flash");
+      void authCard.offsetWidth;
+      authCard.classList.add("status-flash");
+    }
 
     function getRoleLabel() {
       return state.userType === "employer" ? "Employer" : "Candidate";
     }
 
-    function renderMode() {
+    function renderMode(previousMode = mode) {
       const isSignup = mode === "signup";
       signupTab.className = isSignup ? "btn" : "btn secondary";
       loginTab.className = isSignup ? "btn secondary" : "btn";
       action.textContent = isSignup ? "Create account" : "Log in";
-      title.textContent = `${getRoleLabel()} ${isSignup ? "sign up" : "log in"}`;
+      title.textContent = getRoleLabel();
       subtitle.textContent = state.userType === "employer"
         ? "Access your workspace setup and job automation flow."
         : "Access your matched opportunity and profile onboarding flow.";
+
+      if (!modeSwitch) return;
+      modeSwitch.dataset.mode = mode;
+      modeSwitch.classList.remove("moving-left", "moving-right");
+
+      if (previousMode !== mode) {
+        modeSwitch.classList.add(mode === "login" ? "moving-right" : "moving-left");
+        window.clearTimeout(switchAnimTimer);
+        switchAnimTimer = window.setTimeout(() => {
+          modeSwitch.classList.remove("moving-left", "moving-right");
+        }, 320);
+      }
     }
 
-    signupTab.addEventListener("click", () => { mode = "signup"; renderMode(); });
-    loginTab.addEventListener("click", () => { mode = "login"; renderMode(); });
+    signupTab.addEventListener("click", () => {
+      const previousMode = mode;
+      mode = "signup";
+      renderMode(previousMode);
+    });
+    loginTab.addEventListener("click", () => {
+      const previousMode = mode;
+      mode = "login";
+      renderMode(previousMode);
+    });
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
-      UIFlow.showStatus("loading", "Validating credentials...");
+      showStatusPersistent("loading", "Validating credentials...");
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
       setTimeout(() => {
         if (!email || !password) {
-          UIFlow.showStatus("error-recoverable", "Please enter email and password.");
+          showStatusPersistent("error-recoverable", "Please enter email and password.");
           return;
         }
         if (mode === "signup" && email.endsWith("@duplicate.com")) {
-          UIFlow.showStatus("error-recoverable", "This email already exists. Try log in.");
+          showStatusPersistent("error-recoverable", "This email already exists. Try log in.");
           return;
         }
 
@@ -110,7 +713,7 @@
           emailVerified: false,
           consentSet: []
         });
-        UIFlow.showStatus("success", mode === "signup" ? "Account created. Continue to consent." : "Login successful. Continue to consent check.");
+        showStatusPersistent("success", mode === "signup" ? "Account created. Continue to consent." : "Login successful. Continue to consent check.");
         UIFlow.showToast("Auth step complete.");
         setTimeout(() => location.href = "consent.html", 650);
       }, 750);
@@ -128,9 +731,73 @@
       setTimeout(() => location.href = "consent.html", 450);
     });
 
+    function initLightPhysics() {
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      if (prefersReducedMotion.matches) return;
+
+      const root = document.documentElement;
+      let lagX = 0;
+      let lagY = 0;
+      let prevX = 0;
+      let prevY = 0;
+
+      function setVar(name, value) {
+        root.style.setProperty(name, value);
+      }
+
+      function frame(now) {
+        // A few low-frequency waves create organic spotlight drift.
+        const lightX =
+          52 * Math.sin(now * 0.00011) +
+          28 * Math.sin(now * 0.00023 + 1.2) +
+          16 * Math.sin(now * 0.00041 + 2.3);
+        const lightY =
+          34 * Math.sin(now * 0.00009 + 0.7) +
+          22 * Math.sin(now * 0.00019 + 2.1) +
+          14 * Math.sin(now * 0.00037 + 0.2);
+
+        // Low-pass lag gives inertia and avoids robotic motion.
+        lagX += (lightX - lagX) * 0.06;
+        lagY += (lightY - lagY) * 0.06;
+
+        const vx = lagX - prevX;
+        const vy = lagY - prevY;
+        prevX = lagX;
+        prevY = lagY;
+
+        const speed = Math.min(1, Math.hypot(vx, vy) / 1.6);
+
+        // Backdrop spotlights (light source field).
+        setVar("--orb-a-x", `${(lagX * 1.0).toFixed(2)}px`);
+        setVar("--orb-a-y", `${(lagY * 0.72).toFixed(2)}px`);
+        setVar("--orb-b-x", `${(-lagX * 0.86).toFixed(2)}px`);
+        setVar("--orb-b-y", `${(-lagY * 0.58).toFixed(2)}px`);
+        setVar("--orb-c-x", `${(lagX * 0.62 - lagY * 0.22).toFixed(2)}px`);
+        setVar("--orb-c-y", `${(lagY * 0.9).toFixed(2)}px`);
+
+        // Glass response:
+        // - top edge + specular streak: mostly opposite direction (reflection)
+        // - broad card wash: same direction, lower gain (refraction)
+        const reflectX = -0.45 * lagX + 3.8 * vx;
+        const refractX = 0.22 * lagX;
+        const refractY = 0.12 * lagY;
+
+        setVar("--card-reflect-x", `${reflectX.toFixed(2)}px`);
+        setVar("--card-reflect-o", (0.9 + speed * 0.12).toFixed(3));
+        setVar("--card-refract-x", `${refractX.toFixed(2)}px`);
+        setVar("--card-refract-y", `${refractY.toFixed(2)}px`);
+        setVar("--card-refract-o", (0.42 + speed * 0.12).toFixed(3));
+
+        window.requestAnimationFrame(frame);
+      }
+
+      window.requestAnimationFrame(frame);
+    }
+
     renderMode();
-    UIFlow.showStatus("loading", "Loading auth config...");
-    setTimeout(() => UIFlow.showStatus("success", "Auth config loaded. Choose sign up or log in."), 420);
+    initLightPhysics();
+    showStatusPersistent("loading", "Loading auth config...");
+    setTimeout(() => showStatusTransient("success", "Auth config loaded. Choose sign up or log in.", 3000), 420);
   </script>
 </body>
 </html>
