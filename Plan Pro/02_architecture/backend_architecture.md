@@ -19,7 +19,7 @@ Cross-cutting (not bounded contexts):
 - Audit
 
 ## Layers (clean/onion)
-- Presentation: controllers (“BC BFF”), API request/response DTOs, validation, auth guards
+- Presentation: controllers (UI-oriented; “BFF” terminology only), API request/response DTOs, validation, auth guards
 - Application: use-cases + ports (interfaces) + inter-BC contract DTOs (public surface)
 - Domain: entities/value objects/invariants (no framework, no DB, no ports)
 - Infrastructure: Prisma persistence + repositories + external adapters (Firebase/Vertex/SendGrid/etc.)
@@ -41,13 +41,14 @@ No cross-BC imports except via **Application ports + contract DTOs**.
 
 Rule: **use-cases operate on domain entities**. DTOs exist only at boundaries (HTTP, BC-to-BC).
 
-## Inter-BC communication (sync only)
+## Inter-BC communication (sync ports)
 - Calls between BCs go through **Application-layer ports** (TypeScript interfaces).
 - No direct access to another BC’s repositories/DB models/infrastructure.
 - No internal event bus abstraction.
 - Port/contract governance:
   - Ports must be minimal and use-case oriented.
   - Ports must expose/accept **contract DTOs** only (no domain entities).
+Note: async workflows use Pub/Sub (see “Async work + scheduling”).
 
 ## Database boundaries (MVP)
 - One Postgres database (Cloud SQL).
@@ -69,6 +70,8 @@ Rule: **use-cases operate on domain entities**. DTOs exist only at boundaries (H
 
 ## API basics (global)
 - No API versioning for now (single deployment).
+- OpenAPI-first: backend maintains and publishes an OpenAPI spec used for typed client generation in the frontend.
+- Clarification: HTTP API versioning is deferred; async events are versioned (see `Plan Pro/02_architecture/integration_contracts.md`).
 - Errors:
   - Use HTTP status codes for error family.
   - Response body is a simple object:
@@ -76,6 +79,11 @@ Rule: **use-cases operate on domain entities**. DTOs exist only at boundaries (H
     - `message` (human-readable)
 - Pagination/sorting conventions: deferred until needed.
 - ID format (UUID vs ULID): TBD.
+
+TODO (major, to decide soon):
+- Decide ID format (UUID vs ULID) and standardize across DB/API/events.
+- Define an initial error `subcode` taxonomy (namespace + core codes).
+- Define audit logging minimum fields and capture points (cross-cutting module).
 
 ## Security baseline (global)
 - AuthN/AuthZ details: deferred (see `Plan Pro/02_architecture/authentication_authorization.md`).
@@ -120,7 +128,7 @@ Rule: **use-cases operate on domain entities**. DTOs exist only at boundaries (H
 ```mermaid
 flowchart TB
   subgraph PresentationLayer[Presentation]
-    Controllers["Controllers (BC BFF)"]
+    Controllers["Controllers (UI-oriented)"]
     ApiDtos["API_DTOs (req/res)"]
   end
 
