@@ -5,28 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Candidate - Field Confirmation</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="glass-style.css">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    crossorigin=""
+  >
 </head>
-<body>
+<body class="glass-theme has-topbar">
+  <div class="bg-orb orb-c" aria-hidden="true"></div>
   <header class="topbar">
     <div class="container">
-      <div class="brand">Jobarium Candidate Flow</div>
+      <div class="auth-brand"><span class="auth-brand-strong">job</span><span class="auth-brand-thin">arium</span><span class="auth-brand-tm">TM</span></div>
       <nav class="nav-links small">
-        <a href="candidate-cv-upload.html">CV Upload</a>
-        <a href="candidate-profile-completeness.html">Profile Completeness</a>
-        <a href="candidate-match-home.html">Match Home</a>
-        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+        <a class="btn secondary" href="candidate-profile-completeness.html">Account</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Log out</button>
       </nav>
     </div>
   </header>
   <main class="layout">
     <section class="container">
-      <article class="card" style="max-width: 980px;">
+      <article class="card auth-glass-card field-confirm-card">
         <h1>CAND-004: High Impact Field Confirmation</h1>
         <p class="muted">Complete required fields to become matchable with high confidence.</p>
 
-        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
-
-        <div class="match-card" style="margin-top:10px;">
+        <div class="match-card">
           <h3>Preferred positions (up to 5)</h3>
           <p class="small muted">Select from suggestions or type a custom role and add it.</p>
           <div class="range-row">
@@ -34,11 +37,11 @@
             <button class="btn secondary" id="addRoleBtn" type="button">Add role</button>
           </div>
           <div class="chip-wrap" id="roleChips"></div>
-          <div class="small muted" id="roleCount" style="margin-top:6px;"></div>
+          <div class="small muted" id="roleCount"></div>
           <div class="suggestion-grid" id="roleSuggestions"></div>
         </div>
 
-        <div class="match-card" style="margin-top:12px;">
+        <div class="match-card">
           <h3>Location preference</h3>
           <p class="small muted">Use one unified model across onsite, hybrid, remote, regional, and worldwide.</p>
           <div class="grid-2">
@@ -60,21 +63,21 @@
             </div>
           </div>
 
-          <div id="radiusSection" class="map-box" style="margin-top:10px;">
+          <div id="radiusSection" class="map-box">
             <label for="anchorLocation">Anchor location</label>
             <input id="anchorLocation" class="input" placeholder="Chicago, IL">
-            <div class="map-stage" style="margin-top:10px;"></div>
+            <div id="radiusMap" class="map-stage"></div>
             <label for="radiusKm">Radius (km): <span id="radiusLabel">25</span></label>
             <input id="radiusKm" type="range" min="5" max="300" step="5" value="25">
           </div>
 
-          <div id="regionSection" class="map-box" style="display:none; margin-top:10px;">
+          <div id="regionSection" class="map-box">
             <label>Allowed regions or countries</label>
             <div class="suggestion-grid" id="regionChecklist"></div>
           </div>
         </div>
 
-        <div class="match-card" style="margin-top:12px;">
+        <div class="match-card">
           <h3>Compensation preference</h3>
           <div class="grid-2">
             <div>
@@ -95,24 +98,36 @@
             </div>
           </div>
 
-          <div class="range-row" style="margin-top:10px;">
+          <div class="range-row">
             <div>
               <label for="minComp">Minimum desired</label>
-              <input id="minComp" class="input" type="number" min="0" step="1000">
+              <div class="number-input-wrap">
+                <input id="minComp" class="input" type="number" min="0" step="1000">
+                <div class="number-stepper" aria-hidden="true">
+                  <button class="number-step-btn" type="button" data-step-target="minComp" data-step-dir="up" aria-label="Increase minimum desired"></button>
+                  <button class="number-step-btn" type="button" data-step-target="minComp" data-step-dir="down" aria-label="Decrease minimum desired"></button>
+                </div>
+              </div>
             </div>
             <div>
               <label for="maxComp">Maximum desired</label>
-              <input id="maxComp" class="input" type="number" min="0" step="1000">
+              <div class="number-input-wrap">
+                <input id="maxComp" class="input" type="number" min="0" step="1000">
+                <div class="number-stepper" aria-hidden="true">
+                  <button class="number-step-btn" type="button" data-step-target="maxComp" data-step-dir="up" aria-label="Increase maximum desired"></button>
+                  <button class="number-step-btn" type="button" data-step-target="maxComp" data-step-dir="down" aria-label="Decrease maximum desired"></button>
+                </div>
+              </div>
             </div>
           </div>
 
+          <div class="small muted field-comp-summary" id="compSummary"></div>
           <div class="actions">
             <button class="btn secondary" id="benchmarkBtn" type="button">Apply market median hint</button>
-            <span class="small muted" id="compSummary"></span>
           </div>
         </div>
 
-        <div class="match-card" style="margin-top:12px;">
+        <div class="match-card">
           <h3>Earliest start (required)</h3>
           <div class="grid-2">
             <div>
@@ -126,28 +141,34 @@
                 <option value="custom_date">Choose date</option>
               </select>
             </div>
-            <div id="customStartWrap" style="display:none;">
+            <div id="customStartWrap">
               <label for="customStartDate">Custom start date</label>
-              <input id="customStartDate" class="input" type="date">
+              <input id="customStartDate" class="input glass-date-picker" type="date">
             </div>
           </div>
-          <p class="small muted" style="margin-top:10px;">
+          <p class="small muted">
             Schedule preference (full-time, part-time, shift preference) should be captured in profile enrichment,
             not as a required gate at this step.
           </p>
         </div>
 
-        <div class="actions">
-          <button class="btn success" id="saveBtn" type="button">Save and continue</button>
-          <a class="btn secondary" href="candidate-cv-upload.html">Back</a>
-          <a class="btn" href="candidate-profile-completeness.html">Next screen</a>
+        <div class="actions field-confirm-footer-actions">
+          <a class="btn secondary field-confirm-back" href="candidate-cv-upload.html">Back</a>
+          <button class="btn success field-confirm-save" id="saveBtn" type="button">Save and continue</button>
+          <a class="btn field-confirm-next" href="candidate-profile-completeness.html">Continue</a>
         </div>
       </article>
+      <div class="field-confirm-status-slot">
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+      </div>
     </section>
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
+  <script src="glass-date-picker.js"></script>
+  <script src="glass-select.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script>
     UIFlow.guard("candidate");
     const ROLE_SUGGESTIONS = [
@@ -190,6 +211,7 @@
     const anchorLocation = document.getElementById("anchorLocation");
     const radiusKm = document.getElementById("radiusKm");
     const radiusLabel = document.getElementById("radiusLabel");
+    const radiusMap = document.getElementById("radiusMap");
     const regionChecklist = document.getElementById("regionChecklist");
     const currency = document.getElementById("currency");
     const period = document.getElementById("period");
@@ -199,6 +221,96 @@
     const earliestStartSelect = document.getElementById("earliestStart");
     const customStartWrap = document.getElementById("customStartWrap");
     const customStartDate = document.getElementById("customStartDate");
+    let map = null;
+    let mapMarker = null;
+    let mapCircle = null;
+
+    function updateMapRadius() {
+      if (!mapCircle) return;
+      mapCircle.setRadius(Math.max(1, Number(locationPref.radiusKm || 25)) * 1000);
+      if (mapMarker) {
+        const group = L.featureGroup([mapMarker, mapCircle]);
+        map.fitBounds(group.getBounds().pad(0.2), { animate: false });
+      }
+    }
+
+    async function geocodeAnchor(query) {
+      const q = query.trim();
+      if (!q) return null;
+      const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`;
+      try {
+        const resp = await fetch(url, { headers: { Accept: "application/json" } });
+        if (!resp.ok) return null;
+        const data = await resp.json();
+        const first = Array.isArray(data) ? data[0] : null;
+        if (!first) return null;
+        return {
+          lat: Number(first.lat),
+          lng: Number(first.lon),
+          displayName: first.display_name || q
+        };
+      } catch {
+        return null;
+      }
+    }
+
+    async function syncMapFromAnchor() {
+      if (!map || locationPref.scope !== "radius") return;
+      const resolved = await geocodeAnchor(anchorLocation.value || locationPref.anchor || "");
+      if (!resolved) return;
+
+      const center = [resolved.lat, resolved.lng];
+      if (!mapMarker) {
+        mapMarker = L.marker(center).addTo(map);
+      } else {
+        mapMarker.setLatLng(center);
+      }
+      mapMarker.bindPopup(resolved.displayName);
+
+      if (!mapCircle) {
+        mapCircle = L.circle(center, {
+          radius: Math.max(1, Number(locationPref.radiusKm || 25)) * 1000,
+          color: "#7aa6ff",
+          weight: 1,
+          fillColor: "#6f8cff",
+          fillOpacity: 0.18
+        }).addTo(map);
+      } else {
+        mapCircle.setLatLng(center);
+      }
+
+      const group = L.featureGroup([mapMarker, mapCircle]);
+      map.fitBounds(group.getBounds().pad(0.2), { animate: true });
+    }
+
+    function initRadiusMap() {
+      if (!radiusMap || !window.L) return;
+      map = L.map(radiusMap, {
+        zoomControl: true,
+        scrollWheelZoom: false
+      }).setView([41.8781, -87.6298], 10);
+
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+        maxZoom: 19
+      }).addTo(map);
+
+      // Initial marker/circle for default radius map mode.
+      mapMarker = L.marker([41.8781, -87.6298]).addTo(map);
+      mapCircle = L.circle([41.8781, -87.6298], {
+        radius: Math.max(1, Number(locationPref.radiusKm || 25)) * 1000,
+        color: "#7aa6ff",
+        weight: 1,
+        fillColor: "#6f8cff",
+        fillOpacity: 0.18
+      }).addTo(map);
+
+      if (locationPref.anchor) {
+        syncMapFromAnchor();
+      } else {
+        mapMarker.bindPopup("Chicago, IL");
+      }
+    }
 
     function formatMoney(v) {
       return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(Number(v) || 0);
@@ -288,6 +400,9 @@
     function renderLocationSections() {
       radiusSection.style.display = locationPref.scope === "radius" ? "block" : "none";
       regionSection.style.display = locationPref.scope === "region" ? "block" : "none";
+      if (locationPref.scope === "radius" && map) {
+        setTimeout(() => map.invalidateSize(), 0);
+      }
       if (locationPref.scope === "worldwide") {
         UIFlow.showStatus("success", "Worldwide scope selected.");
       }
@@ -329,9 +444,17 @@
       renderLocationSections();
     });
     anchorLocation.addEventListener("input", () => { locationPref.anchor = anchorLocation.value.trim(); });
+    anchorLocation.addEventListener("blur", syncMapFromAnchor);
+    anchorLocation.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        syncMapFromAnchor();
+      }
+    });
     radiusKm.addEventListener("input", () => {
       locationPref.radiusKm = Number(radiusKm.value);
       radiusLabel.textContent = radiusKm.value;
+      updateMapRadius();
     });
 
     currency.value = compensation.currency || "USD";
@@ -340,6 +463,22 @@
     maxComp.value = compensation.max || 85000;
 
     [minComp, maxComp].forEach((el) => el.addEventListener("input", syncCompFromInputs));
+    document.querySelectorAll(".number-step-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const input = document.getElementById(btn.getAttribute("data-step-target"));
+        if (!input) return;
+
+        const step = Number(input.step) || 1;
+        const min = input.min === "" ? Number.NEGATIVE_INFINITY : Number(input.min);
+        const max = input.max === "" ? Number.POSITIVE_INFINITY : Number(input.max);
+        const current = Number(input.value || 0);
+        const dir = btn.getAttribute("data-step-dir") === "down" ? -1 : 1;
+        const next = Math.min(max, Math.max(min, current + dir * step));
+
+        input.value = String(next);
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+    });
     currency.addEventListener("change", () => { compensation.currency = currency.value; syncCompFromInputs(); });
     period.addEventListener("change", () => { compensation.period = period.value; syncCompFromInputs(); });
 
@@ -446,6 +585,7 @@
     renderRegionChecklist();
     renderLocationSections();
     syncCompFromInputs();
+    initRadiusMap();
     UIFlow.showStatus("loading", "Loading parsed profile fields...");
     setTimeout(() => UIFlow.showStatus("success", "Confirm required fields and continue."), 400);
   </script>

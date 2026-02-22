@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glass Style Showcase – UI Elements</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="glass-style.css">
+</head>
+<body class="glass-theme has-topbar showcase-page">
+  <div class="bg-orb orb-c" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="container">
+      <div class="glass-brand"><span class="glass-brand__strong">job</span><span class="glass-brand__thin">arium</span><span class="glass-brand__tm">TM</span></div>
+      <nav class="nav-links small">
+        <a class="btn secondary" href="#">Account</a>
+        <button class="btn secondary" type="button">Log out</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="layout showcase-layout">
+    <aside class="showcase-nav" aria-label="Style sections">
+      <nav>
+        <a href="#brand">Brand</a>
+        <a href="#typography">Typography</a>
+        <a href="#grids">Grids</a>
+        <a href="#lists">Lists</a>
+        <a href="#table">Table</a>
+        <a href="#mode-switch">Mode switch</a>
+        <a href="#buttons">Buttons</a>
+        <a href="#tabs">Tabs</a>
+        <a href="#cards-images">Cards with images</a>
+        <a href="#accordions">Accordions</a>
+        <a href="#carousel">Carousel</a>
+        <a href="#form-inputs">Form inputs</a>
+        <a href="#select">Select</a>
+        <a href="#checkbox-radio">Checkbox & radio</a>
+        <a href="#date-picker">Date picker</a>
+        <a href="#file-upload">File upload</a>
+        <a href="#range-slider">Range slider</a>
+        <a href="#status-box">Status box</a>
+        <a href="#badge">Badge</a>
+        <a href="#progress-bar">Progress bar</a>
+        <a href="#chips">Chips</a>
+        <a href="#links">Links & text</a>
+        <a href="#actions">Actions</a>
+        <a href="#match-card">Match card</a>
+        <a href="#oauth">OAuth</a>
+      </nav>
+    </aside>
+    <section class="showcase-content container">
+      <h1 class="muted" style="font-size:0.9rem; margin-bottom:8px;">Glass Style Showcase</h1>
+      <p class="small muted" style="margin-bottom:32px;">All UI elements in glass theme. Identify what has glass styling and what may be missing.</p>
+
+      <article id="brand" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Brand</h2>
+        <p class="glass-brand"><span class="glass-brand__strong">job</span><span class="glass-brand__thin">arium</span><span class="glass-brand__tm">TM</span></p>
+      </article>
+
+      <article id="typography" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Typography</h2>
+        <h1 style="margin:0 0 12px;">Heading 1</h1>
+        <h2 style="margin:0 0 12px;">Heading 2</h2>
+        <h3 style="margin:0 0 12px;">Heading 3</h3>
+        <h4 style="margin:0 0 12px;">Heading 4</h4>
+        <h5 style="margin:0 0 12px;">Heading 5</h5>
+        <p style="margin:12px 0 0;">Body paragraph. The quick brown fox jumps over the lazy dog.</p>
+        <p class="small muted" style="margin-top:8px;">Small muted text for captions and helper content.</p>
+        <p><code style="padding:2px 6px; border-radius:6px; font-size:0.9em;">Inline code</code> in a sentence.</p>
+        <pre style="margin:12px 0 0; padding:12px; border-radius:10px; overflow:auto; font-size:0.85rem;"><code>// Code block
+const greeting = "Hello";
+console.log(greeting);</code></pre>
+        <blockquote style="margin:16px 0 0; padding-left:16px; border-left:4px solid; font-style:italic;">
+          A blockquote for longer citations or callouts.
+        </blockquote>
+      </article>
+
+      <article id="grids" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Grids</h2>
+        <p class="small muted" style="margin-bottom:16px;">2-, 3-, and 4-column layouts</p>
+        <div class="grid-2" style="gap:12px; margin-bottom:16px;">
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Grid 2 col 1</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Grid 2 col 2</div>
+        </div>
+        <div class="grid-3" style="gap:12px; margin-bottom:16px;">
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 1</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 2</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 3</div>
+        </div>
+        <div class="grid three" style="gap:12px; margin-bottom:16px;">
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 1</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 2</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 3</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 4</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 5</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">Col 6</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px;">
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">4-col 1</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">4-col 2</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">4-col 3</div>
+          <div style="padding:12px; border-radius:10px; background:rgba(255,255,255,0.04);">4-col 4</div>
+        </div>
+      </article>
+
+      <article id="lists" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Lists</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+          <div>
+            <p class="small muted" style="margin-bottom:8px;">Unordered</p>
+            <ul style="margin:0; padding-left:20px;">
+              <li>First item</li>
+              <li>Second item</li>
+              <li>Third item with <a href="#">link</a></li>
+            </ul>
+          </div>
+          <div>
+            <p class="small muted" style="margin-bottom:8px;">Ordered</p>
+            <ol style="margin:0; padding-left:20px;">
+              <li>Step one</li>
+              <li>Step two</li>
+              <li>Step three</li>
+            </ol>
+          </div>
+        </div>
+      </article>
+
+      <article id="table" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Table</h2>
+        <table class="table" style="margin-top:12px;">
+          <thead>
+            <tr><th>Name</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Item A</td><td><span class="badge success">Active</span></td><td>2025-01</td></tr>
+            <tr><td>Item B</td><td><span class="badge">Draft</span></td><td>2025-02</td></tr>
+            <tr><td>Item C</td><td><span class="badge warning">Pending</span></td><td>2025-03</td></tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article id="mode-switch" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Mode switch</h2>
+        <div class="glass-mode-switch" data-mode="login">
+          <span class="glass-mode-blob" aria-hidden="true"><span class="glass-mode-blob-core"></span></span>
+          <button type="button" class="btn">Option A</button>
+          <button type="button" class="btn secondary">Option B</button>
+        </div>
+      </article>
+
+      <article id="buttons" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Buttons</h2>
+        <div class="actions" style="flex-wrap:wrap; gap:12px;">
+          <button type="button" class="btn">Primary</button>
+          <button type="button" class="btn secondary">Secondary</button>
+          <button type="button" class="btn ghost">Ghost</button>
+          <button type="button" class="btn success">Success</button>
+          <button type="button" class="btn danger">Danger</button>
+        </div>
+      </article>
+
+      <article id="tabs" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Tabs</h2>
+        <div class="cv-intake-tabs" role="tablist">
+          <button type="button" class="btn secondary is-active" role="tab">Tab 1</button>
+          <button type="button" class="btn secondary" role="tab">Tab 2</button>
+          <button type="button" class="btn secondary" role="tab">Tab 3</button>
+        </div>
+      </article>
+
+      <article id="cards-images" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Cards with images</h2>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <div class="glass-profile-card">
+            <div class="glass-profile-card__avatar" aria-hidden="true"></div>
+            <h3 style="margin:8px 0 4px;">Jane Doe</h3>
+            <p class="small muted">Senior Developer</p>
+          </div>
+          <div class="glass-id-card">
+            <div class="glass-id-card__photo" aria-hidden="true"></div>
+            <div class="glass-id-card__body">
+              <p class="small muted">Employee ID</p>
+              <p style="font-weight:600; margin:0;">EMP-2025-0042</p>
+              <p class="small muted" style="margin-top:8px;">Valid through 12/2027</p>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article id="accordions" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Accordions</h2>
+        <div class="glass-accordion">
+          <details>
+            <summary>Section one</summary>
+            <p class="small muted" style="margin:12px 0 0;">Content for the first section. Expandable and collapsible.</p>
+          </details>
+          <details>
+            <summary>Section two</summary>
+            <p class="small muted" style="margin:12px 0 0;">Content for the second section.</p>
+          </details>
+          <details>
+            <summary>Section three</summary>
+            <p class="small muted" style="margin:12px 0 0;">Content for the third section.</p>
+          </details>
+        </div>
+      </article>
+
+      <article id="carousel" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Cards carousel</h2>
+        <div class="glass-carousel">
+          <button type="button" class="glass-carousel__prev" aria-label="Previous">‹</button>
+          <div class="glass-carousel__track">
+            <div class="glass-carousel__card"><span>Card 1</span></div>
+            <div class="glass-carousel__card"><span>Card 2</span></div>
+            <div class="glass-carousel__card"><span>Card 3</span></div>
+            <div class="glass-carousel__card"><span>Card 4</span></div>
+            <div class="glass-carousel__card"><span>Card 5</span></div>
+          </div>
+          <button type="button" class="glass-carousel__next" aria-label="Next">›</button>
+        </div>
+      </article>
+
+      <article id="form-inputs" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Form inputs</h2>
+        <div class="grid-2" style="gap:20px;">
+          <div>
+            <label for="ex1">Text input</label>
+            <input id="ex1" class="input" type="text" placeholder="Placeholder">
+          </div>
+          <div>
+            <label for="ex2">Email</label>
+            <input id="ex2" class="input" type="email" placeholder="you@example.com">
+          </div>
+          <div>
+            <label for="ex3">Password</label>
+            <input id="ex3" class="input" type="password" placeholder="••••••••">
+          </div>
+          <div>
+            <label for="ex4">Number</label>
+            <input id="ex4" class="input" type="number" placeholder="0">
+          </div>
+        </div>
+        <div style="margin-top:16px;">
+          <label for="ex5">Textarea</label>
+          <textarea id="ex5" class="input" placeholder="Multi-line text..." rows="3"></textarea>
+        </div>
+      </article>
+
+      <article id="select" class="card glass-card field-confirm-card" style="margin-bottom:24px;">
+        <h2>Select</h2>
+        <div class="grid-2" style="gap:20px;">
+          <div>
+            <label for="exSel">Select</label>
+            <select id="exSel">
+              <option>Option A</option>
+              <option>Option B</option>
+              <option>Option C</option>
+            </select>
+          </div>
+        </div>
+      </article>
+
+      <article id="checkbox-radio" class="card glass-card field-confirm-card" style="margin-bottom:24px;">
+        <h2>Checkbox & radio</h2>
+        <label class="checkbox-row">
+          <input type="checkbox" id="exCb1">
+          <span>Checkbox option</span>
+        </label>
+        <label class="checkbox-row" style="margin-top:10px;">
+          <input type="checkbox" id="exCb2" checked>
+          <span>Checked</span>
+        </label>
+        <label class="radio-row" style="margin-top:10px;">
+          <input type="radio" name="exRadio" id="exRa1">
+          <span>Radio A</span>
+        </label>
+        <label class="radio-row">
+          <input type="radio" name="exRadio" id="exRa2" checked>
+          <span>Radio B</span>
+        </label>
+      </article>
+
+      <article id="date-picker" class="card glass-card field-confirm-card" style="margin-bottom:24px;">
+        <h2>Date picker</h2>
+        <label for="exDate">Custom start date</label>
+        <input id="exDate" class="input glass-date-picker" type="date">
+      </article>
+
+      <article id="file-upload" class="card glass-card" style="margin-bottom:24px;">
+        <h2>File upload</h2>
+        <div class="file-dropzone" role="button" tabindex="0">
+          <p class="file-dropzone-title">Drag and drop files here or click to upload</p>
+          <p class="small muted">PDF, DOC, DOCX</p>
+        </div>
+      </article>
+
+      <article id="range-slider" class="card glass-card field-confirm-card" style="margin-bottom:24px;">
+        <h2>Range slider</h2>
+        <label for="exRange">Radius (km): <span id="exRangeVal">25</span></label>
+        <input id="exRange" type="range" min="5" max="300" step="5" value="25">
+      </article>
+
+      <article id="status-box" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Status box</h2>
+        <div class="glass-status-slot">
+          <div class="status-box loading">Loading…</div>
+        </div>
+        <div class="status-box success" style="margin-top:8px;">Success message</div>
+        <div class="status-box error-recoverable" style="margin-top:8px;">Error (recoverable)</div>
+        <div class="status-box error-blocking" style="margin-top:8px;">Error (blocking)</div>
+        <div class="status-box info" style="margin-top:8px;">Info message</div>
+        <div class="status-box empty" style="margin-top:8px;">Empty state</div>
+      </article>
+
+      <article id="badge" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Badge</h2>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <span class="badge">Default</span>
+          <span class="badge success">Success</span>
+          <span class="badge warning">Warning</span>
+          <span class="badge info">Info</span>
+        </div>
+      </article>
+
+      <article id="progress-bar" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Progress bar</h2>
+        <div class="progress-track">
+          <div class="progress-value" style="width:65%;"></div>
+        </div>
+        <p class="small muted" style="margin-top:6px;">65% complete</p>
+      </article>
+
+      <article id="chips" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Chips</h2>
+        <div class="chip-wrap">
+          <span class="chip">Chip 1</span>
+          <span class="chip">Chip 2</span>
+          <span class="chip">Chip 3</span>
+        </div>
+      </article>
+
+      <article id="links" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Links & text</h2>
+        <p><a href="#">Link</a></p>
+        <p class="muted">Muted text</p>
+        <p class="small muted">Small muted</p>
+      </article>
+
+      <article id="actions" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Actions (button groups)</h2>
+        <div class="actions">
+          <button type="button" class="btn secondary">Cancel</button>
+          <button type="button" class="btn primary">Save</button>
+        </div>
+      </article>
+
+      <article id="match-card" class="card glass-card" style="margin-bottom:24px;">
+        <h2>Match card (nested)</h2>
+        <div class="match-card">
+          <h3>Section title</h3>
+          <p class="small muted">Section description in a match-card.</p>
+        </div>
+      </article>
+
+      <article id="oauth" class="card glass-card" style="margin-bottom:24px;">
+        <h2>OAuth buttons</h2>
+        <button type="button" class="btn ghost oauth-btn google">
+          <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.35 11.1h-9.18v2.92h5.27c-.24 1.5-1.8 4.4-5.27 4.4-3.17 0-5.75-2.63-5.75-5.87s2.58-5.87 5.75-5.87c1.8 0 3 .77 3.69 1.43l2.52-2.46C16.77 4.15 14.67 3.2 12.17 3.2 7.2 3.2 3.2 7.3 3.2 12.35s4 9.15 8.97 9.15c5.18 0 8.6-3.63 8.6-8.75 0-.59-.07-1.04-.15-1.65z"/></svg>
+          <span>Continue with Google</span>
+        </button>
+        <button type="button" class="btn ghost oauth-btn linkedin" style="margin-top:10px;">
+          <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm-9.5 6.5H6.75V18h2.75V9.5zM8.13 6.3a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM18 12.6c0-2.67-1.43-3.9-3.34-3.9-1.54 0-2.23.84-2.61 1.43V9.5H9.31V18h2.74v-4.2c0-1.11.21-2.19 1.58-2.19 1.35 0 1.37 1.26 1.37 2.26V18H18v-5.4z"/></svg>
+          <span>Continue with LinkedIn</span>
+        </button>
+      </article>
+
+      <p class="small muted" style="margin-bottom:48px;">&copy; 2026 jobarium.com</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+  <script src="glass-date-picker.js"></script>
+  <script src="glass-select.js"></script>
+  <script>
+    document.querySelectorAll(".showcase-nav a[href^='#']").forEach((a) => {
+      a.addEventListener("click", (e) => {
+        const id = a.getAttribute("href");
+        if (!id || id === "#") return;
+        const target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+    document.getElementById("exRange")?.addEventListener("input", (e) => {
+      const val = document.getElementById("exRangeVal");
+      if (val) val.textContent = e.target.value;
+    });
+
+    const modeSwitch = document.querySelector(".glass-mode-switch");
+    if (modeSwitch) {
+      const buttons = modeSwitch.querySelectorAll(".btn");
+      buttons.forEach((btn, i) => {
+        btn.addEventListener("click", () => {
+          const prevMode = modeSwitch.dataset.mode;
+          const mode = i === 0 ? "login" : "signup";
+          if (prevMode === mode) return;
+          modeSwitch.dataset.mode = mode;
+          modeSwitch.classList.remove("moving-left", "moving-right");
+          modeSwitch.classList.add(mode === "signup" ? "moving-right" : "moving-left");
+          buttons.forEach((b, j) => {
+            b.classList.toggle("secondary", j !== i);
+          });
+          setTimeout(() => modeSwitch.classList.remove("moving-left", "moving-right"), 320);
+        });
+      });
+    }
+
+    document.querySelectorAll(".cv-intake-tabs [role=tab]").forEach((btn, i) => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".cv-intake-tabs [role=tab]").forEach((b, j) =>
+          b.classList.toggle("is-active", j === i));
+      });
+    });
+
+    const carousel = document.querySelector(".glass-carousel");
+    if (carousel) {
+      const track = carousel.querySelector(".glass-carousel__track");
+      const prev = carousel.querySelector(".glass-carousel__prev");
+      const next = carousel.querySelector(".glass-carousel__next");
+      const cardWidth = 176;
+      prev?.addEventListener("click", () => {
+        track?.scrollBy({ left: -cardWidth, behavior: "smooth" });
+      });
+      next?.addEventListener("click", () => {
+        track?.scrollBy({ left: cardWidth, behavior: "smooth" });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -375,14 +375,25 @@ function getEmployerPacket() {
 function showStatus(kind, message) {
   const el = document.querySelector("[data-status]");
   if (!el) return;
+  window.clearTimeout(showStatus._fadeTimer);
+  window.clearTimeout(showStatus._hideTimer);
   el.className = `status-box ${kind}`;
   el.textContent = message;
+  el.classList.remove("fade-out");
   el.classList.remove("hidden");
+  showStatus._fadeTimer = setTimeout(() => {
+    el.classList.add("fade-out");
+  }, 2700);
+  showStatus._hideTimer = setTimeout(() => {
+    hideStatus();
+  }, 3000);
 }
 
 function hideStatus() {
   const el = document.querySelector("[data-status]");
   if (!el) return;
+  window.clearTimeout(showStatus._fadeTimer);
+  window.clearTimeout(showStatus._hideTimer);
   el.className = "status-box hidden";
   el.textContent = "";
 }

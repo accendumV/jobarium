@@ -5,41 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Candidate - CV Upload</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="glass-style.css">
 </head>
-<body>
+<body class="glass-theme has-topbar">
+  <div class="bg-orb orb-c" aria-hidden="true"></div>
   <header class="topbar">
     <div class="container">
-      <div class="brand">Jobarium Candidate Flow</div>
+      <div class="glass-brand"><span class="glass-brand__strong">job</span><span class="glass-brand__thin">arium</span><span class="glass-brand__tm">TM</span></div>
       <nav class="nav-links small">
-        <a href="landing.html">Landing</a>
-        <a href="candidate-onboarding-entry.html">Onboarding Entry</a>
-        <a href="candidate-match-home.html">Match Home</a>
-        <a href="privacy-data-rights.html">Privacy and Data Rights</a>
-        <button class="btn secondary" onclick="UIFlow.resetFlow()">Reset flow</button>
+        <a class="btn secondary" href="candidate-profile-completeness.html">Account</a>
+        <button class="btn secondary" onclick="UIFlow.resetFlow()">Log out</button>
       </nav>
     </div>
   </header>
 
   <main class="layout">
     <section class="container">
-      <article class="card" style="max-width: 900px;">
+      <article class="card glass-card glass-upload-card">
         <h1>CAND-003: CV Upload or Import</h1>
         <p class="muted">Choose one intake path: upload CV, paste plain-text experience, or use guided constructor.</p>
 
-        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+        <div class="cv-intake-tabs" role="tablist" aria-label="CV intake options">
+          <button class="btn secondary is-active" type="button" role="tab" aria-selected="true" id="tabOptionA" data-tab-target="optionA">Option A</button>
+          <button class="btn secondary" type="button" role="tab" aria-selected="false" id="tabOptionB" data-tab-target="optionB">Option B</button>
+          <button class="btn secondary" type="button" role="tab" aria-selected="false" id="tabOptionC" data-tab-target="optionC">Option C</button>
+        </div>
 
-        <div class="match-card">
+        <div id="optionA" class="match-card cv-intake-panel is-active" role="tabpanel" aria-labelledby="tabOptionA">
           <h3>Option A: Upload CV file</h3>
-          <label for="cvFile">Choose CV file</label>
-          <input id="cvFile" class="input" type="file" accept=".pdf,.doc,.docx">
+          <div id="cvDropzone" class="file-dropzone" role="button" tabindex="0" aria-label="Drag and drop CV file or click to upload">
+            <input id="cvFile" class="input file-input-hidden" type="file" accept=".pdf,.doc,.docx">
+            <p class="file-dropzone-title">Drag and drop files here or click to upload</p>
+            <p class="small muted" id="cvDropzoneMeta">PDF, DOC, DOCX</p>
+          </div>
 
-          <div class="actions">
-            <button class="btn" id="uploadBtn" type="button">Upload and parse</button>
-            <button class="btn secondary" id="linkedinBtn" type="button">Import from LinkedIn</button>
+          <div class="actions cv-upload-actions">
+            <button class="btn secondary oauth-btn linkedin" id="linkedinBtn" type="button">
+              <svg class="oauth-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="currentColor" d="M19 3A2 2 0 0 1 21 5v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm-9.5 6.5H6.75V18h2.75V9.5zM8.13 6.3a1.6 1.6 0 1 0 0 3.2 1.6 1.6 0 0 0 0-3.2zM18 12.6c0-2.67-1.43-3.9-3.34-3.9-1.54 0-2.23.84-2.61 1.43V9.5H9.31V18h2.74v-4.2c0-1.11.21-2.19 1.58-2.19 1.35 0 1.37 1.26 1.37 2.26V18H18v-5.4z"/>
+              </svg>
+              <span>Import from LinkedIn</span>
+            </button>
+            <button class="btn primary" id="uploadBtn" type="button">Upload and parse</button>
           </div>
         </div>
 
-        <div class="match-card" style="margin-top:12px;">
+        <div id="optionB" class="match-card cv-intake-panel cv-intake-panel-spaced" role="tabpanel" aria-labelledby="tabOptionB">
           <h3>Option B: Paste plain text profile</h3>
           <p class="small muted">Paste your role history/skills in plain text. We will parse into canonical structure.</p>
           <textarea id="plainTextInput" class="input" placeholder="Example:&#10;Field Service Supervisor at NorthStar Services (2021-present)&#10;Led 12 technicians...&#10;Skills: HVAC diagnostics, PM, dispatch..."></textarea>
@@ -48,7 +59,7 @@
           </div>
         </div>
 
-        <div class="match-card" style="margin-top:12px;">
+        <div id="optionC" class="match-card cv-intake-panel cv-intake-panel-spaced" role="tabpanel" aria-labelledby="tabOptionC">
           <h3>Option C: Guided constructor</h3>
           <p class="small muted">No CV and no plain text ready? Build step-by-step.</p>
           <div class="actions">
@@ -56,15 +67,18 @@
           </div>
         </div>
 
-        <div class="status-box info" style="margin-top:14px;">
+        <p class="small muted cv-upload-note">
           Accepted formats: PDF, DOC, DOCX. All 3 options end in the same canonical CV model.
-        </div>
+        </p>
 
-        <div class="actions" style="margin-top:18px;">
+        <div class="actions page-nav-actions cv-upload-footer-actions">
           <a class="btn secondary" href="candidate-onboarding-entry.html">Back</a>
-          <a class="btn" href="candidate-field-confirmation.html">Continue</a>
+          <a class="btn primary" href="candidate-field-confirmation.html">Continue</a>
         </div>
       </article>
+      <div class="cv-upload-status-slot">
+        <div class="status-box hidden" data-status role="status" aria-live="polite"></div>
+      </div>
     </section>
   </main>
 
@@ -74,6 +88,62 @@
     UIFlow.guard("candidate");
     const fileInput = document.getElementById("cvFile");
     const plainTextInput = document.getElementById("plainTextInput");
+    const cvDropzone = document.getElementById("cvDropzone");
+    const cvDropzoneMeta = document.getElementById("cvDropzoneMeta");
+    const tabButtons = Array.from(document.querySelectorAll("[data-tab-target]"));
+    const tabPanels = Array.from(document.querySelectorAll(".cv-intake-panel"));
+
+    function setActiveIntakeTab(targetId) {
+      tabButtons.forEach((btn) => {
+        const isActive = btn.getAttribute("data-tab-target") === targetId;
+        btn.classList.toggle("is-active", isActive);
+        btn.setAttribute("aria-selected", String(isActive));
+      });
+      tabPanels.forEach((panel) => {
+        panel.classList.toggle("is-active", panel.id === targetId);
+      });
+    }
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => setActiveIntakeTab(btn.getAttribute("data-tab-target")));
+    });
+
+    function updateCVFileMeta() {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) {
+        cvDropzone.classList.remove("has-file");
+        cvDropzoneMeta.textContent = "PDF, DOC, DOCX";
+        return;
+      }
+      cvDropzone.classList.add("has-file");
+      cvDropzoneMeta.textContent = file.name;
+    }
+
+    cvDropzone.addEventListener("click", () => fileInput.click());
+    cvDropzone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    cvDropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      cvDropzone.classList.add("is-dragover");
+    });
+    cvDropzone.addEventListener("dragleave", () => {
+      cvDropzone.classList.remove("is-dragover");
+    });
+    cvDropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      cvDropzone.classList.remove("is-dragover");
+      const dropped = e.dataTransfer && e.dataTransfer.files;
+      if (!dropped || !dropped.length) return;
+      const dt = new DataTransfer();
+      dt.items.add(dropped[0]);
+      fileInput.files = dt.files;
+      fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    fileInput.addEventListener("change", updateCVFileMeta);
 
     document.getElementById("uploadBtn").addEventListener("click", () => {
       const file = fileInput.files && fileInput.files[0];
@@ -154,6 +224,14 @@
 
     const s = UIFlow.readState();
     plainTextInput.value = s.candidate.onboarding.plainTextDescription || "";
+    updateCVFileMeta();
+    if (s.candidate.onboarding.intakeMethod === "plain_text") {
+      setActiveIntakeTab("optionB");
+    } else if (s.candidate.onboarding.intakeMethod === "constructor") {
+      setActiveIntakeTab("optionC");
+    } else {
+      setActiveIntakeTab("optionA");
+    }
     if (s.candidate.onboarding.parseStatus === "completed") {
       UIFlow.showStatus("success", "You already have parsed profile data. Continue.");
     } else {
