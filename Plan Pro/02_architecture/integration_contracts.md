@@ -28,6 +28,7 @@
 - `billing.usage.updated`
 
 ## Contract Rules
+- TODO: clarify versioning strategy across HTTP vs events. HTTP API is currently unversioned (single deployment), while events require `event_version`. Decide and document the unified versioning approach later.
 - Non-breaking additive fields stay on same version.
 - Breaking change requires new version + migration note + deprecation window.
 - Invalid payloads go to DLQ; no partial processing.
